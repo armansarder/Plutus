@@ -142,7 +142,7 @@ def run_once():
         if source_status == 200:
             print('Authenticated Nessie check: HTTP 200.', flush=True)
         print('Starting http://127.0.0.1:8080/dashboard', flush=True)
-        children.append(subprocess.Popen([node, str(vite), 'dev', '--host', '127.0.0.1',
+        children.append(subprocess.Popen([node, str(vite), 'dev', '--host', '0.0.0.0',
                                           '--port', '8080', '--strictPort'], cwd=ROOT / 'frontend', env=frontend))
         while all(child.poll() is None for child in children):
             time.sleep(0.5)

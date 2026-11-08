@@ -16,7 +16,7 @@ const options = process.argv.slice(2);
 let supported = true;
 for (let i = 0; i < options.length; i += 2) {
   if (!((options[i] === "--port" && options[i + 1] === "8080") ||
-        (options[i] === "--host" && ["127.0.0.1", "localhost"].includes(options[i + 1])))) supported = false;
+        (options[i] === "--host" && ["127.0.0.1", "localhost", "0.0.0.0"].includes(options[i + 1])))) supported = false;
 }
 if (!supported) {
   console.error("npm run dev starts both services on 8000/8080. Use npm run dev:frontend -- <Vite options> for frontend-only work.");
