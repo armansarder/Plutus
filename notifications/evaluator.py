@@ -80,7 +80,8 @@ def evaluate_purchase(financial_data: FinancialData, item: dict[str, Any]) -> di
     purchase_date = start
     if item.get("purchase_date"):
         try:
-            purchase_date = datetime.strptime(item["purchase_date"], "%Y-%m-%d").date()
+            parsed = datetime.strptime(item["purchase_date"], "%Y-%m-%d").date()
+            purchase_date = max(start, parsed)
         except ValueError:
             purchase_date = start
     
