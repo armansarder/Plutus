@@ -219,3 +219,28 @@ def test_nessie_transport_is_get_only_and_empty_404_is_explicit(monkeypatch):
     with pytest.raises(ValueError):
         read_json_https(DEFAULT_NESSIE_BASE_URL + '/accounts/test', allowed_hosts=('prod-api.nessieisreal.com',), transport=httpx.MockTransport(handler))
     assert calls == ['GET', 'GET']
+
+
+def test_council_uses_authorized_nessie_adapter_and_same_chart_snapshot(nessie, monkeypatch):
+    from nemotron_agent.council_store import session_signature
+    monkeypatch.setenv('PLUTUS_COUNCIL_ENABLED', '1')
+    session = 'c' * 64
+    headers = {'Authorization': 'Bearer ' + TOKEN,
+               'X-Plutus-Session': session + '.' + session_signature(session, TOKEN)}
+    with TestClient(app_for_customer()) as client:
+        id = client.post('/api/v2/conversations', json={'role': 'council'}, headers=headers).json()['id']
+        response = client.post(f'/api/v2/conversations/{id}/messages', json={
+            'request_key': 'nessie_council_123', 'message': 'Compare this purchase with waiting.',
+            'allow_model': False, 'analysis': {'purchase_amount': '100.00',
+                'purchase_date': nessie['day'](1), 'allow_model': False}}, headers=headers)
+        assert response.status_code == 200
+        result = response.json()
+        assert result['mode'] == 'deterministic_only'
+        assert result['analysis']['provenance']['source'] == 'nessie_sandbox'
+        assert result['chart']['snapshot_id'] == result['snapshot_id']
+        assert all(s['forecast']['customer_id'] == CUSTOMER for s in result['analysis']['scenarios'])
+        assert all(s['forecast']['starting_balance'] == '1250.25' for s in result['analysis']['scenarios'])
+        assert result['analysis']['stress_tests_total'] == 1
+        assert result['analysis']['scenarios'][1]['forecast']['ending_balance'] == '1025.25'
+        assert not result['analysis']['scenarios'][2]['applicable']
+    assert len(nessie['calls']) == 7

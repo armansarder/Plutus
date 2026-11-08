@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { agentAdapter } from "@/services/agent";
 import type { AgentResponse } from "@/types/agent";
 import { DATA_MODE } from "@/services/config";
+import { COUNCIL_UI_ENABLED } from "@/services/council";
+import { TalkWorkspace } from "@/components/chat/TalkWorkspace";
 import { BackendTalk } from "@/components/chat/BackendTalk";
 
 export const Route = createFileRoute("/talk")({
@@ -35,7 +37,7 @@ function speechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 }
 
 function Talk() {
-  return DATA_MODE === "remote" ? <BackendTalk /> : <DemoTalk />;
+  return DATA_MODE === "remote" ? (COUNCIL_UI_ENABLED ? <TalkWorkspace /> : <BackendTalk />) : <DemoTalk />;
 }
 function DemoTalk() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
