@@ -13,6 +13,8 @@ export const NOTIFICATION_PROXY_PATHS = [
   "/api/notifications/history",
   "/api/notifications/state",
   "/api/notifications/check",
+  "/api/notifications/cash-plan",
+  "/api/notifications/budget",
   "/api/notifications/operator/spend",
   "/api/notifications/operator/advance-payday",
   "/api/notifications/operator/reset",
@@ -63,7 +65,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
   const plan = url.pathname === "/api/cash-plan/preview";
   const post = plan || agent || ["/api/simulate", "/api/compare", "/api/forecast"].includes(url.pathname);
   if (!isNotification && request.method !== (post ? "POST" : "GET")) return error(405, "Method not allowed");
-  if (isNotification && !["GET", "POST", "DELETE"].includes(request.method)) return error(405, "Method not allowed");
+  if (isNotification && !["GET", "POST", "PUT", "DELETE"].includes(request.method)) return error(405, "Method not allowed");
   if (url.pathname === "/api/history") {
     const keys = [...url.searchParams.keys()];
     if (new Set(keys).size !== keys.length || keys.some(k => !["month", "months"].includes(k)) ||
@@ -72,7 +74,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
   } else if (!isNotification && url.search) return error(400, "Query parameters are not supported");
   if (request.headers.get("sec-fetch-site") === "cross-site" || (request.headers.get("origin") && request.headers.get("origin") !== url.origin)) return error(403, "Same-origin access required");
   let body: string | undefined;
-  if (post || (isNotification && (request.method === "POST" || request.method === "DELETE"))) {
+  if (post || (isNotification && (request.method === "POST" || request.method === "PUT" || request.method === "DELETE"))) {
     const hasBody = request.headers.get("content-length") && Number(request.headers.get("content-length")) > 0;
     if (hasBody || post) {
       if (request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() !== "application/json" || ![null, "identity"].includes(request.headers.get("content-encoding"))) return error(415, "Use uncompressed application/json");
