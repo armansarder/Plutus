@@ -150,8 +150,8 @@ def run_agent(request, snapshot, source, provider=None):
         trace.append({'tool': 'decision', 'status': 'fallback', 'initiated_by': 'server'})
     minimum = results['purchase']['forecast']['minimum_balance']
     summaries = {
-        'consider_purchase': 'The purchase maintains your reserve in the baseline purchase and both stress tests.',
-        'consider_waiting': 'Consider a later purchase date; the proposed purchase does not maintain your reserve in every test.',
+        'consider_purchase': f"The purchase maintains your reserve under expected conditions and all {len(stress)} applicable stress test{'s' if len(stress) != 1 else ''}.",
+        'consider_waiting': ('The selected purchase maintains your reserve under expected conditions, but not every applicable stress test. Consider delaying or reducing it; listed safe dates are tested under ordinary conditions only.' if purchase_ok else f'Buying on {safe[0]} maintains your reserve under ordinary conditions; the selected date does not. That later date has not been stress-tested.' if safe else 'No ordinary reserve-preserving date was found.'),
         'reserve_at_risk': 'No tested purchase date maintains your reserve throughout this forecast.'}
     summary = (summaries[verdict] + f' Lowest projected purchase balance: {minimum} {snapshot.currency}. '
                'These are conditional simulations; no payment was executed.')

@@ -5,6 +5,8 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Personal .env.local flags must not change the v1 regression-test baseline.
+    env: { VITE_COUNCIL_ENABLED: "false" },
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],

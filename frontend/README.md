@@ -216,3 +216,10 @@ to four sequential 12-second provider calls. Other financial routes keep their
 12-second deadline. General budgeting/savings chat and free-text purchase extraction
 still require future backend capabilities; this integration does not pretend to
 provide them.
+
+## Optional council v2
+
+Set `VITE_COUNCIL_ENABLED=true` with remote mode and enable the backend local council
+to add Council, Budget, Risk and Simulator chats alongside original purchase analysis.
+See [COUNCIL.md](../nemotron_agent/COUNCIL.md) for configuration, supported calculations,
+session isolation, handoffs, memory expiry, cancellation and rollback.

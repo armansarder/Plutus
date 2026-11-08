@@ -18,3 +18,9 @@ python -m uvicorn nemotron_agent.main:app --host 127.0.0.1 --port 8000
 Defaults to explicitly labeled synthetic demo data and loopback access. Configure
 the service bearer token and frontend origin before connecting the UI. Never
 commit keys. No payment or external message is executed.
+
+## Optional financial council and specialist chats
+
+See [nemotron_agent/COUNCIL.md](nemotron_agent/COUNCIL.md) for the opt-in v2 council,
+four specialist chats, signed demo sessions, chart evidence, startup and rollback.
+Existing purchase analysis and financial routes remain compatible.

@@ -565,3 +565,31 @@ This council plan is a blueprint. Do not deploy additional agents, change curren
 runtime prompts, create API routes, install frameworks, alter financial math, or
 start persistence/hosting while carrying out the documentation request. Future
 implementation must keep claims of completed features aligned with tested behavior.
+
+
+## Council v2 implementation update
+
+The council blueprint above now has an opt-in local implementation. See
+`nemotron_agent/COUNCIL.md` for tested behavior and rollout. Runtime roles/prompts are
+in `council_prompts.py`; contracts in `council_contracts.py`; bounded async workflow
+in `council.py`; session-owned memory in `council_store.py`; routes in `council_api.py`.
+The frontend uses `councilProxy.server.ts`, `services/council.ts`, `types/council.ts`
+and `CouncilWorkspace.tsx`. Both flags default off; v1 is preserved. This update
+supersedes "design only" for those implemented pieces, not the optional ML/debt/
+production-auth/persistence proposals. Do not claim proposed endpoints such as
+independent retained run polling exist; conversation history is the run record.
+Role model calls select schema-constrained verified findings; engine templates own
+numerical prose. Common key patterns are redacted; arbitrary personal text is not
+guaranteed anonymized. Production council activation is blocked pending real user
+authentication. Keep generated council JSON contracts and UI validators synchronized.
+
+
+### User-facing response clarity
+
+Every completed purchase-review agent must give a direct, evidence-supported
+`recommendation` and a brief plain-language `summary` explaining its choice. Do not
+show internal position enums, raw evidence hashes, generic methodology boilerplate,
+or duplicate review rounds in the primary answer. Show the latest review per role;
+retain earlier rounds and references behind expandable evidence. Budget/Risk may
+disagree when ordinary affordability and stress resilience differ. Do not promise
+that a date tested only under expected income will survive delayed income.
