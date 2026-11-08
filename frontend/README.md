@@ -26,6 +26,12 @@ Open your project in the [Lovable editor](https://lovable.dev) and keep building
 
 ## Development
 
+`npm run dev` now starts both the local Nessie API and website with the existing
+backend `.env` files. It also works from the repository root. Use
+http://127.0.0.1:8080/dashboard; no token copying is needed. Install Python backend
+dependencies first. Use `npm run dev:frontend -- --port 8080` only when deliberately
+managing the backend and server-side environment separately.
+
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
@@ -216,3 +222,23 @@ to four sequential 12-second provider calls. Other financial routes keep their
 12-second deadline. General budgeting/savings chat and free-text purchase extraction
 still require future backend capabilities; this integration does not pretend to
 provide them.
+
+## Optional council v2
+
+Set `VITE_COUNCIL_ENABLED=true` with remote mode and enable the backend local council
+to add Council, Budget, Risk and Simulator chats alongside original purchase analysis.
+See [COUNCIL.md](../nemotron_agent/COUNCIL.md) for configuration, supported calculations,
+session isolation, handoffs, memory expiry, cancellation and rollback.
+
+### Council chart readability
+
+Council timelines default to separate scenario panels on a shared date/dollar scale.
+Each panel shows the engine-provided lowest balance/date and final balance. Focus
+mode enlarges one scenario; comparison with a dashed no-purchase baseline is opt-in.
+The cash-buffer line, zero line and event minimum markers remain intact. Exact values
+are available as tables. This is a frontend presentation change; financial results
+and backend contracts are unchanged.
+
+Design references:
+- https://www.datawrapper.de/blog/what-to-consider-when-creating-small-multiple-line-charts
+- https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-charts/

@@ -94,7 +94,7 @@ function DemoAlerts() {
   return (
     <div>
       <PageHeading eyebrow="Alerts" title="A gentle heads-up." description="These come from your plan and cash forecast — not just your balance. Nothing here is random." />
-      <p className="mb-6 text-sm text-muted-foreground">Demo alerts · Based on synthetic data</p>
+      <p className="mb-6 text-sm text-muted-foreground">Sample alerts · Based on synthetic data</p>
       {alerts.length === 0 ? (
         <p className="panel flex items-center gap-3 p-6 text-sm text-muted-foreground"><Bell className="h-5 w-5" aria-hidden /> Nothing needs your attention right now.</p>
       ) : (

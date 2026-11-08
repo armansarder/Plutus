@@ -1,0 +1,7 @@
+{
+  "name": "plutus-local",
+  "private": true,
+  "scripts": {
+    "dev": "node frontend/scripts/dev.mjs"
+  }
+}

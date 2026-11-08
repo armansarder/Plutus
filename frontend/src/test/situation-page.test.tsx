@@ -16,12 +16,14 @@ it("does not preload Alex's financial data in remote mode", async () => {
   expect(ensure).not.toHaveBeenCalled();
 });
 it("shows an explicit loading state", () => { load.mockReturnValue(new Promise(() => {})); page(); expect(screen.getByRole("status")).toHaveTextContent("Loading"); });
-it("shows a retryable error without substituting demo data", async () => { load.mockRejectedValue(new Error("unavailable")); page(); expect(await screen.findByRole("alert")).toHaveTextContent("No demo data has been substituted"); expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument(); });
-it("renders backend balance and estimated provenance with unavailable plans", async () => {
+it("shows a retryable error without substituting demo data", async () => { load.mockRejectedValue(new Error("unavailable")); page(); expect(await screen.findByRole("alert")).toHaveTextContent("No sample data has been substituted"); expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument(); });
+it("renders backend balance and prompts for explicit savings and cash allocations", async () => {
   load.mockResolvedValue({ customer: { displayName: "synthetic_demo" }, startDate: "2026-11-07", startingBalanceCents: 80000, cashFlows: [{ id: "pay", date: "2026-11-09", type: "income", amountCents: 100000, label: "Income", provenance: "assumed" }], backend: { synthetic: true, notes: [], basis: "opening" } });
   page(); expect(await screen.findByText("$800")).toBeInTheDocument();
-  expect(screen.getByText(/Synthetic demo dataset/)).toHaveTextContent("estimated upcoming");
-  expect(screen.getAllByText("Unavailable")).toHaveLength(2);
+  expect(screen.getByText(/Synthetic sample dataset/)).toHaveTextContent("estimated upcoming");
+  expect(screen.getByText("Set a target")).toBeInTheDocument();
+  expect(screen.getByText("Set your cash plan")).toBeInTheDocument();
+  expect(screen.getByRole("button", {name:"Preview my plan"})).toBeInTheDocument();
   expect(screen.queryByText("$600")).not.toBeInTheDocument();
 });
 it("retries the backend after failure and displays its snapshot", async () => {

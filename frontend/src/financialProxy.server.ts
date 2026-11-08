@@ -3,8 +3,9 @@ import { z } from "zod";
 import { purchaseRequestSchema, compareRequestSchema, forecastRequestSchema, engineSimulationSchema, engineComparisonSchema, engineForecastSchema, engineHistorySchema } from "./types/engine";
 import { nemotronRequestSchema, nemotronResponseSchema } from "./types/nemotron";
 import { ENDPOINTS } from "./services/endpoints";
+import { cashPlanRequestSchema, cashPlanResultSchema } from "./types/cashPlan";
 
-export const FINANCIAL_PROXY_PATHS = ["/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", ENDPOINTS.agentRun] as const;
+export const FINANCIAL_PROXY_PATHS = ["/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", "/api/cash-plan/preview", ENDPOINTS.agentRun] as const;
 
 export const NOTIFICATION_PROXY_PATHS = [
   "/api/notifications/preferences",
@@ -59,7 +60,8 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
   if (!isFinancialProxyPath(url.pathname)) return error(404, "Financial route not found");
   const isNotification = (NOTIFICATION_PROXY_PATHS as readonly string[]).includes(url.pathname) || url.pathname.startsWith("/api/notifications/watchlist/");
   const agent = url.pathname === ENDPOINTS.agentRun;
-  const post = agent || ["/api/simulate", "/api/compare", "/api/forecast"].includes(url.pathname);
+  const plan = url.pathname === "/api/cash-plan/preview";
+  const post = plan || agent || ["/api/simulate", "/api/compare", "/api/forecast"].includes(url.pathname);
   if (!isNotification && request.method !== (post ? "POST" : "GET")) return error(405, "Method not allowed");
   if (isNotification && !["GET", "POST", "DELETE"].includes(request.method)) return error(405, "Method not allowed");
   if (url.pathname === "/api/history") {
@@ -79,7 +81,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
       try {
         body = await readBody(request);
         if (!isNotification) {
-          const schema = agent ? nemotronRequestSchema : url.pathname === "/api/simulate" ? purchaseRequestSchema : url.pathname === "/api/compare" ? compareRequestSchema : forecastRequestSchema;
+          const schema = plan ? cashPlanRequestSchema : agent ? nemotronRequestSchema : url.pathname === "/api/simulate" ? purchaseRequestSchema : url.pathname === "/api/compare" ? compareRequestSchema : forecastRequestSchema;
           schema.parse(JSON.parse(body)); // Forward original JSON so backend duplicate-key checks still apply.
         }
       } catch {
@@ -92,6 +94,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
     } else if (isNotification && request.method === "POST") {
       body = "{}";
     }
+  }
   }
   const token = process.env["FINPILOT_API_TOKEN"];
   if (!token) return error(503, "Financial service is not configured");
@@ -120,6 +123,10 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
       return Response.json(data, { status: response.status, headers });
     }
     if (!response.ok) return error([401, 403, 422, 429, 503].includes(response.status) ? response.status : 502, "Financial service request failed");
+    if (plan) {
+      const result = cashPlanResultSchema.safeParse(await response.json());
+      return result.success ? Response.json(result.data,{headers}) : error(502,"Invalid cash plan response");
+    }
     if (agent) {
       const result = nemotronResponseSchema.safeParse(await response.json());
       if (!result.success) return error(502, "Invalid agent service response");

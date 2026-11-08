@@ -184,6 +184,27 @@ def test_no_inferred_schedule_or_history_replay(nessie, monkeypatch):
     assert any('flat forecast' in note for note in data.source_notes)
 
 
+def test_explicit_future_pending_income_is_estimated_and_not_replayed(nessie):
+    nessie['raw']['deposits'].extend([
+        {'_id':'future_pay', 'transaction_date':nessie['day'](4), 'amount':600, 'status':'pending'},
+        {'_id':'today_pay', 'transaction_date':nessie['day'](0), 'amount':900, 'status':'pending'},
+        {'_id':'future_completed', 'transaction_date':nessie['day'](5), 'amount':900, 'status':'completed'},
+    ])
+    data = app_for_customer().state.financial_source.load()
+    assert data.current_balance == Decimal('1250.25')
+    incomes = [t for t in data.upcoming_transactions if t.type == 'income']
+    assert len(incomes) == 1 and incomes[0].amount == Decimal('600.00')
+    assert incomes[0].source_status == 'estimated'
+
+
+def test_future_income_ownership_and_precision_fail_closed(nessie):
+    nessie['raw']['deposits'].append({'_id':'future_pay', 'transaction_date':nessie['day'](4),
+                                     'amount':'1.001','status':'pending'})
+    with TestClient(app_for_customer()) as client:
+        response = client.get('/api/financial-data', headers={'Authorization':'Bearer '+TOKEN})
+        assert response.status_code == 503
+
+
 def test_cache_does_not_return_expired_records_after_failure(nessie, monkeypatch):
     app = app_for_customer()
     data = app.state.financial_source.load()
@@ -219,3 +240,28 @@ def test_nessie_transport_is_get_only_and_empty_404_is_explicit(monkeypatch):
     with pytest.raises(ValueError):
         read_json_https(DEFAULT_NESSIE_BASE_URL + '/accounts/test', allowed_hosts=('prod-api.nessieisreal.com',), transport=httpx.MockTransport(handler))
     assert calls == ['GET', 'GET']
+
+
+def test_council_uses_authorized_nessie_adapter_and_same_chart_snapshot(nessie, monkeypatch):
+    from nemotron_agent.council_store import session_signature
+    monkeypatch.setenv('PLUTUS_COUNCIL_ENABLED', '1')
+    session = 'c' * 64
+    headers = {'Authorization': 'Bearer ' + TOKEN,
+               'X-Plutus-Session': session + '.' + session_signature(session, TOKEN)}
+    with TestClient(app_for_customer()) as client:
+        id = client.post('/api/v2/conversations', json={'role': 'council'}, headers=headers).json()['id']
+        response = client.post(f'/api/v2/conversations/{id}/messages', json={
+            'request_key': 'nessie_council_123', 'message': 'Compare this purchase with waiting.',
+            'allow_model': False, 'analysis': {'purchase_amount': '100.00',
+                'purchase_date': nessie['day'](1), 'allow_model': False}}, headers=headers)
+        assert response.status_code == 200
+        result = response.json()
+        assert result['mode'] == 'deterministic_only'
+        assert result['analysis']['provenance']['source'] == 'nessie_sandbox'
+        assert result['chart']['snapshot_id'] == result['snapshot_id']
+        assert all(s['forecast']['customer_id'] == CUSTOMER for s in result['analysis']['scenarios'])
+        assert all(s['forecast']['starting_balance'] == '1250.25' for s in result['analysis']['scenarios'])
+        assert result['analysis']['stress_tests_total'] == 1
+        assert result['analysis']['scenarios'][1]['forecast']['ending_balance'] == '1025.25'
+        assert not result['analysis']['scenarios'][2]['applicable']
+    assert len(nessie['calls']) == 7

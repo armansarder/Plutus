@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5 text-xs text-muted-foreground sm:px-6">
           <p>
-            {backendConnected ? "Using the connected customer's records across all pages." : "Synthetic demo data for Alex."} No real money moves. Your plan stays under your control. Projections are illustrative, not financial advice. Plutus is not a bank.
+            {backendConnected ? "Using the connected customer's records across all pages." : "Synthetic sample data for Alex."} No real money moves. Your plan stays under your control. Projections are illustrative, not financial advice. Plutus is not a bank.
           </p>
           <Link to="/operator" className="underline hover:text-foreground">Demo Operator Console</Link>
         </div>

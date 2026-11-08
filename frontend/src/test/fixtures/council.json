@@ -1,0 +1,2359 @@
+{
+  "schema_version": "2.0",
+  "run_id": "03355e3e2701486397578627e6fe6d26",
+  "conversation_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "role": "council",
+  "status": "complete",
+  "mode": "nemotron_council",
+  "message": "Wait for your income, then recheck. Buying on the selected date could leave you $100 short on November 10. Keep the $400 for upcoming bills until the income clears.",
+  "next_question": null,
+  "snapshot_id": "ab341804528ea75fb00f2b44",
+  "reviews": [
+    {
+      "role": "council",
+      "stage": "framing",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:council:framing:purchase_minimum",
+          "text": "Purchase: minimum projected balance -100.00 USD on 2026-11-10.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:council:framing:purchase_reserve",
+          "text": "Purchase: does not maintain the selected reserve over this horizon.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        }
+      ],
+      "summary": "Buying on the selected date could leave you $100 short on November 10. Keep the money for your upcoming expenses.",
+      "recommendation": "Wait before buying it.",
+      "revised": false,
+      "model": "fake-nemotron"
+    },
+    {
+      "role": "budget",
+      "stage": "initial_review",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:budget:initial_review:purchase_minimum",
+          "text": "Purchase: minimum projected balance -100.00 USD on 2026-11-10.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:budget:initial_review:purchase_reserve",
+          "text": "Purchase: does not maintain the selected reserve over this horizon.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        }
+      ],
+      "summary": "Buying on the selected date could leave you $100 short on November 10. Keep that cash for your scheduled expenses.",
+      "recommendation": "Don't buy it on the selected date.",
+      "revised": false,
+      "model": "fake-nemotron"
+    },
+    {
+      "role": "risk",
+      "stage": "initial_review",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:risk:initial_review:purchase_minimum",
+          "text": "Purchase: minimum projected balance -100.00 USD on 2026-11-10.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:risk:initial_review:purchase_reserve",
+          "text": "Purchase: does not maintain the selected reserve over this horizon.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        }
+      ],
+      "summary": "Buying on the selected date could leave you $100 short on November 10. Keep the money for your upcoming expenses.",
+      "recommendation": "Wait before buying it.",
+      "revised": false,
+      "model": "fake-nemotron"
+    },
+    {
+      "role": "simulator",
+      "stage": "evidence_review",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:simulator:evidence_review:stress_count",
+          "text": "0 of 2 applicable stress tests maintain the reserve. This is a test count, not a probability.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:stress"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:simulator:evidence_review:safe_dates",
+          "text": "First ordinary reserve-preserving purchase date: 2026-11-16.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:safe_dates"
+          ]
+        }
+      ],
+      "summary": "That is the first tested date that keeps your $200 cash buffer. It assumes income arrives as scheduled, so rerun the forecast if the deposit is late.",
+      "recommendation": "Try buying on November 16 instead.",
+      "revised": false,
+      "model": "fake-nemotron"
+    },
+    {
+      "role": "budget",
+      "stage": "evidence_review",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:budget:evidence_review:stress_count",
+          "text": "0 of 2 applicable stress tests maintain the reserve. This is a test count, not a probability.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:stress"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:budget:evidence_review:safe_dates",
+          "text": "First ordinary reserve-preserving purchase date: 2026-11-16.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:safe_dates"
+          ]
+        }
+      ],
+      "summary": "Buying on the selected date could leave you $100 short on November 10. Keep that cash for your scheduled expenses.",
+      "recommendation": "Don't buy it on the selected date.",
+      "revised": true,
+      "model": "fake-nemotron"
+    },
+    {
+      "role": "risk",
+      "stage": "evidence_review",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:risk:evidence_review:stress_count",
+          "text": "0 of 2 applicable stress tests maintain the reserve. This is a test count, not a probability.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:stress"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:risk:evidence_review:safe_dates",
+          "text": "First ordinary reserve-preserving purchase date: 2026-11-16.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:safe_dates"
+          ]
+        }
+      ],
+      "summary": "With your income three days late, the purchase could still leave you $100 short. Recheck after the money reaches your account.",
+      "recommendation": "Wait for your income to arrive.",
+      "revised": true,
+      "model": "fake-nemotron"
+    },
+    {
+      "role": "council",
+      "stage": "synthesis",
+      "status": "complete",
+      "position": "consider_waiting",
+      "findings": [
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:council:synthesis:purchase_minimum",
+          "text": "Purchase: minimum projected balance -100.00 USD on 2026-11-10.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        },
+        {
+          "id": "03355e3e2701486397578627e6fe6d26:council:synthesis:purchase_reserve",
+          "text": "Purchase: does not maintain the selected reserve over this horizon.",
+          "evidence_ids": [
+            "ab341804528ea75fb00f2b44:purchase"
+          ]
+        }
+      ],
+      "summary": "Buying on the selected date could leave you $100 short on November 10. Keep the $400 for upcoming bills until the income clears.",
+      "recommendation": "Wait for your income, then recheck.",
+      "revised": false,
+      "model": "fake-nemotron"
+    }
+  ],
+  "events": [
+    {
+      "sequence": 1,
+      "role": "simulator",
+      "action": "server_baseline:baseline",
+      "status": "completed"
+    },
+    {
+      "sequence": 2,
+      "role": "simulator",
+      "action": "server_baseline:purchase",
+      "status": "completed"
+    },
+    {
+      "sequence": 3,
+      "role": "council",
+      "action": "framing",
+      "status": "completed"
+    },
+    {
+      "sequence": 4,
+      "role": "budget",
+      "action": "initial_review",
+      "status": "completed"
+    },
+    {
+      "sequence": 5,
+      "role": "risk",
+      "action": "initial_review",
+      "status": "completed"
+    },
+    {
+      "sequence": 6,
+      "role": "simulator",
+      "action": "model_requested:delayed_income",
+      "status": "completed"
+    },
+    {
+      "sequence": 7,
+      "role": "simulator",
+      "action": "model_requested:unexpected_expense",
+      "status": "completed"
+    },
+    {
+      "sequence": 8,
+      "role": "simulator",
+      "action": "model_requested:buy_later",
+      "status": "completed"
+    },
+    {
+      "sequence": 9,
+      "role": "simulator",
+      "action": "evidence_review",
+      "status": "completed"
+    },
+    {
+      "sequence": 10,
+      "role": "budget",
+      "action": "evidence_review",
+      "status": "completed"
+    },
+    {
+      "sequence": 11,
+      "role": "risk",
+      "action": "evidence_review",
+      "status": "completed"
+    },
+    {
+      "sequence": 12,
+      "role": "council",
+      "action": "synthesis",
+      "status": "completed"
+    }
+  ],
+  "analysis": {
+    "schema_version": "1.0",
+    "request_id": "97af9146-4d88-4377-8ccd-b736c5c2b259",
+    "mode": "deterministic_fallback",
+    "model": null,
+    "fallback_reason": "model_disabled",
+    "summary": "Buying on 2026-11-16 maintains your reserve under ordinary conditions; the selected date does not. That later date has not been stress-tested. Lowest projected purchase balance: -100.00 USD. These are conditional simulations; no payment was executed.",
+    "risk_level": "high",
+    "scenarios": [
+      {
+        "name": "baseline",
+        "purchase_date": null,
+        "maintains_reserve": true,
+        "applicable": true,
+        "forecast": {
+          "customer_id": "synthetic_demo",
+          "currency": "USD",
+          "start_date": "2026-11-07",
+          "end_date": "2026-12-06",
+          "starting_balance": "800.00",
+          "ending_balance": "1300.00",
+          "minimum_balance": "300.00",
+          "minimum_balance_date": "2026-11-10",
+          "shortfall_occurs": false,
+          "transaction_timeline": [
+            {
+              "id": "rent",
+              "date": "2026-11-10",
+              "description": "Demo rent",
+              "amount": "-500.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "300.00"
+            },
+            {
+              "id": "pay",
+              "date": "2026-11-15",
+              "description": "Demo income",
+              "amount": "1000.00",
+              "type": "income",
+              "source_status": "estimated",
+              "balance": "1300.00"
+            }
+          ],
+          "daily_balances": [
+            {
+              "date": "2026-11-07",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-08",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-09",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-10",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-11",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-12",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-13",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-14",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-15",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-16",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-17",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-18",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-19",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-20",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-21",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-22",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-23",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-24",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-25",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-26",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-27",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-28",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-29",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-30",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-12-01",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-12-02",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-12-03",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-12-04",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-12-05",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-12-06",
+              "ending_balance": "1300.00"
+            }
+          ],
+          "negative_balance_days": [],
+          "minimum_daily_ending_balance": "300.00",
+          "minimum_daily_ending_balance_date": "2026-11-10",
+          "assumptions": {
+            "snapshot": "Opening balance on as_of_date; upcoming events are not yet applied.",
+            "same_day_order": "Expenses before income, then transaction ID; posting times unknown.",
+            "coverage": "Only supplied events are projected; completeness cannot be verified.",
+            "estimated_transaction_ids": [
+              "rent",
+              "pay"
+            ],
+            "missing_information": [
+              "intraday posting times",
+              "verification of future schedule completeness"
+            ],
+            "currency_precision": "Two decimal places; no fees, interest, or events inferred.",
+            "source_notes": [
+              "Synthetic connectivity fixture"
+            ],
+            "scenario_changes": null
+          }
+        }
+      },
+      {
+        "name": "purchase",
+        "purchase_date": "2026-11-08",
+        "maintains_reserve": false,
+        "applicable": true,
+        "forecast": {
+          "customer_id": "synthetic_demo",
+          "currency": "USD",
+          "start_date": "2026-11-07",
+          "end_date": "2026-12-06",
+          "starting_balance": "800.00",
+          "ending_balance": "900.00",
+          "minimum_balance": "-100.00",
+          "minimum_balance_date": "2026-11-10",
+          "shortfall_occurs": true,
+          "transaction_timeline": [
+            {
+              "id": "plutus_hypothetical_purchase",
+              "date": "2026-11-08",
+              "description": "Hypothetical purchase",
+              "amount": "-400.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "400.00"
+            },
+            {
+              "id": "rent",
+              "date": "2026-11-10",
+              "description": "Demo rent",
+              "amount": "-500.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "-100.00"
+            },
+            {
+              "id": "pay",
+              "date": "2026-11-15",
+              "description": "Demo income",
+              "amount": "1000.00",
+              "type": "income",
+              "source_status": "estimated",
+              "balance": "900.00"
+            }
+          ],
+          "daily_balances": [
+            {
+              "date": "2026-11-07",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-08",
+              "ending_balance": "400.00"
+            },
+            {
+              "date": "2026-11-09",
+              "ending_balance": "400.00"
+            },
+            {
+              "date": "2026-11-10",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-11",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-12",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-13",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-14",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-15",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-16",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-17",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-18",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-19",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-20",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-21",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-22",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-23",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-24",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-25",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-26",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-27",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-28",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-29",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-30",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-01",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-02",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-03",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-04",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-05",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-06",
+              "ending_balance": "900.00"
+            }
+          ],
+          "negative_balance_days": [
+            "2026-11-10",
+            "2026-11-11",
+            "2026-11-12",
+            "2026-11-13",
+            "2026-11-14"
+          ],
+          "minimum_daily_ending_balance": "-100.00",
+          "minimum_daily_ending_balance_date": "2026-11-10",
+          "assumptions": {
+            "snapshot": "Opening balance on as_of_date; upcoming events are not yet applied.",
+            "same_day_order": "Expenses before income, then transaction ID; posting times unknown.",
+            "coverage": "Only supplied events are projected; completeness cannot be verified.",
+            "estimated_transaction_ids": [
+              "rent",
+              "pay",
+              "plutus_hypothetical_purchase"
+            ],
+            "missing_information": [
+              "intraday posting times",
+              "verification of future schedule completeness"
+            ],
+            "currency_precision": "Two decimal places; no fees, interest, or events inferred.",
+            "source_notes": [
+              "Synthetic connectivity fixture"
+            ],
+            "scenario_changes": null
+          }
+        }
+      },
+      {
+        "name": "delayed_income",
+        "purchase_date": "2026-11-08",
+        "maintains_reserve": false,
+        "applicable": true,
+        "forecast": {
+          "customer_id": "synthetic_demo",
+          "currency": "USD",
+          "start_date": "2026-11-07",
+          "end_date": "2026-12-06",
+          "starting_balance": "800.00",
+          "ending_balance": "900.00",
+          "minimum_balance": "-100.00",
+          "minimum_balance_date": "2026-11-10",
+          "shortfall_occurs": true,
+          "transaction_timeline": [
+            {
+              "id": "plutus_hypothetical_purchase",
+              "date": "2026-11-08",
+              "description": "Hypothetical purchase",
+              "amount": "-400.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "400.00"
+            },
+            {
+              "id": "rent",
+              "date": "2026-11-10",
+              "description": "Demo rent",
+              "amount": "-500.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "-100.00"
+            },
+            {
+              "id": "pay",
+              "date": "2026-11-18",
+              "description": "Demo income",
+              "amount": "1000.00",
+              "type": "income",
+              "source_status": "estimated",
+              "balance": "900.00"
+            }
+          ],
+          "daily_balances": [
+            {
+              "date": "2026-11-07",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-08",
+              "ending_balance": "400.00"
+            },
+            {
+              "date": "2026-11-09",
+              "ending_balance": "400.00"
+            },
+            {
+              "date": "2026-11-10",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-11",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-12",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-13",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-14",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-15",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-16",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-17",
+              "ending_balance": "-100.00"
+            },
+            {
+              "date": "2026-11-18",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-19",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-20",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-21",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-22",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-23",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-24",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-25",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-26",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-27",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-28",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-29",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-30",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-01",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-02",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-03",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-04",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-05",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-06",
+              "ending_balance": "900.00"
+            }
+          ],
+          "negative_balance_days": [
+            "2026-11-10",
+            "2026-11-11",
+            "2026-11-12",
+            "2026-11-13",
+            "2026-11-14",
+            "2026-11-15",
+            "2026-11-16",
+            "2026-11-17"
+          ],
+          "minimum_daily_ending_balance": "-100.00",
+          "minimum_daily_ending_balance_date": "2026-11-10",
+          "assumptions": {
+            "snapshot": "Opening balance on as_of_date; upcoming events are not yet applied.",
+            "same_day_order": "Expenses before income, then transaction ID; posting times unknown.",
+            "coverage": "Only supplied events are projected; completeness cannot be verified.",
+            "estimated_transaction_ids": [
+              "rent",
+              "pay",
+              "plutus_hypothetical_purchase"
+            ],
+            "missing_information": [
+              "intraday posting times",
+              "verification of future schedule completeness"
+            ],
+            "currency_precision": "Two decimal places; no fees, interest, or events inferred.",
+            "source_notes": [
+              "Synthetic connectivity fixture"
+            ],
+            "scenario_changes": null
+          }
+        }
+      },
+      {
+        "name": "unexpected_expense",
+        "purchase_date": "2026-11-08",
+        "maintains_reserve": false,
+        "applicable": true,
+        "forecast": {
+          "customer_id": "synthetic_demo",
+          "currency": "USD",
+          "start_date": "2026-11-07",
+          "end_date": "2026-12-06",
+          "starting_balance": "800.00",
+          "ending_balance": "700.00",
+          "minimum_balance": "-300.00",
+          "minimum_balance_date": "2026-11-10",
+          "shortfall_occurs": true,
+          "transaction_timeline": [
+            {
+              "id": "plutus_hypothetical_purchase",
+              "date": "2026-11-08",
+              "description": "Hypothetical purchase",
+              "amount": "-400.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "400.00"
+            },
+            {
+              "id": "plutus_stress_expense",
+              "date": "2026-11-08",
+              "description": "Hypothetical unexpected expense",
+              "amount": "-200.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "200.00"
+            },
+            {
+              "id": "rent",
+              "date": "2026-11-10",
+              "description": "Demo rent",
+              "amount": "-500.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "-300.00"
+            },
+            {
+              "id": "pay",
+              "date": "2026-11-15",
+              "description": "Demo income",
+              "amount": "1000.00",
+              "type": "income",
+              "source_status": "estimated",
+              "balance": "700.00"
+            }
+          ],
+          "daily_balances": [
+            {
+              "date": "2026-11-07",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-08",
+              "ending_balance": "200.00"
+            },
+            {
+              "date": "2026-11-09",
+              "ending_balance": "200.00"
+            },
+            {
+              "date": "2026-11-10",
+              "ending_balance": "-300.00"
+            },
+            {
+              "date": "2026-11-11",
+              "ending_balance": "-300.00"
+            },
+            {
+              "date": "2026-11-12",
+              "ending_balance": "-300.00"
+            },
+            {
+              "date": "2026-11-13",
+              "ending_balance": "-300.00"
+            },
+            {
+              "date": "2026-11-14",
+              "ending_balance": "-300.00"
+            },
+            {
+              "date": "2026-11-15",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-16",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-17",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-18",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-19",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-20",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-21",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-22",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-23",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-24",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-25",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-26",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-27",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-28",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-29",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-11-30",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-12-01",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-12-02",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-12-03",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-12-04",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-12-05",
+              "ending_balance": "700.00"
+            },
+            {
+              "date": "2026-12-06",
+              "ending_balance": "700.00"
+            }
+          ],
+          "negative_balance_days": [
+            "2026-11-10",
+            "2026-11-11",
+            "2026-11-12",
+            "2026-11-13",
+            "2026-11-14"
+          ],
+          "minimum_daily_ending_balance": "-300.00",
+          "minimum_daily_ending_balance_date": "2026-11-10",
+          "assumptions": {
+            "snapshot": "Opening balance on as_of_date; upcoming events are not yet applied.",
+            "same_day_order": "Expenses before income, then transaction ID; posting times unknown.",
+            "coverage": "Only supplied events are projected; completeness cannot be verified.",
+            "estimated_transaction_ids": [
+              "rent",
+              "pay",
+              "plutus_stress_expense",
+              "plutus_hypothetical_purchase"
+            ],
+            "missing_information": [
+              "intraday posting times",
+              "verification of future schedule completeness"
+            ],
+            "currency_precision": "Two decimal places; no fees, interest, or events inferred.",
+            "source_notes": [
+              "Synthetic connectivity fixture"
+            ],
+            "scenario_changes": null
+          }
+        }
+      },
+      {
+        "name": "buy_later",
+        "purchase_date": "2026-11-16",
+        "maintains_reserve": true,
+        "applicable": true,
+        "forecast": {
+          "customer_id": "synthetic_demo",
+          "currency": "USD",
+          "start_date": "2026-11-07",
+          "end_date": "2026-12-06",
+          "starting_balance": "800.00",
+          "ending_balance": "900.00",
+          "minimum_balance": "300.00",
+          "minimum_balance_date": "2026-11-10",
+          "shortfall_occurs": false,
+          "transaction_timeline": [
+            {
+              "id": "rent",
+              "date": "2026-11-10",
+              "description": "Demo rent",
+              "amount": "-500.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "300.00"
+            },
+            {
+              "id": "pay",
+              "date": "2026-11-15",
+              "description": "Demo income",
+              "amount": "1000.00",
+              "type": "income",
+              "source_status": "estimated",
+              "balance": "1300.00"
+            },
+            {
+              "id": "plutus_hypothetical_purchase",
+              "date": "2026-11-16",
+              "description": "Hypothetical purchase",
+              "amount": "-400.00",
+              "type": "expense",
+              "source_status": "estimated",
+              "balance": "900.00"
+            }
+          ],
+          "daily_balances": [
+            {
+              "date": "2026-11-07",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-08",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-09",
+              "ending_balance": "800.00"
+            },
+            {
+              "date": "2026-11-10",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-11",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-12",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-13",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-14",
+              "ending_balance": "300.00"
+            },
+            {
+              "date": "2026-11-15",
+              "ending_balance": "1300.00"
+            },
+            {
+              "date": "2026-11-16",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-17",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-18",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-19",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-20",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-21",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-22",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-23",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-24",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-25",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-26",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-27",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-28",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-29",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-11-30",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-01",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-02",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-03",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-04",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-05",
+              "ending_balance": "900.00"
+            },
+            {
+              "date": "2026-12-06",
+              "ending_balance": "900.00"
+            }
+          ],
+          "negative_balance_days": [],
+          "minimum_daily_ending_balance": "300.00",
+          "minimum_daily_ending_balance_date": "2026-11-10",
+          "assumptions": {
+            "snapshot": "Opening balance on as_of_date; upcoming events are not yet applied.",
+            "same_day_order": "Expenses before income, then transaction ID; posting times unknown.",
+            "coverage": "Only supplied events are projected; completeness cannot be verified.",
+            "estimated_transaction_ids": [
+              "rent",
+              "pay",
+              "plutus_hypothetical_purchase"
+            ],
+            "missing_information": [
+              "intraday posting times",
+              "verification of future schedule completeness"
+            ],
+            "currency_precision": "Two decimal places; no fees, interest, or events inferred.",
+            "source_notes": [
+              "Synthetic connectivity fixture"
+            ],
+            "scenario_changes": null
+          }
+        }
+      }
+    ],
+    "safe_purchase_dates": [
+      "2026-11-16",
+      "2026-11-17",
+      "2026-11-18",
+      "2026-11-19",
+      "2026-11-20",
+      "2026-11-21",
+      "2026-11-22",
+      "2026-11-23",
+      "2026-11-24",
+      "2026-11-25",
+      "2026-11-26",
+      "2026-11-27",
+      "2026-11-28",
+      "2026-11-29",
+      "2026-11-30",
+      "2026-12-01",
+      "2026-12-02",
+      "2026-12-03",
+      "2026-12-04",
+      "2026-12-05",
+      "2026-12-06"
+    ],
+    "safe_to_spend_on_purchase_date": "100.00",
+    "stress_tests_passed": 0,
+    "stress_tests_total": 2,
+    "provenance": {
+      "source": "synthetic_demo",
+      "snapshot_as_of": "2026-11-07",
+      "snapshot_id": "ab341804528ea75fb00f2b44",
+      "generated_at": "2026-11-08T11:47:52.325369+00:00",
+      "currency": "USD",
+      "synthetic": true,
+      "schedule_complete": false
+    },
+    "passport": {
+      "id": "97af9146-4d88-4377-8ccd-b736c5c2b259",
+      "purchase_amount": "400.00",
+      "reserve": "200.00",
+      "horizon_end": "2026-12-06",
+      "recommendation": "consider_waiting",
+      "evidence_scenarios": [
+        "purchase",
+        "delayed_income",
+        "unexpected_expense"
+      ],
+      "assumptions": [
+        "Only supplied scheduled events are modeled; future schedule completeness is unverified.",
+        "Expenses post before income on the same day; intraday posting times are unknown.",
+        "Stress results count explicit test cases, not probabilities of success.",
+        "Delayed income shifts the next scheduled income three days; no income means that test changes nothing.",
+        "Unexpected expense is a hypothetical 200.00 outflow in the account currency.",
+        "Safe dates apply to the purchase scenario only, not all adverse scenarios.",
+        "No fees, interest, or unscheduled daily spending are inferred.",
+        "Free-text message is retained only in the request; structured purchase fields drive this MVP."
+      ],
+      "payment_executed": false
+    },
+    "trust_shield": {
+      "permissions": [
+        "read_snapshot",
+        "simulate"
+      ],
+      "payment_execution": false,
+      "external_message_sent": false,
+      "model_data_shared": false,
+      "untrusted_text_excluded": true,
+      "security_scope": "Single configured customer; not a multi-user session system."
+    },
+    "tool_trace": [
+      {
+        "tool": "simulate_scenario",
+        "scenario": "baseline",
+        "status": "completed",
+        "initiated_by": "server"
+      },
+      {
+        "tool": "simulate_scenario",
+        "scenario": "purchase",
+        "status": "completed",
+        "initiated_by": "server"
+      },
+      {
+        "tool": "simulate_scenario",
+        "scenario": "delayed_income",
+        "status": "completed",
+        "initiated_by": "server"
+      },
+      {
+        "tool": "simulate_scenario",
+        "scenario": "unexpected_expense",
+        "status": "completed",
+        "initiated_by": "server"
+      },
+      {
+        "tool": "simulate_scenario",
+        "scenario": "buy_later",
+        "status": "completed",
+        "initiated_by": "server"
+      },
+      {
+        "tool": "decision",
+        "scenario": null,
+        "status": "fallback",
+        "initiated_by": "server"
+      }
+    ],
+    "photon": {
+      "text": "Future You: Buying on 2026-11-16 maintains your reserve under ordinary conditions; the selected date does not. That later date has not been stress-tested. This is a simulation, not a payment. Open Plutus securely to view the comparison.",
+      "simulated": true,
+      "delivery_status": "draft_only",
+      "requires_authenticated_delivery": true
+    }
+  },
+  "chart": {
+    "id": "35298495435a4de6beed45b8ea17e198",
+    "snapshot_id": "ab341804528ea75fb00f2b44",
+    "currency": "USD",
+    "reserve": "200.00",
+    "kind": "line",
+    "series": [
+      {
+        "scenario": "baseline",
+        "points": [
+          {
+            "date": "2026-11-07",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-08",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-09",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-10",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-11",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-12",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-13",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-14",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-15",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-16",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-17",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-18",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-19",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-20",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-21",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-22",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-23",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-24",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-25",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-26",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-27",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-28",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-29",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-30",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-12-01",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-12-02",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-12-03",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-12-04",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-12-05",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-12-06",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          }
+        ]
+      },
+      {
+        "scenario": "purchase",
+        "points": [
+          {
+            "date": "2026-11-07",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-08",
+            "balance": "400.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "200.00"
+          },
+          {
+            "date": "2026-11-09",
+            "balance": "400.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "200.00"
+          },
+          {
+            "date": "2026-11-10",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-11",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-12",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-13",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-14",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-15",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-16",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-17",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-18",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-19",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-20",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-21",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-22",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-23",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-24",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-25",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-26",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-27",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-28",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-29",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-30",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-01",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-02",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-03",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-04",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-05",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-06",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          }
+        ]
+      },
+      {
+        "scenario": "delayed_income",
+        "points": [
+          {
+            "date": "2026-11-07",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-08",
+            "balance": "400.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "200.00"
+          },
+          {
+            "date": "2026-11-09",
+            "balance": "400.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "200.00"
+          },
+          {
+            "date": "2026-11-10",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-11",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-12",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-13",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-14",
+            "balance": "-100.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-15",
+            "balance": "-100.00",
+            "difference_from_baseline": "-1400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-16",
+            "balance": "-100.00",
+            "difference_from_baseline": "-1400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-17",
+            "balance": "-100.00",
+            "difference_from_baseline": "-1400.00",
+            "reserve_headroom": "-300.00"
+          },
+          {
+            "date": "2026-11-18",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-19",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-20",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-21",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-22",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-23",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-24",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-25",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-26",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-27",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-28",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-29",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-30",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-01",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-02",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-03",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-04",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-05",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-06",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          }
+        ]
+      },
+      {
+        "scenario": "unexpected_expense",
+        "points": [
+          {
+            "date": "2026-11-07",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-08",
+            "balance": "200.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "0.00"
+          },
+          {
+            "date": "2026-11-09",
+            "balance": "200.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "0.00"
+          },
+          {
+            "date": "2026-11-10",
+            "balance": "-300.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "-500.00"
+          },
+          {
+            "date": "2026-11-11",
+            "balance": "-300.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "-500.00"
+          },
+          {
+            "date": "2026-11-12",
+            "balance": "-300.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "-500.00"
+          },
+          {
+            "date": "2026-11-13",
+            "balance": "-300.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "-500.00"
+          },
+          {
+            "date": "2026-11-14",
+            "balance": "-300.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "-500.00"
+          },
+          {
+            "date": "2026-11-15",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-16",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-17",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-18",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-19",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-20",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-21",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-22",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-23",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-24",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-25",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-26",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-27",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-28",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-29",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-11-30",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-12-01",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-12-02",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-12-03",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-12-04",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-12-05",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          },
+          {
+            "date": "2026-12-06",
+            "balance": "700.00",
+            "difference_from_baseline": "-600.00",
+            "reserve_headroom": "500.00"
+          }
+        ]
+      },
+      {
+        "scenario": "buy_later",
+        "points": [
+          {
+            "date": "2026-11-07",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-08",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-09",
+            "balance": "800.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "600.00"
+          },
+          {
+            "date": "2026-11-10",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-11",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-12",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-13",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-14",
+            "balance": "300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "100.00"
+          },
+          {
+            "date": "2026-11-15",
+            "balance": "1300.00",
+            "difference_from_baseline": "0.00",
+            "reserve_headroom": "1100.00"
+          },
+          {
+            "date": "2026-11-16",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-17",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-18",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-19",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-20",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-21",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-22",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-23",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-24",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-25",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-26",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-27",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-28",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-29",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-11-30",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-01",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-02",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-03",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-04",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-05",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          },
+          {
+            "date": "2026-12-06",
+            "balance": "900.00",
+            "difference_from_baseline": "-400.00",
+            "reserve_headroom": "700.00"
+          }
+        ]
+      }
+    ],
+    "markers": [
+      {
+        "scenario": "baseline",
+        "date": "2026-11-10",
+        "balance": "300.00",
+        "kind": "minimum"
+      },
+      {
+        "scenario": "purchase",
+        "date": "2026-11-10",
+        "balance": "-100.00",
+        "kind": "minimum"
+      },
+      {
+        "scenario": "purchase",
+        "date": "2026-11-10",
+        "balance": "-100.00",
+        "kind": "first_reserve_breach"
+      },
+      {
+        "scenario": "delayed_income",
+        "date": "2026-11-10",
+        "balance": "-100.00",
+        "kind": "minimum"
+      },
+      {
+        "scenario": "delayed_income",
+        "date": "2026-11-10",
+        "balance": "-100.00",
+        "kind": "first_reserve_breach"
+      },
+      {
+        "scenario": "unexpected_expense",
+        "date": "2026-11-10",
+        "balance": "-300.00",
+        "kind": "minimum"
+      },
+      {
+        "scenario": "unexpected_expense",
+        "date": "2026-11-10",
+        "balance": "-300.00",
+        "kind": "first_reserve_breach"
+      },
+      {
+        "scenario": "buy_later",
+        "date": "2026-11-10",
+        "balance": "300.00",
+        "kind": "minimum"
+      }
+    ],
+    "assumptions": [
+      "Conditional daily closing balances; event-level minimum markers may be lower.",
+      "Same snapshot and horizon for every scenario. No probability or trained predictive model."
+    ]
+  },
+  "handoff_reference": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:03355e3e2701486397578627e6fe6d26",
+  "limitations": [
+    "Temporary, session-isolated demo chats; restart or expiry clears history.",
+    "Shared customer demo, not a multi-user login system. No payment or external message is executed.",
+    "Only purchase cash-flow calculations are supported. Debt interest, goal dates and probabilities are unavailable.",
+    "Model selects verified findings; financial prose and charts are assembled from engine evidence."
+  ]
+}

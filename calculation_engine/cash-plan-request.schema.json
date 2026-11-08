@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "savings_target": {
+      "anyOf": [
+        {
+          "maximum": 1000000.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "title": "Savings Target"
+    },
+    "reserve": {
+      "anyOf": [
+        {
+          "maximum": 1000000.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "title": "Reserve"
+    },
+    "essential_buffer": {
+      "anyOf": [
+        {
+          "maximum": 1000000.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "title": "Essential Buffer"
+    }
+  },
+  "required": [
+    "savings_target",
+    "reserve",
+    "essential_buffer"
+  ],
+  "title": "CashPlanRequest",
+  "type": "object"
+}

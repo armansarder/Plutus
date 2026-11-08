@@ -1,0 +1,97 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "customer_id": {
+      "title": "Customer Id",
+      "type": "string"
+    },
+    "currency": {
+      "title": "Currency",
+      "type": "string"
+    },
+    "snapshot_as_of": {
+      "format": "date",
+      "title": "Snapshot As Of",
+      "type": "string"
+    },
+    "starting_balance": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Starting Balance",
+      "type": "string"
+    },
+    "month": {
+      "title": "Month",
+      "type": "string"
+    },
+    "horizon_end": {
+      "format": "date",
+      "title": "Horizon End",
+      "type": "string"
+    },
+    "planned_savings": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Planned Savings",
+      "type": "string"
+    },
+    "reserve": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Reserve",
+      "type": "string"
+    },
+    "essential_buffer": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Essential Buffer",
+      "type": "string"
+    },
+    "protected_amount": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Protected Amount",
+      "type": "string"
+    },
+    "projected_minimum": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Projected Minimum",
+      "type": "string"
+    },
+    "available_flexible_spending": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Available Flexible Spending",
+      "type": "string"
+    },
+    "funding_gap": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Funding Gap",
+      "type": "string"
+    },
+    "schedule_complete": {
+      "default": false,
+      "title": "Schedule Complete",
+      "type": "boolean"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "customer_id",
+    "currency",
+    "snapshot_as_of",
+    "starting_balance",
+    "month",
+    "horizon_end",
+    "planned_savings",
+    "reserve",
+    "essential_buffer",
+    "protected_amount",
+    "projected_minimum",
+    "available_flexible_spending",
+    "funding_gap",
+    "assumptions"
+  ],
+  "title": "CashPlanResult",
+  "type": "object"
+}

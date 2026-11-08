@@ -2,8 +2,8 @@
 export type DataMode = "synthetic_demo" | "remote";
 export function resolveDataMode(mode?: string, legacyMode?: string): DataMode {
   if (mode && legacyMode && mode !== legacyMode) throw new Error("Conflicting financial data modes");
-  const selected = mode ?? legacyMode ?? "synthetic_demo";
-  if (selected !== "remote" && selected !== "synthetic_demo") throw new Error("Invalid financial data mode");
+  const selected = mode ?? legacyMode ?? "remote";
+  if (selected !== "remote") throw new Error("Use remote mode for the configured Nessie customer");
   return selected;
 }
 // Keep existing local startup commands working; the legacy name now applies globally.

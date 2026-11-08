@@ -152,3 +152,43 @@ python -m nemotron_agent.check tool
 The tests cover authentication, CORS, request validation, model tool/decision flow,
 prompt-injection exclusion, unauthorized tools, malformed output, failure fallback,
 snapshot immutability, intraday dates, absent income, and safe-date forecasts.
+
+## Local presentation startup
+
+The dashboard and Monthly Plan now support an explicit session cash allocation via
+`POST /api/cash-plan/preview`. The user supplies a savings target, reserve, and extra
+unlisted essentials. The existing engine calculates event-minimum headroom through
+the snapshot month end; the server subtracts those allocations using Decimal. The
+user must approve the preview before the dashboard figures update. These are user
+targets and conditional cash-flow capacity, not Nessie savings balances or complete
+category budgets. Plans live only in browser query memory and clear on refresh.
+Request/response JSON schemas live in `calculation_engine/cash-plan-*.schema.json`;
+the frontend contracts are in `frontend/src/types/cashPlan.ts`.
+The backend also returns the combined protected amount. Chat can explicitly apply
+that amount as its reserve, keeping an approved savings allocation protected during
+a purchase review. The entire target is conservatively earmarked from the start.
+
+Chat distinguishes cash context (including trailing-dollar forms such as `2500$`)
+from option prices. Laptop versus car-down-payment questions ask for both prices
+and include keeping the cash as a baseline; car financing/ongoing costs are not
+implied. A clarification reply contains no projection or model-action boilerplate.
+
+Natural purchase questions in Council and specialist chats now propose editable
+amount/date/reserve fields. Confirm before analysis. Two cash choices (for example,
+"$500 laptop or $300 tablet") can be compared with keeping the cash using the same
+snapshot; choose an option for a role-specific stress review. Missing prices prompt
+clarification. Relative dates use the browser's displayed IANA timezone. This is a
+bounded deterministic intake, not unconstrained conversational intent extraction.
+
+From the repository root, run `.\.venv\Scripts\python.exe start_local.py`.
+This reads the existing `calculation_engine/.env`, synchronizes the private service
+token with the frontend server, and enables the local Council and specialist chats.
+Open http://127.0.0.1:8080/dashboard or http://127.0.0.1:8080/talk.
+Stop existing processes on 8000/8080 first; Ctrl+C stops the launcher and services.
+Never put the token in a VITE_ variable or paste it into chat.
+
+Live model reviews additionally require a valid `NVIDIA_API_KEY` in
+`nemotron_agent/.env`; restart after saving it. Missing model access produces
+explicit deterministic results, while failed Nessie access remains an error.
+Chats are temporary and single-customer. Monthly budgets, investment/debt models,
+and outbound messaging are not connected. See [Council details](COUNCIL.md).

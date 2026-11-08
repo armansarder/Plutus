@@ -23,7 +23,7 @@ import { financialPayload, forecastPayload } from "./fixtures/engineResponses";
 
 const pages = [
   { path: "/dashboard", Component: DashboardRoute.options.component!, message: "Here's where you stand." },
-  { path: "/monthly-plan", Component: MonthlyRoute.options.component!, message: "We don't have your monthly spending plan yet." },
+  { path: "/monthly-plan", Component: MonthlyRoute.options.component!, message: "Choose a savings target and the cash you want to protect." },
   { path: "/simulator", Component: SimulatorRoute.options.component!, message: "What if you bought it?" },
   { path: "/cash-flow", Component: CashFlowRoute.options.component!, message: "A look at what's next." },
   { path: "/alerts", Component: AlertsRoute.options.component!, message: "We don't have enough information to assess your plan yet." },
@@ -40,7 +40,7 @@ it.each(pages)("uses the backend customer and honest availability on $path", asy
   render(<QueryClientProvider client={client()}><Component /></QueryClientProvider>);
   expect(await screen.findByText(message)).toBeInTheDocument();
   expect(screen.getByText(/synthetic_demo/)).toBeInTheDocument();
-  expect(screen.getByText(/Synthetic demo dataset/)).toBeInTheDocument();
+  expect(screen.getByText(/Synthetic sample dataset/)).toBeInTheDocument();
   expect(document.body.textContent).not.toMatch(/\$1,800|\$1,600|\$600|Reserved ticket|Emergency fund|Fun & Entertainment/);
   if (path === "/dashboard") expect(screen.getByText("$800")).toBeInTheDocument();
   if (["/dashboard", "/alerts"].includes(path)) {
@@ -54,7 +54,7 @@ it.each(pages)("uses the backend customer and honest availability on $path", asy
 it.each(pages)("does not fall back after a backend failure on $path", async ({ Component }) => {
   vi.mocked(fetch).mockRejectedValue(new Error("offline"));
   render(<QueryClientProvider client={client()}><Component /></QueryClientProvider>);
-  expect(await screen.findByRole("alert")).toHaveTextContent("No demo data has been substituted");
+  expect(await screen.findByRole("alert")).toHaveTextContent("No sample data has been substituted");
   expect(screen.queryByText(/\$1,800|\$600|Reserved ticket/)).not.toBeInTheDocument();
   vi.mocked(fetch).mockImplementation(async () => Response.json(payload));
   fireEvent.click(screen.getByRole("button", { name: "Try again" }));
@@ -78,7 +78,7 @@ it("keeps customer identity and one shared snapshot while navigating all financi
     expect(await screen.findByText(message)).toBeInTheDocument();
     expect(screen.getByText(/synthetic_demo/)).toBeInTheDocument();
     expect(screen.getByText("Backend-connected data")).toBeInTheDocument();
-    expect(screen.queryByText("Synthetic demo data · Alex")).not.toBeInTheDocument();
+    expect(screen.queryByText("Synthetic sample data · Alex")).not.toBeInTheDocument();
   }
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(demoSnapshot).not.toHaveBeenCalled();

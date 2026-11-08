@@ -565,3 +565,51 @@ This council plan is a blueprint. Do not deploy additional agents, change curren
 runtime prompts, create API routes, install frameworks, alter financial math, or
 start persistence/hosting while carrying out the documentation request. Future
 implementation must keep claims of completed features aligned with tested behavior.
+
+
+## Council v2 implementation update
+
+The council blueprint above now has an opt-in local implementation. See
+`nemotron_agent/COUNCIL.md` for tested behavior and rollout. Runtime roles/prompts are
+in `council_prompts.py`; contracts in `council_contracts.py`; bounded async workflow
+in `council.py`; session-owned memory in `council_store.py`; routes in `council_api.py`.
+The frontend uses `councilProxy.server.ts`, `services/council.ts`, `types/council.ts`
+and `CouncilWorkspace.tsx`. Both flags default off; v1 is preserved. This update
+supersedes "design only" for those implemented pieces, not the optional ML/debt/
+production-auth/persistence proposals. Do not claim proposed endpoints such as
+independent retained run polling exist; conversation history is the run record.
+Role model calls select schema-constrained verified findings; engine templates own
+numerical prose. Common key patterns are redacted; arbitrary personal text is not
+guaranteed anonymized. Production council activation is blocked pending real user
+authentication. Keep generated council JSON contracts and UI validators synchronized.
+
+
+### Authorized Nessie sample-data maintenance
+
+The runtime and agent tools remain read-only. User-approved sandbox population is
+implemented separately in `pipeline/populate_nessie.py`; it is a dry run unless
+`--apply` is supplied. It preserves credentials/customer IDs, uses frozen private
+plans and remote sample markers, refuses conflicting records, and never retries an
+uncertain POST automatically. Do not run the older seed scripts. The explicitly
+approved one-account recovery is in `pipeline/recover_sample_account.py`; it verifies
+the full adapter/history before changing only the configured account ID.
+
+Nessie requires `recurring_date` on bill creation and derives the GET-only
+`upcoming_payment_date`. Future pending deposits with explicit source dates are now
+projected as estimated income; past/same-day deposits are never replayed.
+
+The frontend purchase intake in `services/purchaseIntent.ts` proposes one purchase
+or two cash alternatives, anchored to the displayed browser timezone. The user
+confirms fields before calculation. Alternatives share one engine snapshot through
+`/api/compare`; choosing one for specialist review is explicit. This does not add
+unrestricted model parsing or new financial tools.
+
+### User-facing response clarity
+
+Every completed purchase-review agent must give a direct, evidence-supported
+`recommendation` and a brief plain-language `summary` explaining its choice. Do not
+show internal position enums, raw evidence hashes, generic methodology boilerplate,
+or duplicate review rounds in the primary answer. Show the latest review per role;
+retain earlier rounds and references behind expandable evidence. Budget/Risk may
+disagree when ordinary affordability and stress resilience differ. Do not promise
+that a date tested only under expected income will survive delayed income.

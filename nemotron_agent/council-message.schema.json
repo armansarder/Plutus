@@ -1,0 +1,143 @@
+{
+  "$defs": {
+    "AgentRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Message",
+          "type": "string"
+        },
+        "purchase_amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "gt": 0,
+          "le": 1000000,
+          "title": "Purchase Amount"
+        },
+        "purchase_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Purchase Date"
+        },
+        "reserve": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "default": "200.00",
+          "ge": 0,
+          "le": 1000000,
+          "title": "Reserve"
+        },
+        "horizon_days": {
+          "default": 30,
+          "maximum": 90,
+          "minimum": 1,
+          "title": "Horizon Days",
+          "type": "integer"
+        },
+        "allow_model": {
+          "default": true,
+          "title": "Allow Model",
+          "type": "boolean"
+        },
+        "channel": {
+          "default": "web",
+          "enum": [
+            "web",
+            "photon"
+          ],
+          "title": "Channel",
+          "type": "string"
+        }
+      },
+      "required": [
+        "purchase_amount"
+      ],
+      "title": "AgentRequest",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "request_key": {
+      "pattern": "^[a-zA-Z0-9_-]{8,80}$",
+      "title": "Request Key",
+      "type": "string"
+    },
+    "message": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "analysis": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AgentRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "handoff": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{32}:[a-f0-9]{32}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Handoff"
+    },
+    "expected_snapshot_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Snapshot Id"
+    },
+    "allow_model": {
+      "default": true,
+      "title": "Allow Model",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "request_key",
+    "message"
+  ],
+  "title": "MessageRequest",
+  "type": "object"
+}
