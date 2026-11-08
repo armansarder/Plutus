@@ -6,7 +6,6 @@ const COPY = {
   "monthly-plan": { title: "Make room for what matters.", message: "We don't have your monthly spending plan yet.", detail: "Category budgets and savings allocations are unavailable. You can review your balance and upcoming transactions in Current Situation." },
   alerts: { title: "A gentle heads-up.", message: "We don't have enough information to assess your plan yet.", detail: "Budget, savings and forecast alerts are unavailable. Review the supplied upcoming transactions below; this is not an all-clear on your finances." },
   suggestions: { title: "A few possibilities for you.", message: "We don't have your monthly spending plan yet.", detail: "Personalized suggestions need your category budgets and savings allocations. You can review the records already available in Current Situation." },
-  talk: { title: "Talk to Plutus.", message: "Personalized answers aren't available for this customer yet.", detail: "The demo assistant uses Alex's separate records, so it is turned off in backend-connected mode. No AI or messaging service is connected here." },
 } as const;
 export type BackendCustomerPageId = keyof typeof COPY;
 

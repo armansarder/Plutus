@@ -11,7 +11,7 @@ const transaction = z.object({
   id: z.string().min(1).max(200), date: day, description: z.string().min(1).max(200),
   amount: decimalCents, type: z.enum(["income", "expense"]), source_status: z.enum(["confirmed", "estimated"]),
 }).refine(t => t.type === "income" ? t.amount > 0 : t.amount < 0);
-export const backendFinancialSchema = z.object({ data: z.object({
+export const backendFinancialSchema = z.object({ source: z.enum(["nessie_sandbox", "synthetic_demo", "configured_backend"]).optional(), data: z.object({
   customer_id: z.string().min(1).max(200), currency: z.literal("USD"), as_of_date: day,
   current_balance: decimalCents, upcoming_transactions: z.array(transaction).max(1000),
   snapshot_basis: z.enum(["opening", "intraday"]).default("opening"),

@@ -10,7 +10,7 @@ const cents = z.number().int().safe();
 
 export const cashFlowTypeSchema = z.enum(["income", "bill", "expense", "purchase"]);
 export const provenanceSchema = z.enum(["observed", "scheduled", "assumed", "committed", "hypothetical"]);
-export const dataSourceSchema = z.enum(["synthetic_demo", "nessie_sandbox"]);
+export const dataSourceSchema = z.enum(["synthetic_demo", "nessie_sandbox", "configured_backend"]);
 
 export const cashFlowSchema = z.object({
   id: z.string().min(1).max(80),

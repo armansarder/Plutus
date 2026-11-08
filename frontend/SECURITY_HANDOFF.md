@@ -5,11 +5,19 @@ The frontend alone cannot secure a real financial app. This lists what the front
 ## Stage 2/3 additions
 - Alerts are derived locally from the plan, snapshot and baseline simulation (`src/lib/alerts.ts`) — no random or fabricated warnings.
 - The Talk to Plutus demo assistant computes every number through the same simulation engine as the Simulator; it never invents tool results, and stress-test cards report tested outcomes ("N of 4 scenarios"), never probabilities.
-- Chat input is capped at 500 characters; all agent text renders through React escaping. Voice input uses the browser's speech recognition only when present, requires a user gesture, and never auto-submits — the user reviews the transcript first.
+- Alex demo chat input is capped at 500 characters. Remote Talk follows the actual 2,000-character agent message limit and requires explicit validated purchase fields. All agent text renders through React escaping. Demo voice input uses the browser's speech recognition only when present, requires a user gesture, and never auto-submits — the user reviews the transcript first.
 - The Photon section shows real status when a backend provides it and otherwise honestly reports "Messaging demo — not connected." No fake phone numbers or channels.
-- Proposed backend paths live in `src/services/endpoints.ts`; these prototype HTTP adapters remain unselected. Remote mode uses `services/engine.ts` and the secure proxy allowlist: `/api/financial-data`, `/api/simulate`, `/api/compare`, `/api/forecast`, `/api/history`. Unconnected category budgets, savings, agent and messaging capabilities remain unavailable. No Alex fallback.
+- Proposed backend paths live in `src/services/endpoints.ts`; prototype chat adapters remain unselected. Remote mode uses `services/engine.ts`, `services/nemotron.ts` and the secure proxy allowlist: `/api/financial-data`, `/api/simulate`, `/api/compare`, `/api/forecast`, `/api/history`, `/api/agent/run`. Category budgets, protected savings and messaging remain unavailable. No Alex fallback.
+- Remote Talk accepts only the purchase-analysis schema on channel `web`, never arbitrary tools, customer IDs, data URLs or delivery requests. It checks the flat agent response, customer/currency/snapshot and confirmed request fields, applicability counts and truthful model/fallback state. Credentials stay server-side. Unknown provider fields (including reasoning) are stripped. Conversation history stays in a snapshot-scoped memory cache; user questions do not grant tool permissions or become conversation history for the backend model.
 
 ## At rest
+
+Nessie mode uses the existing server-only GET adapter and same-customer/account
+ownership checks for snapshots and history. `source=nessie_sandbox` metadata is
+validated and preserved by the proxy; account IDs, source URLs and Nessie keys are
+not accepted from frontend requests. No historical replay or history-derived future
+paychecks enter the simulation. See `calculation_engine/NESSIE.md` for selection,
+30-second cache, source-failure semantics and private environment configuration.
 **Frontend (done):** demo or backend records stay in memory only; no financial data in localStorage/sessionStorage/IndexedDB/URLs; state lives in React memory and resets on reload; no persistent query cache; no secrets or API keys in source; no analytics scripts. One application-wide mode and mode-scoped snapshot cache prevent cross-customer substitution.
 **Backend (to do):** encrypt databases and backups, per-user authorization / row-level policies, secret management and rotation, retention and deletion policy.
 

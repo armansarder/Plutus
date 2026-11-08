@@ -1,112 +1,131 @@
-# Connecting Capital One Nessie
+# Nessie-backed Plutus (read only)
 
-This integration means Capital One's Nessie banking **simulation API**, not the
-unrelated Project Nessie data catalog. It reads a selected Checking/Savings account;
-it never creates purchases, transfers, deposits, withdrawals, bills, or accounts.
+Nessie is Capital One's banking **sandbox**, not a real bank connection. All
+financial routes and the existing Nemotron agent share one server-selected
+customer and cash account. No Nessie write methods or seed scripts run.
 
-Primary references:
+References reviewed: [published docs](https://nessieisreal.com/docs),
+[official account SDK](https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/account.js),
+[deposit SDK](https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/deposit.js),
+[purchase SDK](https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/purchase.js),
+and [bill SDK](https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/bills.js).
+Use `https://prod-api.nessieisreal.com`, not older SDK HTTP defaults.
 
-- https://nessieisreal.com/docs — current Nessie dashboard/API documentation.
-- https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/account.js
-  — official SDK account GET route and `key` query authentication.
-- https://github.com/nessieisreal/nessie-python-sdk — official Python SDK. Its
-  historical HTTP/reimaginebanking configuration is not copied into this service.
+## Reused architecture and selection
 
-## Implemented contract
+`NessieHistorySource` reuses Azzam's extraction shape and the existing history
+normalizer. It GETs `/customers/{customer_id}/accounts`, then the selected account's
+purchases, deposits, withdrawals, transfers and bills, plus merchant metadata.
+The same source object feeds `NessieAdapter` and `/api/history`. Explicit ownership
+and account-reference checks reject foreign records. Credit-card balances are not
+treated as cash. With no account ID configured, exactly one Checking account is
+preferred; otherwise exactly one cash account is required. Ambiguity fails closed.
 
-`NessieAdapter` sends one authenticated HTTPS GET to `/accounts/{account_id}`.
-It expects an account object containing `_id`, `customer_id`, `type`, and `balance`.
-Extra account metadata is ignored. Both IDs are checked against server configuration,
-and credit-card balances are rejected because debt is not a cash account balance.
-Amounts pass the same strict Decimal validation as every other adapter.
+The cache lasts 30 seconds, does not cross UTC date boundaries, and never returns
+expired data after a source failure. Collection 404 responses mean empty lists;
+account discovery, authentication and other failures are errors, not demo fallback.
 
-Set the exact current HTTPS API origin provided by your Nessie dashboard. Supported
-origins are `https://api.nessieisreal.com` and `https://prod-api.nessieisreal.com`.
-There is no fallback to HTTP or automatic host switching. If the team's dashboard
-uses a different origin, verify its ownership and API contract before updating the
-explicit allowlist in `nessie_adapter.py`. No connectivity or actual account response
-has been tested by the coding agent for this revision.
+The combined server supports `AGENT_DATA_SOURCE=nessie`, or the existing
+`AGENT_DATA_SOURCE=engine` plus `FINPILOT_DATA_SOURCE=nessie`. Setting only the latter
+also selects Nessie when no agent mode is explicit. Demo/Nessie conflicts fail.
+Financial calculations and Nemotron orchestration are unchanged.
 
-## Snapshot and future-event semantics
+`/api/financial-data` now returns a top-level `source` alongside `data`, reflected
+in FastAPI's OpenAPI schema. The secure proxy preserves it while stripping
+snapshot history. Shared frontend state and badges identify `nessie_sandbox` as
+**Nessie sandbox data**. Older backends without metadata remain labeled configured
+data, rather than being assumed to be Nessie.
 
-Nessie current balance is an **intraday snapshot**, with `as_of_date` recorded as
-the UTC date when the account response was received, not a reconstructed opening
-balance. `snapshot_basis=intraday` and `source_notes` expose that distinction.
-Same-day purchases and forecasts starting on the snapshot date are rejected because
-date-only events cannot identify which same-day postings are already included.
-Use dates strictly after the current UTC snapshot date.
+## Financial semantics and limitations
 
-Historical purchases are already reflected in that balance. This adapter does not
-fetch or subtract them again. Pending items, bills, recurring periods, or old deposits
-are not automatically treated as future events. There is no inferred future paycheck.
-Nessie does not establish currency in this account mapping; the team configures it
-with `FINPILOT_CURRENCY` (defaults to USD, two-decimal precision).
+- Use the selected account's current balance as an intraday UTC snapshot. Never
+  replay history onto it. Purchases/forecasts start strictly after the snapshot day.
+- History is scoped to that same account. Only completed/executed records count
+  toward spending/income. Pending records are not counted; future dates are excluded.
+  Transfers keep the existing pipeline semantics and are excluded from those totals.
+- Only explicit future `upcoming_payment_date` values on pending/recurring bills
+  are projected. A pending one-time bill may instead supply a future `payment_date`.
+  Dates are marked estimated. Completed/cancelled, same-day and stale bills are
+  excluded. No stale date is rolled forward; no later recurrence is extrapolated.
+- No paycheck, subscription, budget or protected savings allocation is inferred.
+  `FINPILOT_UPCOMING_FILE` is rejected in Nessie mode because the current pipeline
+  output contains inferred paychecks and rolled-forward bill dates. Existing raw
+  and clean pipeline files are preserved and never substituted after a live failure.
+- With no eligible future dates, upcoming events are empty. A flat forecast does
+  not establish affordability. Schedule completeness and unscheduled spending are
+  unknown. Category budget affordability and savings protection remain unknown.
+- Currency is configured (`FINPILOT_CURRENCY=USD`); Nessie balances do not establish
+  it. The current frontend supports USD only.
 
-With no schedule attached, the result has an empty future list and explicit missing
-information. This is useful for testing the adapter, but cannot establish affordability
-without future bills/income. Azzam can supply those events independently.
+## Exact Git Bash startup (Windows worktree)
 
-## Configure in your terminal
+Use an available backend port; replace the old dev server manually if it already
+occupies 8003. Start both processes in the same shell so the frontend server inherits
+the service token without printing or saving it. The ignored `.venv` was prepared
+for the backend tests.
 
-Do not paste your Nessie key into chat, code, a command literal, or Git. These commands
-prompt without displaying it:
+```bash
+cd /c/Users/there/PlutusFake-integration
+./.venv/Scripts/python.exe -m pip install -r nemotron_agent/requirements.txt
 
-```powershell
-$env:FINPILOT_DATA_SOURCE = 'nessie'
-$env:FINPILOT_MODE = 'local'
-$env:FINPILOT_API_TOKEN = python -c "import secrets; print(secrets.token_urlsafe(48))"
-$env:FINPILOT_CUSTOMER_ID = Read-Host 'Nessie customer ID'
-$env:NESSIE_ACCOUNT_ID = Read-Host 'Nessie Checking or Savings account ID'
-$env:NESSIE_BASE_URL = Read-Host 'Exact HTTPS API origin from your Nessie dashboard'
-$nessieSecret = Read-Host 'Nessie sandbox API key' -AsSecureString
-$env:NESSIE_API_KEY = [System.Net.NetworkCredential]::new('', $nessieSecret).Password
-$env:FINPILOT_ALLOWED_HOSTS = 'localhost,127.0.0.1'
-powershell -ExecutionPolicy Bypass -File calculation_engine\run.ps1 serve
+read -rsp 'Nessie API key: ' NESSIE_API_KEY; printf '\n'
+export NESSIE_API_KEY
+read -rp 'Nessie customer ID: ' FINPILOT_CUSTOMER_ID
+read -rp 'Account ID (blank for unambiguous Checking selection): ' NESSIE_ACCOUNT_ID
+export FINPILOT_CUSTOMER_ID NESSIE_ACCOUNT_ID
+export NESSIE_BASE_URL=https://prod-api.nessieisreal.com
+export AGENT_DATA_SOURCE=nessie FINPILOT_DATA_SOURCE=nessie
+export FINPILOT_MODE=local FINPILOT_CURRENCY=USD
+export FINPILOT_ALLOWED_HOSTS=localhost,127.0.0.1
+export FINPILOT_CORS_ORIGINS=http://localhost:8080
+unset FINPILOT_UPCOMING_FILE
+export FINPILOT_API_TOKEN="$(./.venv/Scripts/python.exe -c 'import secrets; print(secrets.token_urlsafe(48))')"
+
+./.venv/Scripts/python.exe -m uvicorn nemotron_agent.main:app --host 127.0.0.1 --port 8003 &
+
+export VITE_DATA_MODE=remote
+unset VITE_SITUATION_DATA_MODE
+export FINPILOT_BACKEND_URL=http://127.0.0.1:8003
+cd frontend
+npm run dev -- --port 8080
 ```
 
-Restart the old server first; it will not adopt new environment variables. From a
-terminal with the same token, inspect the snapshot:
+Open `http://localhost:8080/dashboard`, then Simulator, Cash Flow, Alerts,
+Suggestions and Talk. They retain the same Nessie customer and source badge.
+Monthly Plan remains unavailable. Talk keeps its confirmed purchase fields and
+backend-supported stress scenarios. Actual Nemotron investigation additionally
+requires the existing server-only `NVIDIA_API_KEY` configuration; missing model
+access is labeled deterministic fallback, never a financial-source fallback.
 
-```powershell
-$headers = @{ Authorization = "Bearer $env:FINPILOT_API_TOKEN" }
-$snapshot = (Invoke-RestMethod http://127.0.0.1:8000/api/financial-data -Headers $headers).data
-$snapshot | Select-Object customer_id, currency, as_of_date, current_balance, snapshot_basis
-$purchaseDate = ([datetime]::ParseExact($snapshot.as_of_date, 'yyyy-MM-dd', $null)).AddDays(1).ToString('yyyy-MM-dd')
-$body = @{ purchase_amount = '25.00'; purchase_date = $purchaseDate } | ConvertTo-Json
-Invoke-RestMethod http://127.0.0.1:8000/api/simulate -Method Post -Headers $headers -ContentType 'application/json' -Body $body
+Never put Nessie/NVIDIA/service keys in `VITE_` variables, browser storage, source
+files, command literals or Git. Nessie uses a server-side key query parameter;
+outbound URL logging remains suppressed and errors are sanitized. Shared deployment
+still needs the existing authenticated application access boundary; same-origin
+checks alone are not user authentication.
+
+## Verification
+
+```bash
+cd /c/Users/there/PlutusFake-integration
+./.venv/Scripts/python.exe -m pytest tests -q
+cd frontend
+npm test
+npx tsc --noEmit
+VITE_DATA_MODE=remote npm run build
 ```
 
-Expected: HTTP 200, the configured customer, `snapshot_basis=intraday`, and a purchase
-timeline whose balance reflects only fetched balance and the supplied future events.
-With no schedule, ending balance equals the fetched balance minus 25.00. There is
-no fixed expected live balance. Source/contract failures return sanitized HTTP 503;
-they never silently switch to mock data.
+Normal tests use synthetic Nessie wire fixtures, not customer records or remote
+NVIDIA calls. With real keys configured, opt into authenticated read-only checks:
 
-## Connect Azzam's future schedule
+```bash
+cd /c/Users/there/PlutusFake-integration
+PLUTUS_NESSIE_LIVE_CHECK=1 ./.venv/Scripts/python.exe -m pytest tests/test_nessie_live.py -q -s
+```
 
-Set `FINPILOT_UPCOMING_FILE` to an absolute path containing the shared FinancialData
-contract. Put private integration fixtures under ignored
-`calculation_engine/private_data/`, not in `mock_data.json`.
-
-The schedule must match Nessie's customer, configured currency, and the current
-UTC `as_of_date`; all future events must be strictly later than that date. The
-schedule's `current_balance` and history are validated but **not applied**. Nessie
-provides the actual snapshot balance. Stale/mismatched schedules fail closed.
-
-For a Python function/API, inject the corresponding existing adapter as
-`NessieAdapter(..., upcoming_source=FunctionAdapter(your_normalization_function))`
-or `ApiAdapter(your_agreed_url, transform=normalize, allowed_hosts=(your_api_host,))`.
-Pass that NessieAdapter to `create_app(..., settings=SecuritySettings(...))` with
-matching customer ID and authentication. URLs, account IDs and keys stay server-side.
-
-Use `source_notes` to communicate material upstream omissions. Output normalization
-must not mark already-posted purchases as upcoming. This approach keeps financial
-math unchanged regardless of the pipeline that supplies future events.
-
-## Verification remaining
-
-The new synthetic tests cover GET-only integration, ownership checks, credit-card
-rejection, invalid balances, schedule mismatches, same-day rejection, and matching
-simulation output for equivalent normalized data. You must run them, then perform
-the authenticated live GET above with your sandbox account. Confirm its fields and
-HTTPS API origin against the team's dashboard before teammate handoff.
+This runs the combined FastAPI app in-process with its bearer-token boundary and
+the real Nessie GET adapter. It verifies `/api/financial-data`, `/api/simulate`,
+`/api/compare`, `/api/forecast`, `/api/history` and `/api/agent/run` against the selected
+customer. The agent request uses `allow_model=false` to check source wiring without
+sending records to an external model. Only route statuses are printed. Missing
+credentials skip the check; a Nessie error fails it. No live success is claimed
+without running this check.

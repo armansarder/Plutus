@@ -2,7 +2,8 @@ import { z } from "zod";
 import { categoryIdSchema, compareScenariosRequestSchema } from "./financial";
 
 /**
- * Contracts for the proposed Nemotron agent backend (POST /api/agent/message).
+ * Alex demo chat / prototype contracts. The actual remote agent has a different
+ * purchase-analysis contract in types/nemotron.ts (POST /api/agent/run).
  * The frontend never fabricates tool results: structured payloads are either
  * produced by the backend or, in demo mode, computed by the same deterministic
  * simulation engine the Simulator uses.

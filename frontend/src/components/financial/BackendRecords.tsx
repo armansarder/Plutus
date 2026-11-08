@@ -3,7 +3,7 @@ import { formatMoney } from "@/lib/formatMoney";
 import { formatDateOnly } from "@/lib/dateOnly";
 
 export function BackendSource({ snapshot }: { snapshot: SituationSnapshot }) {
-  return <p className="mb-6 rounded-md bg-caution-soft p-3 text-sm">Backend data · {snapshot.backend?.synthetic ? "Synthetic demo dataset" : "Configured backend dataset"} · {snapshot.backend?.basis} snapshot · {formatDateOnly(snapshot.startDate)}. {snapshot.cashFlows.length === 0 ? "No upcoming transactions supplied." : snapshot.cashFlows.some(t => t.provenance === "assumed") ? "Includes estimated upcoming transactions." : "Upcoming transactions are marked confirmed by the source."} Schedule completeness is not verified.</p>;
+  return <p className="mb-6 rounded-md bg-caution-soft p-3 text-sm">Backend data · {snapshot.backend?.source === "nessie_sandbox" ? "Nessie sandbox data" : snapshot.backend?.synthetic ? "Synthetic demo dataset" : "Configured backend dataset"} · {snapshot.backend?.basis} snapshot · {formatDateOnly(snapshot.startDate)}. {snapshot.cashFlows.length === 0 ? "No upcoming transactions supplied." : snapshot.cashFlows.some(t => t.provenance === "assumed") ? "Includes estimated upcoming transactions." : "Upcoming transactions are marked confirmed by the source."} Schedule completeness is not verified.</p>;
 }
 
 export function BackendTransactions({ snapshot }: { snapshot: SituationSnapshot }) {

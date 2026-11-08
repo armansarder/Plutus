@@ -58,7 +58,7 @@ export function BackendSituation() {
   return <div><PageHeading eyebrow={`${snap.customer.displayName} · ${formatDateOnly(snap.startDate)}`} title="Here's where you stand." description="Your backend account snapshot and upcoming scheduled events." />
     <BackendSource snapshot={snap} />
     <section aria-label="Key figures" className="grid gap-4 sm:grid-cols-2">
-      <MetricCard icon={Wallet} label="Current checking balance" value={formatMoney(snap.startingBalanceCents)} hint="Snapshot balance · not all available to spend" />
+      <MetricCard icon={Wallet} label="Current account balance" value={formatMoney(snap.startingBalanceCents)} hint="Snapshot balance · not all available to spend" />
       <MetricCard icon={PiggyBank} label="Planned savings this month" value="Unavailable" hint="Savings records have not been integrated for this customer" />
       <MetricCard icon={Ticket} label="Available flexible spending" value="Unavailable" hint="Budget records have not been integrated for this customer" />
       <MetricCard icon={CalendarClock} label="Next expected payday" value={payday ? formatMoney(payday.amountCents) : "Unavailable"} hint={payday ? `${formatDateOnly(payday.date)} · ${payday.provenance === "assumed" ? "estimated" : "confirmed"} income` : "No upcoming income supplied"} />

@@ -187,6 +187,7 @@ class ComparisonResult(Contract):
 
 class FinancialResponse(Contract):
     data: FinancialData
+    source: Literal['nessie_sandbox', 'synthetic_demo', 'configured_backend'] = 'configured_backend'
 
 
 class SimulationResponse(Contract):

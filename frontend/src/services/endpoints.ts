@@ -5,6 +5,8 @@
  * Stage 1 contracts.
  */
 export const ENDPOINTS = {
+  // Confirmed combined FastAPI agent route (schema 1.0).
+  agentRun: "/api/agent/run",
   // Stage 1 contracts
   snapshot: "/api/v1/financial/snapshot",
   compareScenarios: "/api/v1/simulations/compare",
