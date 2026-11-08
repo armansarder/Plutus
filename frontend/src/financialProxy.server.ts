@@ -82,7 +82,15 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
           const schema = agent ? nemotronRequestSchema : url.pathname === "/api/simulate" ? purchaseRequestSchema : url.pathname === "/api/compare" ? compareRequestSchema : forecastRequestSchema;
           schema.parse(JSON.parse(body)); // Forward original JSON so backend duplicate-key checks still apply.
         }
-      } catch { return error(422, "Check purchase amounts, dates and scenario inputs"); }
+      } catch {
+        if (isNotification && (request.method === "POST" || request.method === "DELETE")) {
+          body = "{}";
+        } else {
+          return error(422, "Check purchase amounts, dates and scenario inputs");
+        }
+      }
+    } else if (isNotification && request.method === "POST") {
+      body = "{}";
     }
   }
   const token = process.env["FINPILOT_API_TOKEN"];
@@ -92,6 +100,9 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
     if (upstream.username || upstream.password || upstream.search || upstream.hash || upstream.pathname !== "/" || !["http:", "https:"].includes(upstream.protocol)) return error(503, "Financial service is not configured");
     if (upstream.protocol === "http:" && !["127.0.0.1", "localhost", "[::1]"].includes(upstream.hostname)) return error(503, "Financial service requires HTTPS");
     const opToken = request.headers.get("x-operator-token");
+    if (request.method === "POST" && (body === undefined || body === "")) {
+      body = "{}";
+    }
     const response = await fetch(new URL(url.pathname + url.search, upstream), {
       method: request.method,
       ...(body === undefined ? {} : { body }),

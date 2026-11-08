@@ -254,7 +254,6 @@ def operator_spend(
 
 @router.post("/api/notifications/operator/advance-payday")
 def operator_advance_payday(
-    payload: AdvancePaydayRequest | None = None,
     x_operator_token: str | None = Header(None),
     customer_id: str = "synthetic_demo"
 ):
