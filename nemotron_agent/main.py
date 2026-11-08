@@ -9,7 +9,11 @@ from calculation_engine.data_loader import FunctionAdapter
 from .check import fixture
 from .contracts import AgentRequest, AgentResponse
 from .service import run_agent
+from notifications.router import router as notifications_router
+from notifications.store import get_authoritative_financial_data
 
+root_dir = Path(__file__).resolve().parents[1]
+load_dotenv(root_dir / '.env', override=False)
 load_dotenv(Path(__file__).with_name('.env'), override=False)
 
 
@@ -30,9 +34,10 @@ def create_app(source=None, settings=None, provider=None):
         raise ValueError('Conflicting data sources: select AGENT_DATA_SOURCE=nessie or engine')
     label = 'synthetic_demo' if source is None and mode == 'demo' else 'configured_engine_source'
     if source is None and mode == 'demo':
-        source = FunctionAdapter(demo_snapshot)
+        source = FunctionAdapter(get_authoritative_financial_data)
     app = create_engine_app(source=source, settings=settings,
                            data_source_mode='nessie' if mode == 'nessie' else None)
+    app.include_router(notifications_router)
     from calculation_engine.nessie_adapter import NessieAdapter
     if isinstance(app.state.financial_source, NessieAdapter):
         label = 'nessie_sandbox'

@@ -1,9 +1,12 @@
-# Python
+# Dependencies
+node_modules/
 venv/
 .venv/
 __pycache__/
 .pytest_cache/
 *.log
+*.sqlite3
+*.sqlite
 .test-tmp*/
 .DS_Store
 

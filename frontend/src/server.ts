@@ -1,4 +1,4 @@
-import { proxyFinancialData, FINANCIAL_PROXY_PATHS } from "./financialProxy.server";
+import { proxyFinancialData, FINANCIAL_PROXY_PATHS, isFinancialProxyPath } from "./financialProxy.server";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -50,7 +50,7 @@ function isH3SwallowedErrorBody(body: string): boolean {
 // twice and renders garbled.
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    if ((FINANCIAL_PROXY_PATHS as readonly string[]).includes(new URL(request.url).pathname)) return proxyFinancialData(request);
+    if (isFinancialProxyPath(new URL(request.url).pathname)) return proxyFinancialData(request);
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

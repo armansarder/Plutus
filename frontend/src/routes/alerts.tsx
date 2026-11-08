@@ -13,6 +13,8 @@ import { addDays } from "@/lib/dateOnly";
 import { HORIZON_DAYS, type FinancialSnapshot } from "@/types/financial";
 import { DATA_MODE } from "@/services/config";
 import { BackendCustomerPage } from "@/components/app/BackendCustomerPage";
+import { TextNotificationSettings } from "@/components/notifications/TextNotificationSettings";
+import { WatchedPurchasesSection } from "@/components/notifications/WatchedPurchasesSection";
 
 export const Route = createFileRoute("/alerts")({
   loader: async ({ context }) => {
@@ -111,6 +113,9 @@ function DemoAlerts() {
           )}
         </>
       )}
+
+      <WatchedPurchasesSection />
+      <TextNotificationSettings />
     </div>
   );
 }
