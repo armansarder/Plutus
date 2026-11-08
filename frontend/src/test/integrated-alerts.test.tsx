@@ -32,7 +32,7 @@ it("protects the notification proxy from forged identity, arbitrary routes and c
  vi.stubEnv("FINPILOT_API_TOKEN","server-token-"+"x".repeat(40));const fetch=vi.fn();vi.stubGlobal("fetch",fetch);
  const request=(path:string,body:unknown)=>new Request("http://localhost"+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
  expect((await proxyNotifications(request("/api/notifications/watchlist",{label:"Laptop",amount_cents:40000,reserve_cents:20000,horizon_days:30,customer_id:"other"}))).status).toBe(422);
- expect((await proxyNotifications(request("/api/notifications/operator/spend",{}))).status).toBe(404);
+ expect((await proxyNotifications(request("/api/notifications/operator/unknown",{}))).status).toBe(404);
  expect((await proxyNotifications(new Request("http://localhost/api/notifications/history",{headers:{Origin:"https://evil.test"}}))).status).toBe(403);
  expect(fetch).not.toHaveBeenCalled();
 });

@@ -14,6 +14,7 @@ import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as CashFlowRouteImport } from './routes/cash-flow'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MonthlyPlanRouteImport } from './routes/monthly-plan'
+import { Route as OperatorRouteImport } from './routes/operator'
 import { Route as SimulatorRouteImport } from './routes/simulator'
 import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as TalkRouteImport } from './routes/talk'
@@ -43,6 +44,11 @@ const MonthlyPlanRoute = MonthlyPlanRouteImport.update({
   path: '/monthly-plan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OperatorRoute = OperatorRouteImport.update({
+  id: '/operator',
+  path: '/operator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimulatorRoute = SimulatorRouteImport.update({
   id: '/simulator',
   path: '/simulator',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/cash-flow': typeof CashFlowRoute
   '/dashboard': typeof DashboardRoute
   '/monthly-plan': typeof MonthlyPlanRoute
+  '/operator': typeof OperatorRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
   '/talk': typeof TalkRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/cash-flow': typeof CashFlowRoute
   '/dashboard': typeof DashboardRoute
   '/monthly-plan': typeof MonthlyPlanRoute
+  '/operator': typeof OperatorRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
   '/talk': typeof TalkRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/cash-flow': typeof CashFlowRoute
   '/dashboard': typeof DashboardRoute
   '/monthly-plan': typeof MonthlyPlanRoute
+  '/operator': typeof OperatorRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
   '/talk': typeof TalkRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/cash-flow'
     | '/dashboard'
     | '/monthly-plan'
+    | '/operator'
     | '/simulator'
     | '/suggestions'
     | '/talk'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/cash-flow'
     | '/dashboard'
     | '/monthly-plan'
+    | '/operator'
     | '/simulator'
     | '/suggestions'
     | '/talk'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/cash-flow'
     | '/dashboard'
     | '/monthly-plan'
+    | '/operator'
     | '/simulator'
     | '/suggestions'
     | '/talk'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   CashFlowRoute: typeof CashFlowRoute
   DashboardRoute: typeof DashboardRoute
   MonthlyPlanRoute: typeof MonthlyPlanRoute
+  OperatorRoute: typeof OperatorRoute
   SimulatorRoute: typeof SimulatorRoute
   SuggestionsRoute: typeof SuggestionsRoute
   TalkRoute: typeof TalkRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MonthlyPlanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/operator': {
+      id: '/operator'
+      path: '/operator'
+      fullPath: '/operator'
+      preLoaderRoute: typeof OperatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simulator': {
       id: '/simulator'
       path: '/simulator'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   CashFlowRoute: CashFlowRoute,
   DashboardRoute: DashboardRoute,
   MonthlyPlanRoute: MonthlyPlanRoute,
+  OperatorRoute: OperatorRoute,
   SimulatorRoute: SimulatorRoute,
   SuggestionsRoute: SuggestionsRoute,
   TalkRoute: TalkRoute,
