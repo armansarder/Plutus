@@ -1,3 +1,4 @@
+import { profileHeaders } from "./demoProxy.server";
 /** Server-only council gateway. Browser headers never define identity or tools. */
 import { z } from "zod";
 import { councilMessageSchema, conversationCreateSchema, conversationSchema, councilRunSchema, councilStatusSchema } from "./types/council";
@@ -61,7 +62,7 @@ export async function proxyCouncil(request: Request): Promise<Response> {
       (upstream.protocol === "http:" && !["localhost", "127.0.0.1", "[::1]"].includes(upstream.hostname))) return fail(503);
     const signed = await session(request, token);
     const response = await fetch(new URL(url.pathname, upstream), {method: request.method,
-      ...(body === undefined ? {} : {body}), headers: {Authorization: `Bearer ${token}`, "X-Plutus-Session": signed,
+      ...(body === undefined ? {} : {body}), headers: {...profileHeaders(request), Authorization: `Bearer ${token}`, "X-Plutus-Session": signed,
         Accept: "application/json", ...(body === undefined ? {} : {"Content-Type": "application/json"})},
       redirect: "error", cache: "no-store", signal: AbortSignal.any([request.signal, AbortSignal.timeout(65000)])});
     if (!response.ok) return fail([401, 403, 404, 409, 422, 429, 503].includes(response.status) ? response.status : 502);

@@ -55,4 +55,22 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
     return app
 
 
-app = create_app()
+def configured_app():
+    if not (os.getenv('PLUTUS_DEMO_PROFILES') or os.getenv('PLUTUS_DEMO_PROFILES_FILE')):
+        return create_app()
+    from .demo_gateway import from_env
+    from calculation_engine.nessie_adapter import NessieAdapter, DEFAULT_NESSIE_BASE_URL
+    from calculation_engine.history import NessieHistorySource
+    def factory(profile, settings):
+        records = NessieHistorySource(api_key=os.getenv('NESSIE_API_KEY', ''),
+            customer_id=settings.customer_id, account_id=profile.get('account_id'),
+            base_url=os.getenv('NESSIE_BASE_URL', DEFAULT_NESSIE_BASE_URL), select_single=True, cache_seconds=30)
+        source = NessieAdapter(api_key=os.getenv('NESSIE_API_KEY', ''), account_id=profile.get('account_id'),
+            customer_id=settings.customer_id, base_url=records.base_url,
+            currency=os.getenv('FINPILOT_CURRENCY', 'USD'), raw_source=records)
+        app = create_app(source=source, settings=settings)
+        app.state.history_source = records
+        return app
+    return from_env(factory)
+
+app = configured_app()

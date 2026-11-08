@@ -14,3 +14,5 @@ __pycache__/
 *.pem
 *.key
 calculation_engine/private_data/
+# Local approved sandbox profiles (customer/account IDs)
+nemotron_agent/demo-profiles.json

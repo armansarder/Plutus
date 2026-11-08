@@ -154,7 +154,7 @@ class NessieHistorySource:
         fetched_at = datetime.now(timezone.utc).isoformat()
         accounts = ([select_cash_account(available, self.customer_id, self.account_id)]
                     if self.select_single or self.account_id else _check_accounts(available, self.customer_id))
-        raw = {'customer_id': self.customer_id, 'accounts': accounts}
+        raw = {'customer_id': self.customer_id, 'accounts': accounts, 'available_accounts': available}
         for kind in TRANSACTION_KINDS:
             rows = []
             for account in accounts:

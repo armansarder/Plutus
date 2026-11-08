@@ -24,7 +24,7 @@ def install_council(app, snapshot_dependency, source, provider=None):
         if not enabled:
             raise HTTPException(404, 'Council feature is disabled')
         session = verify_session(request.headers.get('x-plutus-session'), settings.api_token)
-        return (settings.customer_id or 'configured_source', session)
+        return (settings.customer_id or 'configured_source', request.scope.get('plutus_profile_owner', session))
 
     def view(item):
         return ConversationView(id=item.id, role=item.role, messages=item.messages, busy=item.active is not None)
@@ -32,7 +32,7 @@ def install_council(app, snapshot_dependency, source, provider=None):
     @router.get('/council/status', response_model=CouncilStatus)
     def status():
         return CouncilStatus(enabled=enabled, roles=['council', 'budget', 'risk', 'simulator'],
-            scope='Temporary signed-browser sessions for one configured customer; local demo only. No user login or durable storage.')
+            scope='Temporary browser sessions bound to the selected configured customer; local demo only. No bank login or durable storage.')
 
     @router.post('/conversations', response_model=ConversationView)
     async def create(body: ConversationCreate, identity=Depends(owner)):

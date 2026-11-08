@@ -1,3 +1,5 @@
+import { NessieInsights } from "@/components/financial/NessieInsights";
+import { useLocation } from "@tanstack/react-router";
 import { DATA_MODE } from "@/services/config";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -7,6 +9,10 @@ import { Button } from "@/components/ui/button";
 import { FinancialDataBadge } from "@/components/financial/FinancialDataBadge";
 import { useCustomerFinancialData } from "./CustomerFinancialData";
 
+function AccountInsights() {
+ const q = useCustomerFinancialData();
+ return q.data?.backend?.source === "nessie_sandbox" ? <NessieInsights /> : null;
+}
 function BackendDataBadge() {
   const query = useCustomerFinancialData();
   const label = query.isError ? "Backend data unavailable" : query.isPending ? "Loading backend data…" : query.data.backend?.source === "nessie_sandbox" ? "Nessie sandbox data" : "Backend-connected data";
@@ -17,6 +23,7 @@ const navCls =
   "rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const location = useLocation();
   const backendConnected = DATA_MODE === "remote";
   const [open, setOpen] = useState(false);
   const links = [{ to: "/", label: "Home" }, { to: "/dashboard", label: "Current situation" }, { to: "/monthly-plan", label: "Monthly plan" }, { to: "/simulator", label: "Simulator" }, { to: "/cash-flow", label: "Cash flow" }, { to: "/suggestions", label: "Suggestions" }, { to: "/alerts", label: "Alerts" }, { to: "/talk", label: "Talk to Plutus" }] as const;
@@ -35,7 +42,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           {open && <nav aria-label="Mobile" className="grid w-full gap-1 border-t border-border pt-3 xl:hidden">{links.map((link) => <Link key={link.to} to={link.to} activeOptions={{ exact: true }} onClick={() => setOpen(false)} className={`${navCls} flex min-h-11 items-center justify-between`} activeProps={{ className: "bg-primary-soft text-primary" }}>{link.label}<ArrowUpRight className="h-4 w-4" /></Link>)}</nav>}
         </div>
       </header>
-      <main className="page-enter mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">{children}</main>
+      <main className="page-enter mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">{children}{backendConnected && location.pathname === "/dashboard" && <AccountInsights />}</main>
       <footer className="border-t border-border">
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-muted-foreground sm:px-6">
           {backendConnected ? "Using the connected customer's records across all pages." : "Synthetic demo data for Alex."} No real money moves. Your plan stays under your control. Projections are illustrative, not financial advice. Plutus is not a bank.

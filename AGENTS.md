@@ -593,3 +593,28 @@ or duplicate review rounds in the primary answer. Show the latest review per rol
 retain earlier rounds and references behind expandable evidence. Budget/Risk may
 disagree when ordinary affordability and stress resilience differ. Do not promise
 that a date tested only under expected income will survive delayed income.
+
+
+## Implemented local Nessie demo profiles
+
+`nemotron_agent.main:app` supports an optional allowlist in
+`PLUTUS_DEMO_PROFILES_FILE` (or `PLUTUS_DEMO_PROFILES`, not both). The local-only
+DemoGateway binds every financial, history, agent and council request to an
+opaque, expiring server-side profile session. Shared service bearer auth remains
+mandatory. Profile sessions are a sandbox presentation feature, not real user
+identity authentication: anyone with access to the local frontend can select any
+approved demo profile. Never enable this for real financial accounts or production.
+Council ownership includes the profile session; switching or logging out revokes
+that credential. Each profile has separate Nessie sources and council storage.
+The frontend uses HttpOnly cookies and a full reload to discard cached financial
+results and chats on switches. No financial browser persistence is added.
+
+GET /api/nessie/insights exposes selected-account month-to-date exact aggregates,
+owned account balances, bounded spending drill-down, upcoming events and optional
+loan record types/statuses. Loan errors are partial, not zero debt claims. Do not
+infer loan interest, future paychecks, protected savings or complete coverage.
+PUT /api/demo/schedule replaces up to 50 session-only user-confirmed future events;
+the current UI offers one manual event. Events are labeled estimated, applied to
+all snapshot-based calculations and included in snapshot fingerprints. They never
+write to Nessie. Only tomorrow through 90 days ahead is accepted. Historical
+transactions remain separate from future schedules. See NESSIE_DEMO.md for setup.

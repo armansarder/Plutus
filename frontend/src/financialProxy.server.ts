@@ -1,3 +1,4 @@
+import { profileHeaders } from "./demoProxy.server";
 /** Server entry only. Never import this module from a browser component. */
 import { z } from "zod";
 import { purchaseRequestSchema, compareRequestSchema, forecastRequestSchema, engineSimulationSchema, engineComparisonSchema, engineForecastSchema, engineHistorySchema } from "./types/engine";
@@ -67,7 +68,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
     const response = await fetch(new URL(url.pathname + url.search, upstream), {
       method: request.method,
       ...(body === undefined ? {} : { body }),
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/json", ...(post ? { "Content-Type": "application/json" } : {}) },
+      headers: { ...profileHeaders(request), Authorization: `Bearer ${token}`, Accept: "application/json", ...(post ? { "Content-Type": "application/json" } : {}) },
       // One investigation may make up to four sequential provider calls at 12 seconds each.
       cache: "no-store", redirect: "error", signal: AbortSignal.any([request.signal, AbortSignal.timeout(agent ? 60000 : 12000)]),
     });

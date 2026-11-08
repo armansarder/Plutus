@@ -44,7 +44,7 @@ it("keeps the same Nessie customer and accurate source badge across every financ
       expect(document.body.textContent).not.toMatch(/synthetic_demo|\$1,800|\$600|Alex|Emergency fund/);
     }
     expect(fetch.mock.calls.filter(c => c[0] === "/api/financial-data")).toHaveLength(1);
-    expect(fetch.mock.calls.every(c => ["/api/financial-data", "/api/forecast"].includes(c[0]))).toBe(true);
+    expect(fetch.mock.calls.every(c => ["/api/financial-data", "/api/forecast", "/api/nessie/insights"].includes(c[0]))).toBe(true);
   } finally { cleanup(); queryClient.clear(); }
 });
 

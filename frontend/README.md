@@ -236,3 +236,6 @@ and backend contracts are unchanged.
 Design references:
 - https://www.datawrapper.de/blog/what-to-consider-when-creating-small-multiple-line-charts
 - https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-charts/
+
+
+Local Nessie customer selector and banking insights: see [NESSIE_DEMO.md](../NESSIE_DEMO.md).

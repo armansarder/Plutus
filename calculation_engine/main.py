@@ -109,6 +109,12 @@ def create_app(source=None, settings: SecuritySettings | None = None, history_so
         data = load_financial_data(request.app.state.financial_source)
         if settings.customer_id and data.customer_id != settings.customer_id:
             raise HTTPException(status_code=403, detail='Source customer does not match authorized customer')
+        events = request.scope.get('plutus_confirmed_events', ())
+        if events:
+            from .models import FinancialData
+            data = FinancialData.model_validate({**data.model_dump(),
+                'upcoming_transactions': data.upcoming_transactions + list(events),
+                'source_notes': data.source_notes + ['Additional user-confirmed future events are estimates, not Nessie records.']})
         return data
 
     from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -175,6 +181,8 @@ def create_app(source=None, settings: SecuritySettings | None = None, history_so
             raise HTTPException(status_code=403, detail='Source customer does not match authorized customer')
         return {'data': result}
 
+    from .insights import install_insights
+    install_insights(app, get_data)
     return app
 
 

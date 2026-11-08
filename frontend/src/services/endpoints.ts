@@ -5,6 +5,9 @@
  * Stage 1 contracts.
  */
 export const ENDPOINTS = {
+  demoSession: "/api/demo/session",
+  demoSchedule: "/api/demo/schedule",
+  nessieInsights: "/api/nessie/insights",
   councilStatus: "/api/v2/council/status",
   councilConversations: "/api/v2/conversations",
   // Confirmed combined FastAPI agent route (schema 1.0).

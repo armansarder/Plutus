@@ -1,0 +1,4 @@
+[
+  {"id":"customer_1","label":"Customer 1","customer_id":"REPLACE_CUSTOMER_ID","account_id":"REPLACE_CHECKING_ACCOUNT_ID"},
+  {"id":"customer_2","label":"Customer 2","customer_id":"REPLACE_CUSTOMER_ID","account_id":"REPLACE_CHECKING_ACCOUNT_ID"}
+]
