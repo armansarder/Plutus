@@ -43,3 +43,15 @@ it("forwards only validated responses and the server's token",async()=>{
  expect((fetch.mock.calls[0]![1].headers as Record<string,string>)["Authorization"]).not.toContain("forged");
  expect((fetch.mock.calls[0]![1].headers as Record<string,string>)["X-Operator-Token"]).toBeUndefined();
 });
+
+it("accepts persisted watch metadata while omitting internal fields from the browser response",async()=>{
+ vi.stubEnv("FINPILOT_API_TOKEN","server-token-"+"x".repeat(40));
+ const watch={id:"a".repeat(32),created_at:"2026-11-08T12:00:00Z",label:"Laptop",amount_cents:120000,reserve_cents:60000,purchase_date:"2026-11-09",horizon_days:30,last_ready:false};
+ vi.stubGlobal("fetch",vi.fn(async()=>Response.json([watch])));
+ const response=await proxyNotifications(new Request("http://localhost/api/notifications/watchlist"));
+ expect(response.status).toBe(200);
+ const data=await response.json();expect(data[0].amount_cents).toBe(120000);expect(data[0]).not.toHaveProperty("last_ready");
+ vi.stubGlobal("fetch",vi.fn(async()=>Response.json({...watch,ready:false,stress_tests_passed:0,stress_tests_total:2,snapshot_id:"internal-reference"})));
+ const saved=await proxyNotifications(new Request("http://localhost/api/notifications/watchlist",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({label:"Laptop",amount_cents:120000,reserve_cents:60000,purchase_date:"2026-11-09",horizon_days:30})}));
+ expect(saved.status).toBe(200);const savedBody=await saved.json();expect(savedBody.ready).toBe(false);expect(savedBody).not.toHaveProperty("snapshot_id");
+});
