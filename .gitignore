@@ -14,3 +14,8 @@ __pycache__/
 *.pem
 *.key
 calculation_engine/private_data/
+# Private notification preferences and delivery history
+private_data/
+*.sqlite3
+*.sqlite3-*
+photon_service/node_modules/

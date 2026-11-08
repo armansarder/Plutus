@@ -7,7 +7,7 @@ import { cashPlanRequestSchema, cashPlanResultSchema } from "./types/cashPlan";
 
 export const FINANCIAL_PROXY_PATHS = ["/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", "/api/cash-plan/preview", ENDPOINTS.agentRun] as const;
 
-async function readBody(request: Request) {
+export async function readBody(request: Request) {
   const reader = request.body?.getReader();
   if (!reader) throw new Error("Missing body");
   let timer: ReturnType<typeof setTimeout> | undefined;

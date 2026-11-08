@@ -31,10 +31,10 @@ it("keeps the same Nessie customer and accurate source badge across every financ
     render(<QueryClientProvider client={queryClient}><RouterProvider router={router} /></QueryClientProvider>);
     expect(await screen.findByText("$1,250.25")).toBeInTheDocument();
     expect(screen.queryByRole("link", {name:"Suggestions"})).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", {name:"Alerts"})).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", {name:"Alerts"}).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button",{name:"Open menu"}));
     expect(screen.queryByRole("link", {name:"Suggestions"})).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", {name:"Alerts"})).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", {name:"Alerts"}).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button",{name:"Close menu"}));
     for (const { path, heading } of pages) {
       fireEvent.click(screen.getAllByRole("link").find(l => l.getAttribute("href") === path)!);

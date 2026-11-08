@@ -260,3 +260,6 @@ and Home; their old URLs redirect to Current situation. Monthly planning, Counci
 evidence, charts, Passport, Trust Shield and backend messaging behavior are unchanged.
 
 Monthly Plan is also retired: its navigation/Home links are removed and /monthly-plan redirects to /dashboard, where CashPlanEditor remains available.
+
+
+Final Photon integration: [PHOTON_INTEGRATION.md](../PHOTON_INTEGRATION.md). Alerts is restored without restoring Monthly Plan, Suggestions, Purchase Analysis, or the removed source banners.

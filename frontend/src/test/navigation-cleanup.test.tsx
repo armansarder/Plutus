@@ -6,7 +6,6 @@ vi.mock("@/components/chat/CouncilWorkspace",()=>({CouncilWorkspace:()=> <div>Co
 import { TalkWorkspace } from "@/components/chat/TalkWorkspace";
 import { Route as Suggestions } from "@/routes/suggestions";
 import { Route as MonthlyPlan } from "@/routes/monthly-plan";
-import { Route as Alerts } from "@/routes/alerts";
 afterEach(cleanup);
 it("opens the existing Council workspace directly without the legacy purchase-analysis selector",()=>{
  render(<TalkWorkspace/>);
@@ -14,7 +13,7 @@ it("opens the existing Council workspace directly without the legacy purchase-an
  expect(screen.queryByRole("button",{name:/purchase analysis/i})).not.toBeInTheDocument();
  expect(screen.queryByLabelText("Analysis experience")).not.toBeInTheDocument();
 });
-it.each([Suggestions,Alerts,MonthlyPlan])("redirects retired page bookmarks to Current situation",route=>{
+it.each([Suggestions,MonthlyPlan])("redirects retired page bookmarks to Current situation",route=>{
  try {
   (route.options.beforeLoad as unknown as ()=>unknown)();
   throw new Error("Expected retired page redirect");

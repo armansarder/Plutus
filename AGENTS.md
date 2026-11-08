@@ -626,3 +626,20 @@ Never manufacture objections or claim unknown expenses are covered. Display the
 selected agent once at the top and other roles below, with their validated selected
 findings expandable. Scenario graphs start expanded in separate panels using the
 existing shared scale; inapplicable late-income scenarios remain excluded.
+
+
+## Plutus-v1-final Photon integration
+
+Notifications extend the combined branch without replacing Council prompts, labels,
+charts, source adapters or numerical contracts. `notifications/router.py` binds all
+preference/watch/history access to configured customer AND account; arbitrary client
+customer/account selectors and operator tools are rejected. `evaluator.py` uses the
+same `run_agent(..., allow_model=False)` calculations against one current snapshot.
+Budget warnings require a user-entered category limit and actual normalized history.
+There is no synthetic operator state in this runtime. Photon defaults to preview;
+real sending needs server-enrolled recipient, shared sender secret and explicit
+notification enablement. Do not send messages during implementation verification.
+No model can send messages. Generic notifications omit balances, IDs and merchant
+records. Log submission honestly; never equate it with confirmed delivery. Persistent
+claims suppress duplicate and uncertain retries. Polling is opt-in, one worker,
+minimum 60 seconds. See PHOTON_INTEGRATION.md for configuration and limitations.

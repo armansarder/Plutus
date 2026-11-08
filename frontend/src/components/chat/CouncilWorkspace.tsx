@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpRight, Calculator, CircleHelp, Layers3, LoaderCircle, RefreshCw, Send, ShieldCheck, Sparkles, Wallet } from "lucide-react";
+import { WatchPurchaseButton } from "@/components/notifications/WatchPurchaseButton";
 import { CouncilGraph } from "./CouncilGraph";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
 import { PageHeading } from "@/components/app/PageHeading";
@@ -184,6 +185,7 @@ export function CouncilAnswer({result, onHandoff}: {result: CouncilRun; onHandof
       {review.revised && <p className="mt-3 text-xs text-muted-foreground">Updated after comparing the results</p>}
     </section>)}</div>
     <p className="text-xs text-muted-foreground">Projections use the supplied income and expenses. No payment was made.</p>
+    {result.analysis && result.status !== "cancelled" && <WatchPurchaseButton analysis={result.analysis} />}
     {result.chart && <details open className="rounded-xl border border-border p-4"><summary className="cursor-pointer text-sm font-semibold">Compare balance timelines</summary><div className="mt-4"><CouncilGraph chart={result.chart} /></div></details>}
     {result.analysis && <details className="rounded-xl border border-border p-4"><summary className="cursor-pointer font-semibold">Calculation evidence, safe dates, Passport and Trust Shield</summary><NemotronResult response={result.analysis} calculationOnly /></details>}
     <details className="rounded-xl border border-border p-4"><summary className="cursor-pointer text-sm font-semibold">Advisor discussion and supporting evidence</summary><div className="mt-4 space-y-5">{result.reviews.map((review, i) => <section key={i}><h4 className="text-sm font-semibold">{LABELS[review.role]} · {review.stage.replaceAll("_", " ")} · {review.status}</h4><p className="mt-1 text-sm">{review.recommendation ?? review.position.replaceAll("_", " ")}</p><ul className="mt-2 space-y-2 text-sm">{review.findings.map(f => <li key={f.id}><p>{f.text}</p><span className="break-all text-xs text-muted-foreground">Calculation references: {f.evidence_ids.join(", ")}</span></li>)}</ul></section>)}</div></details>

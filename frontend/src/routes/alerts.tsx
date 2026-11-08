@@ -1,6 +1,3 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-
-// Retired page: preserve old bookmarks without exposing the removed feature.
-export const Route = createFileRoute("/alerts")({
-  beforeLoad: () => { throw redirect({to: "/dashboard", replace: true}); },
-});
+import { createFileRoute } from "@tanstack/react-router";
+import { AlertsWorkspace } from "@/components/notifications/AlertsWorkspace";
+export const Route=createFileRoute("/alerts")({head:()=>({meta:[{title:"Alerts — Plutus"},{name:"description",content:"Account-based purchase and spending alerts, with optional Photon texts."}]}),component:AlertsWorkspace});

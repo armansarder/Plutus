@@ -5,6 +5,7 @@
  * Stage 1 contracts.
  */
 export const ENDPOINTS = {
+  notifications: "/api/notifications",
   councilStatus: "/api/v2/council/status",
   councilConversations: "/api/v2/conversations",
   // Confirmed combined FastAPI agent route (schema 1.0).

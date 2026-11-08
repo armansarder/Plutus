@@ -45,6 +45,9 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
     def agent_run(body: AgentRequest, snapshot=Depends(snapshot_dependency)):
         return run_agent(body, snapshot, label, provider=provider)
 
+    from notifications.router import install_notifications
+    install_notifications(app, snapshot_dependency, label)
+
     from .council_api import install_council
     install_council(app, snapshot_dependency, label, provider=council_provider)
 

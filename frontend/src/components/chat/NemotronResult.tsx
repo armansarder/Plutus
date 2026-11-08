@@ -1,3 +1,4 @@
+import { WatchPurchaseButton } from "@/components/notifications/WatchPurchaseButton";
 import { useState } from "react";
 import type { NemotronResponse } from "@/types/nemotron";
 import { formatMoney } from "@/lib/formatMoney";
@@ -22,6 +23,7 @@ export function NemotronResult({ response, calculationOnly = false }: { response
     <p className="font-semibold">{calculationOnly ? "Verified calculation evidence · Council reviews shown above" : response.mode === "nemotron" ? "Nemotron investigation · Backend-validated result" : "Deterministic fallback · Not a completed Nemotron investigation"}</p>
     {!calculationOnly && response.fallback_reason && <p className="text-sm text-muted-foreground">{REASONS[response.fallback_reason]} The backend calculation engine completed the analysis.</p>}
     <p className="text-sm">{summary}</p>
+    {!calculationOnly && <WatchPurchaseButton analysis={response} />}
     {response.passport.recommendation === "consider_waiting" && response.scenarios.find(s => s.name === "purchase")?.maintains_reserve && <p className="text-sm">The selected purchase preserves the reserve under ordinary conditions but is stress-sensitive. A later ordinary purchase date is not automatically stress-safe.</p>}
     <details className="mb-4 text-sm text-muted-foreground"><summary className="cursor-pointer">Calculation limits</summary><p className="mt-2">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. Reserve-preserving cash flow does not establish that a purchase fits your budget.</p></details>
     <p className="text-sm font-semibold">{response.stress_tests_passed} of {response.stress_tests_total} applicable stress tests maintained your selected reserve.</p>
