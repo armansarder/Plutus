@@ -19,7 +19,7 @@ const navCls =
 export function AppShell({ children }: { children: ReactNode }) {
   const backendConnected = DATA_MODE === "remote";
   const [open, setOpen] = useState(false);
-  const links = [{ to: "/", label: "Home" }, { to: "/dashboard", label: "Current situation" }, { to: "/simulator", label: "Simulator" }, { to: "/cash-flow", label: "Cash flow" }, { to: "/talk", label: "Talk to Plutus" }] as const;
+  const links = [{ to: "/", label: "Home" }, { to: "/dashboard", label: "Current situation" }, { to: "/simulator", label: "Simulator" }, { to: "/cash-flow", label: "Cash flow" }, { to: "/future-lab", label: "Future Lab" }, { to: "/talk", label: "Talk to Plutus" }] as const;
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur">
