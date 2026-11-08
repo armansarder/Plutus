@@ -1,0 +1,20 @@
+[
+  {
+    "id": "bba29388-c97e-488a-8dae-99b25e5c59d5",
+    "transaction_date": "2026-09-20",
+    "status": "completed",
+    "amount": 100,
+    "description": "Transfer to savings",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "id": "cadd2403-2572-4b71-8fab-a77a8a4f6243",
+    "transaction_date": "2026-10-20",
+    "status": "completed",
+    "amount": 100,
+    "description": "Transfer to savings",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  }
+]

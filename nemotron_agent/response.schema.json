@@ -1,0 +1,802 @@
+{
+  "$defs": {
+    "Assumptions": {
+      "additionalProperties": false,
+      "properties": {
+        "snapshot": {
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "same_day_order": {
+          "title": "Same Day Order",
+          "type": "string"
+        },
+        "coverage": {
+          "title": "Coverage",
+          "type": "string"
+        },
+        "estimated_transaction_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Estimated Transaction Ids",
+          "type": "array"
+        },
+        "missing_information": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Information",
+          "type": "array"
+        },
+        "currency_precision": {
+          "title": "Currency Precision",
+          "type": "string"
+        },
+        "source_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Notes",
+          "type": "array"
+        },
+        "scenario_changes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Scenario"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "snapshot",
+        "same_day_order",
+        "coverage",
+        "estimated_transaction_ids",
+        "missing_information",
+        "currency_precision",
+        "source_notes"
+      ],
+      "title": "Assumptions",
+      "type": "object"
+    },
+    "DailyBalance": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "ending_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Ending Balance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "ending_balance"
+      ],
+      "title": "DailyBalance",
+      "type": "object"
+    },
+    "ForecastResult": {
+      "additionalProperties": false,
+      "properties": {
+        "customer_id": {
+          "title": "Customer Id",
+          "type": "string"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date",
+          "title": "Start Date",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date",
+          "title": "End Date",
+          "type": "string"
+        },
+        "starting_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Starting Balance",
+          "type": "string"
+        },
+        "ending_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Ending Balance",
+          "type": "string"
+        },
+        "minimum_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Minimum Balance",
+          "type": "string"
+        },
+        "minimum_balance_date": {
+          "format": "date",
+          "title": "Minimum Balance Date",
+          "type": "string"
+        },
+        "shortfall_occurs": {
+          "title": "Shortfall Occurs",
+          "type": "boolean"
+        },
+        "transaction_timeline": {
+          "items": {
+            "$ref": "#/$defs/TimelineEvent"
+          },
+          "title": "Transaction Timeline",
+          "type": "array"
+        },
+        "daily_balances": {
+          "items": {
+            "$ref": "#/$defs/DailyBalance"
+          },
+          "title": "Daily Balances",
+          "type": "array"
+        },
+        "negative_balance_days": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Negative Balance Days",
+          "type": "array"
+        },
+        "minimum_daily_ending_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Minimum Daily Ending Balance",
+          "type": "string"
+        },
+        "minimum_daily_ending_balance_date": {
+          "format": "date",
+          "title": "Minimum Daily Ending Balance Date",
+          "type": "string"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/Assumptions"
+        }
+      },
+      "required": [
+        "customer_id",
+        "currency",
+        "start_date",
+        "end_date",
+        "starting_balance",
+        "ending_balance",
+        "minimum_balance",
+        "minimum_balance_date",
+        "shortfall_occurs",
+        "transaction_timeline",
+        "daily_balances",
+        "negative_balance_days",
+        "minimum_daily_ending_balance",
+        "minimum_daily_ending_balance_date",
+        "assumptions"
+      ],
+      "title": "ForecastResult",
+      "type": "object"
+    },
+    "IncomeDelay": {
+      "additionalProperties": false,
+      "properties": {
+        "transaction_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Transaction Id",
+          "type": "string"
+        },
+        "new_date": {
+          "format": "date",
+          "title": "New Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "transaction_id",
+        "new_date"
+      ],
+      "title": "IncomeDelay",
+      "type": "object"
+    },
+    "Passport": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "purchase_amount": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Purchase Amount",
+          "type": "string"
+        },
+        "reserve": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Reserve",
+          "type": "string"
+        },
+        "horizon_end": {
+          "format": "date",
+          "title": "Horizon End",
+          "type": "string"
+        },
+        "recommendation": {
+          "enum": [
+            "consider_purchase",
+            "consider_waiting",
+            "reserve_at_risk"
+          ],
+          "title": "Recommendation",
+          "type": "string"
+        },
+        "evidence_scenarios": {
+          "items": {
+            "enum": [
+              "baseline",
+              "purchase",
+              "delayed_income",
+              "unexpected_expense",
+              "buy_later"
+            ],
+            "type": "string"
+          },
+          "title": "Evidence Scenarios",
+          "type": "array"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "payment_executed": {
+          "const": false,
+          "default": false,
+          "title": "Payment Executed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "purchase_amount",
+        "reserve",
+        "horizon_end",
+        "recommendation",
+        "evidence_scenarios",
+        "assumptions"
+      ],
+      "title": "Passport",
+      "type": "object"
+    },
+    "PhotonDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "simulated": {
+          "const": true,
+          "default": true,
+          "title": "Simulated",
+          "type": "boolean"
+        },
+        "delivery_status": {
+          "const": "draft_only",
+          "default": "draft_only",
+          "title": "Delivery Status",
+          "type": "string"
+        },
+        "requires_authenticated_delivery": {
+          "const": true,
+          "default": true,
+          "title": "Requires Authenticated Delivery",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "PhotonDraft",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "snapshot_as_of": {
+          "format": "date",
+          "title": "Snapshot As Of",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "generated_at": {
+          "title": "Generated At",
+          "type": "string"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        },
+        "synthetic": {
+          "title": "Synthetic",
+          "type": "boolean"
+        },
+        "schedule_complete": {
+          "default": false,
+          "title": "Schedule Complete",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source",
+        "snapshot_as_of",
+        "snapshot_id",
+        "generated_at",
+        "currency",
+        "synthetic"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Scenario": {
+      "additionalProperties": false,
+      "properties": {
+        "purchase_amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "ge": 0,
+          "title": "Purchase Amount"
+        },
+        "purchase_date": {
+          "format": "date",
+          "title": "Purchase Date",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "delayed_income": {
+          "items": {
+            "$ref": "#/$defs/IncomeDelay"
+          },
+          "maxItems": 100,
+          "title": "Delayed Income",
+          "type": "array"
+        },
+        "unexpected_expenses": {
+          "items": {
+            "$ref": "#/$defs/Transaction"
+          },
+          "maxItems": 100,
+          "title": "Unexpected Expenses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "purchase_amount",
+        "purchase_date",
+        "name"
+      ],
+      "title": "Scenario",
+      "type": "object"
+    },
+    "ScenarioOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "baseline",
+            "purchase",
+            "delayed_income",
+            "unexpected_expense",
+            "buy_later"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "purchase_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Purchase Date"
+        },
+        "maintains_reserve": {
+          "title": "Maintains Reserve",
+          "type": "boolean"
+        },
+        "applicable": {
+          "default": true,
+          "title": "Applicable",
+          "type": "boolean"
+        },
+        "forecast": {
+          "$ref": "#/$defs/ForecastResult"
+        }
+      },
+      "required": [
+        "name",
+        "purchase_date",
+        "maintains_reserve",
+        "forecast"
+      ],
+      "title": "ScenarioOutput",
+      "type": "object"
+    },
+    "TimelineEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "amount": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "income",
+            "expense"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "source_status": {
+          "enum": [
+            "confirmed",
+            "estimated"
+          ],
+          "title": "Source Status",
+          "type": "string"
+        },
+        "balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Balance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "description",
+        "amount",
+        "type",
+        "source_status",
+        "balance"
+      ],
+      "title": "TimelineEvent",
+      "type": "object"
+    },
+    "Trace": {
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "enum": [
+            "simulate_scenario",
+            "decision"
+          ],
+          "title": "Tool",
+          "type": "string"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "baseline",
+                "purchase",
+                "delayed_income",
+                "unexpected_expense",
+                "buy_later"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scenario"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "rejected",
+            "fallback"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "initiated_by": {
+          "enum": [
+            "nemotron",
+            "server"
+          ],
+          "title": "Initiated By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool",
+        "status",
+        "initiated_by"
+      ],
+      "title": "Trace",
+      "type": "object"
+    },
+    "Transaction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "description": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "type": {
+          "enum": [
+            "income",
+            "expense"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "source_status": {
+          "enum": [
+            "confirmed",
+            "estimated"
+          ],
+          "title": "Source Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "description",
+        "amount",
+        "type",
+        "source_status"
+      ],
+      "title": "Transaction",
+      "type": "object"
+    },
+    "TrustShield": {
+      "additionalProperties": false,
+      "properties": {
+        "permissions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "payment_execution": {
+          "const": false,
+          "default": false,
+          "title": "Payment Execution",
+          "type": "boolean"
+        },
+        "external_message_sent": {
+          "const": false,
+          "default": false,
+          "title": "External Message Sent",
+          "type": "boolean"
+        },
+        "model_data_shared": {
+          "title": "Model Data Shared",
+          "type": "boolean"
+        },
+        "untrusted_text_excluded": {
+          "const": true,
+          "default": true,
+          "title": "Untrusted Text Excluded",
+          "type": "boolean"
+        },
+        "security_scope": {
+          "default": "Single configured customer; not a multi-user session system.",
+          "title": "Security Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "permissions",
+        "model_data_shared"
+      ],
+      "title": "TrustShield",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "nemotron",
+        "deterministic_fallback"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Model"
+    },
+    "fallback_reason": {
+      "anyOf": [
+        {
+          "enum": [
+            "model_disabled",
+            "model_unavailable",
+            "model_protocol_failed"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Fallback Reason"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "risk_level": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "Risk Level",
+      "type": "string"
+    },
+    "scenarios": {
+      "items": {
+        "$ref": "#/$defs/ScenarioOutput"
+      },
+      "title": "Scenarios",
+      "type": "array"
+    },
+    "safe_purchase_dates": {
+      "items": {
+        "format": "date",
+        "type": "string"
+      },
+      "title": "Safe Purchase Dates",
+      "type": "array"
+    },
+    "safe_to_spend_on_purchase_date": {
+      "pattern": "^-?\\d+\\.\\d{2}$",
+      "title": "Safe To Spend On Purchase Date",
+      "type": "string"
+    },
+    "stress_tests_passed": {
+      "title": "Stress Tests Passed",
+      "type": "integer"
+    },
+    "stress_tests_total": {
+      "title": "Stress Tests Total",
+      "type": "integer"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "passport": {
+      "$ref": "#/$defs/Passport"
+    },
+    "trust_shield": {
+      "$ref": "#/$defs/TrustShield"
+    },
+    "tool_trace": {
+      "items": {
+        "$ref": "#/$defs/Trace"
+      },
+      "title": "Tool Trace",
+      "type": "array"
+    },
+    "photon": {
+      "$ref": "#/$defs/PhotonDraft"
+    }
+  },
+  "required": [
+    "request_id",
+    "mode",
+    "model",
+    "fallback_reason",
+    "summary",
+    "risk_level",
+    "scenarios",
+    "safe_purchase_dates",
+    "safe_to_spend_on_purchase_date",
+    "stress_tests_passed",
+    "stress_tests_total",
+    "provenance",
+    "passport",
+    "trust_shield",
+    "tool_trace",
+    "photon"
+  ],
+  "title": "AgentResponse",
+  "type": "object"
+}

@@ -1,0 +1,130 @@
+[
+  {
+    "_id": "47d5addc-e49c-4cb5-b878-0bd23f40e412",
+    "name": "Netflix",
+    "category": "Subscriptions",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "599cc04b-c339-4fef-a426-89f5bf6be661",
+    "name": "Whataburger",
+    "category": "Food",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "7a1eb7ba-601d-4f35-ad39-3a6af86c15c0",
+    "name": "Shell",
+    "category": "Transport",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "7eb89599-1d1c-46b7-b622-7f05fd0db897",
+    "name": "Chipotle",
+    "category": "Food",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "916f322b-94c8-44da-99df-8a547e0a4831",
+    "name": "Amazon",
+    "category": "Shopping",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "a36825cf-df29-4bb4-ac13-3a3b65235b31",
+    "name": "H-E-B",
+    "category": "Groceries",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "c0e4e318-e087-4711-8860-5d29c99ac0b4",
+    "name": "Spotify",
+    "category": "Subscriptions",
+    "address": {
+      "street_number": "100",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.95,
+      "lng": -96.73
+    }
+  },
+  {
+    "_id": "f137aac1-2b34-4c9f-8f90-689d17f1a2fa",
+    "name": "Starbucks",
+    "category": "Food",
+    "address": {
+      "street_number": "1",
+      "street_name": "Main St",
+      "city": "Richardson",
+      "state": "TX",
+      "zip": "75080"
+    },
+    "geocode": {
+      "lat": 32.98,
+      "lng": -96.75
+    }
+  }
+]

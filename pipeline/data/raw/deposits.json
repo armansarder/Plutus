@@ -1,0 +1,72 @@
+[
+  {
+    "_id": "1909b5ce-219e-4453-b7c1-b19fef316c7e",
+    "medium": "balance",
+    "transaction_date": "2026-10-03",
+    "status": "completed",
+    "amount": 600,
+    "description": "Payroll deposit",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "_id": "3afa4a67-391e-4b58-9711-371a6bde4315",
+    "medium": "balance",
+    "transaction_date": "2026-10-31",
+    "status": "completed",
+    "amount": 600,
+    "description": "Payroll deposit",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "_id": "3d609665-5a12-4393-9b7e-718846b71c68",
+    "medium": "balance",
+    "transaction_date": "2026-09-05",
+    "status": "completed",
+    "amount": 600,
+    "description": "Payroll deposit",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "_id": "8d40b0a9-5c13-477b-b09d-0926d19abe96",
+    "medium": "balance",
+    "transaction_date": "2026-10-17",
+    "status": "completed",
+    "amount": 600,
+    "description": "Payroll deposit",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "_id": "f57d2f23-512d-448a-a65b-d7b1c82a7a98",
+    "medium": "balance",
+    "transaction_date": "2026-09-19",
+    "status": "completed",
+    "amount": 600,
+    "description": "Payroll deposit",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "_id": "9c8f7917-7220-46ef-a214-ea7616962807",
+    "medium": "balance",
+    "transaction_date": "2026-10-20",
+    "status": "completed",
+    "amount": 100,
+    "description": "Transfer from checking",
+    "_source_account_id": "d7f44918-d8c6-4104-9b69-d39770210194",
+    "_source_account_type": "Savings"
+  },
+  {
+    "_id": "cec1a795-6a25-437d-8ffe-e4086c561aff",
+    "medium": "balance",
+    "transaction_date": "2026-09-20",
+    "status": "completed",
+    "amount": 100,
+    "description": "Transfer from checking",
+    "_source_account_id": "d7f44918-d8c6-4104-9b69-d39770210194",
+    "_source_account_type": "Savings"
+  }
+]

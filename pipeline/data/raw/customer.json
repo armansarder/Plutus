@@ -1,0 +1,12 @@
+{
+  "last_name": "Rivera",
+  "first_name": "Alex",
+  "_id": "0898b0b0-88cc-4011-ba91-3057e1b480a0",
+  "address": {
+    "city": "Richardson",
+    "state": "TX",
+    "street_name": "W Campbell Rd",
+    "street_number": "800",
+    "zip": "75080"
+  }
+}

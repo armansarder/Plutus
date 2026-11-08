@@ -1,0 +1,15 @@
+{
+  "customer_id": "0898b0b0-88cc-4011-ba91-3057e1b480a0",
+  "checking_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+  "savings_id": "d7f44918-d8c6-4104-9b69-d39770210194",
+  "merchants": {
+    "Starbucks": "f137aac1-2b34-4c9f-8f90-689d17f1a2fa",
+    "Chipotle": "7eb89599-1d1c-46b7-b622-7f05fd0db897",
+    "Whataburger": "599cc04b-c339-4fef-a426-89f5bf6be661",
+    "H-E-B": "a36825cf-df29-4bb4-ac13-3a3b65235b31",
+    "Shell": "7a1eb7ba-601d-4f35-ad39-3a6af86c15c0",
+    "Amazon": "916f322b-94c8-44da-99df-8a547e0a4831",
+    "Netflix": "47d5addc-e49c-4cb5-b878-0bd23f40e412",
+    "Spotify": "c0e4e318-e087-4711-8860-5d29c99ac0b4"
+  }
+}

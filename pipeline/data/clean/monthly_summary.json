@@ -1,0 +1,44 @@
+{
+  "2026-09": {
+    "spending": 1476.0,
+    "income": 1200.0,
+    "by_category": {
+      "Housing": 900.0,
+      "Insurance": 180.0,
+      "Groceries": 135.0,
+      "Utilities": 123.0,
+      "Cash": 40.0,
+      "Food": 37.0,
+      "Transport": 35.0,
+      "Subscriptions": 26.0
+    },
+    "transaction_count": 18
+  },
+  "2026-10": {
+    "spending": 1710.0,
+    "income": 1800.0,
+    "by_category": {
+      "Housing": 900.0,
+      "Groceries": 245.0,
+      "Insurance": 180.0,
+      "Utilities": 137.0,
+      "Food": 79.0,
+      "Cash": 60.0,
+      "Shopping": 45.0,
+      "Transport": 38.0,
+      "Subscriptions": 26.0
+    },
+    "transaction_count": 24
+  },
+  "2026-11": {
+    "spending": 1015.0,
+    "income": 0.0,
+    "by_category": {
+      "Housing": 900.0,
+      "Groceries": 60.0,
+      "Transport": 36.0,
+      "Food": 19.0
+    },
+    "transaction_count": 5
+  }
+}

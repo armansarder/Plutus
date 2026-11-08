@@ -1,0 +1,2 @@
+-r ../calculation_engine/requirements.txt
+python-dotenv>=1,<2

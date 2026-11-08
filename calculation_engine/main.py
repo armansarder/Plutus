@@ -2,7 +2,7 @@
 import os
 import logging
 
-from fastapi import Depends, FastAPI, Request, HTTPException, Security
+from fastapi import Depends, FastAPI, Query, Request, HTTPException, Security
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
@@ -15,6 +15,7 @@ from .models import (CompareRequest, ForecastRequest, PurchaseRequest, ErrorResp
                      FinancialResponse, SimulationResponse, ForecastResponse, ComparisonResponse)
 from .security import SecurityMiddleware, SecuritySettings
 from .simulator import compare_scenarios, forecast_cash_flow, simulate_purchase
+from .history import HistoryResponse, NessieHistorySource, RawDirHistorySource, build_history
 
 
 class DecimalJSONRequest(Request):
@@ -34,7 +35,7 @@ class DecimalJSONRoute(APIRoute):
         return handle
 
 
-def create_app(source=None, settings: SecuritySettings | None = None):
+def create_app(source=None, settings: SecuritySettings | None = None, history_source=None):
     settings = settings if settings is not None else SecuritySettings.from_env()
     source_mode = os.getenv('FINPILOT_DATA_SOURCE', 'mock')
     if source is None:
@@ -60,6 +61,16 @@ def create_app(source=None, settings: SecuritySettings | None = None):
             source = JsonFileAdapter(path or JsonFileAdapter().path)
         else:
             raise ValueError('FINPILOT_DATA_SOURCE must be mock, file, or nessie')
+    if history_source is None:
+        history_dir = os.getenv('FINPILOT_HISTORY_DIR')
+        if source_mode == 'nessie':
+            history_source = NessieHistorySource(
+                api_key=os.getenv('NESSIE_API_KEY', ''), customer_id=settings.customer_id,
+                base_url=os.getenv('NESSIE_BASE_URL', ''))
+        elif history_dir:
+            if not settings.api_token or not settings.customer_id:
+                raise ValueError('History files require a token and configured customer ID')
+            history_source = RawDirHistorySource(history_dir, customer_id=settings.customer_id)
     from .nessie_adapter import NessieAdapter
     if isinstance(source, NessieAdapter) and (
         not settings.api_token or settings.customer_id != source.customer_id
@@ -77,6 +88,7 @@ def create_app(source=None, settings: SecuritySettings | None = None):
                   openapi_url='/openapi.json' if settings.mode == 'local' else None,
                   dependencies=[Security(HTTPBearer(auto_error=False))], responses=errors)
     app.state.financial_source = source
+    app.state.history_source = history_source
     app.router.route_class = DecimalJSONRoute
     app.state.security_settings = settings
     app.add_middleware(CORSMiddleware, allow_origins=list(settings.allowed_origins),
@@ -133,6 +145,23 @@ def create_app(source=None, settings: SecuritySettings | None = None):
               response_model=ComparisonResponse, response_model_exclude_none=True)
     def compare(body: CompareRequest, data=Depends(get_data)):
         return {'data': compare_scenarios(data, body.scenarios)}
+
+    @app.get('/api/history', operation_id='get_transaction_history',
+             response_model=HistoryResponse, response_model_exclude_none=True)
+    def history(request: Request,
+                month: str | None = Query(None, pattern=r'^\d{4}-(0[1-9]|1[0-2])$'),
+                months: int = Query(6, ge=1, le=24)):
+        source = request.app.state.history_source
+        if source is None:
+            raise HTTPException(status_code=503, detail='History requires FINPILOT_DATA_SOURCE=nessie or FINPILOT_HISTORY_DIR')
+        try:
+            result = build_history(source, currency=os.getenv('FINPILOT_CURRENCY', 'USD'),
+                                   month=month, months_back=months)
+        except Exception as exc:
+            raise DataSourceError('History source is unavailable or invalid') from exc
+        if settings.customer_id and result['customer_id'] != settings.customer_id:
+            raise HTTPException(status_code=403, detail='Source customer does not match authorized customer')
+        return {'data': result}
 
     return app
 

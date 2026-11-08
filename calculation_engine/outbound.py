@@ -20,7 +20,8 @@ def validate_destination(url, allowed_hosts):
         raise ValueError('Source must resolve only to public addresses')
 
 
-def read_json_https(url, *, allowed_hosts, params=None, timeout=10.0, transport=None):
+def read_json_https(url, *, allowed_hosts, params=None, timeout=10.0, transport=None,
+                    empty_on_404=False):
     # The destination is trusted configuration, never request input. A deployment
     # egress firewall is also required to protect against DNS rebinding/compromised DNS.
     validate_destination(url, allowed_hosts)
@@ -30,6 +31,8 @@ def read_json_https(url, *, allowed_hosts, params=None, timeout=10.0, transport=
                       transport=transport) as client:
         with client.stream('GET', url, params=params,
                            headers={'Accept': 'application/json', 'Accept-Encoding': 'identity'}) as response:
+            if empty_on_404 and response.status_code == 404:
+                return []  # Nessie returns 404 instead of [] for some empty collections
             if response.status_code != 200:
                 raise ValueError('Upstream did not return HTTP 200')
             if response.headers.get('content-encoding', 'identity').lower() != 'identity':
