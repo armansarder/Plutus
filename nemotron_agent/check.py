@@ -64,6 +64,8 @@ def completion(client, key, model, messages, **options):
 
 
 def run(mode):
+    root_dir = Path(__file__).resolve().parents[1]
+    load_dotenv(root_dir / '.env', override=False)
     load_dotenv(Path(__file__).with_name('.env'), override=False)
     key = os.getenv('NVIDIA_API_KEY', '')
     model = os.getenv('NVIDIA_MODEL', 'nvidia/nemotron-3.5-bolt-e4b')
