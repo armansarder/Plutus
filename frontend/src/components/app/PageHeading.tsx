@@ -1,0 +1,3 @@
+export function PageHeading({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+  return <header className="mb-9 max-w-3xl"><p className="mb-3 text-sm font-semibold text-primary">{eyebrow}</p><h1 className="font-display text-4xl font-semibold sm:text-5xl">{title}</h1><p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">{description}</p></header>;
+}

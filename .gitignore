@@ -1,0 +1,16 @@
+# Python
+venv/
+.venv/
+__pycache__/
+.pytest_cache/
+*.log
+.test-tmp*/
+.DS_Store
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+calculation_engine/private_data/

@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "type": "Checking",
+    "nickname": "Alex Checking",
+    "rewards": 0,
+    "balance": 450,
+    "account_number": "5879600007923733",
+    "customer_id": "0898b0b0-88cc-4011-ba91-3057e1b480a0"
+  },
+  {
+    "_id": "d7f44918-d8c6-4104-9b69-d39770210194",
+    "type": "Savings",
+    "nickname": "Alex Savings",
+    "rewards": 0,
+    "balance": 800,
+    "account_number": "0968963171492782",
+    "customer_id": "0898b0b0-88cc-4011-ba91-3057e1b480a0"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "b1ba04b5-9768-41db-947b-851fd9147d7b",
+    "type": "withdrawal",
+    "transaction_date": "2026-09-12",
+    "status": "completed",
+    "payer_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "medium": "balance",
+    "amount": 40,
+    "description": "ATM withdrawal",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  },
+  {
+    "_id": "f5ac255f-2402-4480-8b25-683a01d4c51f",
+    "type": "withdrawal",
+    "transaction_date": "2026-10-25",
+    "status": "completed",
+    "payer_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "medium": "balance",
+    "amount": 60,
+    "description": "ATM withdrawal",
+    "_source_account_id": "7b8bfb53-62d2-4582-881d-bbced51bd8cb",
+    "_source_account_type": "Checking"
+  }
+]

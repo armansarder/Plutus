@@ -1,0 +1,63 @@
+[
+  {
+    "kind": "paycheck",
+    "name": "Payroll deposit",
+    "amount": 600.0,
+    "every_days": 14,
+    "every_months": null,
+    "last_date": "2026-10-31",
+    "occurrences": 5
+  },
+  {
+    "kind": "subscription",
+    "name": "Netflix",
+    "amount": -15.0,
+    "every_months": 1,
+    "last_date": "2026-10-09",
+    "occurrences": 2
+  },
+  {
+    "kind": "subscription",
+    "name": "Spotify",
+    "amount": -11.0,
+    "every_months": 1,
+    "last_date": "2026-10-22",
+    "occurrences": 2
+  },
+  {
+    "kind": "bill",
+    "name": "Phone bill",
+    "payee": "T-Mobile",
+    "amount": -45.0,
+    "every_months": 1,
+    "next_date": "2026-11-12",
+    "recurring_day": 12
+  },
+  {
+    "kind": "bill",
+    "name": "Rent",
+    "payee": "Campus Apartments",
+    "amount": -900.0,
+    "every_months": 1,
+    "next_date": "2026-12-01",
+    "recurring_day": 1
+  },
+  {
+    "kind": "bill",
+    "name": "Car insurance",
+    "payee": "GEICO",
+    "amount": -180.0,
+    "every_months": 1,
+    "next_date": "2026-11-13",
+    "recurring_day": 13
+  },
+  {
+    "kind": "bill",
+    "name": "Electric bill",
+    "payee": "TXU Energy",
+    "amount": -80.0,
+    "every_months": 1,
+    "next_date": "2026-11-10",
+    "recurring_day": 10
+  }
+]

@@ -1,0 +1,13 @@
+import { CategoryBar } from "@/components/financial/BudgetOverview";
+import { formatMoney as m } from "@/lib/formatMoney";
+import type { ScenarioResult } from "@/types/financial";
+
+export function BudgetImpact({ result }: { result: ScenarioResult }) {
+  const r = result;
+  const purchase = r.appliedEvents.find((e) => e.type === "purchase");
+  return <section className="space-y-4" aria-label="Budget and savings impact">
+    <div className="border-l-4 border-primary bg-primary-soft p-4"><h2 className="font-display text-2xl font-semibold">{r.assessment}</h2><div className="mt-2 space-y-2 text-sm">{r.reasons.map((reason) => <p key={reason}>{reason}</p>)}</div></div>
+    <div className="grid gap-5 md:grid-cols-2"><div><h3 className="font-semibold">Budget impact · {r.budgetMonth}</h3>{r.category ? <><p className="mt-2 text-sm">You have {m(Math.max(0, r.categoryRemainingBeforeCents ?? 0))} remaining in {r.category.label} under your current plan.</p><div className="my-3"><CategoryBar category={r.category} purchaseCents={-(purchase?.amountCents ?? 0)} /></div><dl className="grid grid-cols-2 gap-1 text-xs"><dt>Allocation</dt><dd className="text-right font-mono">{m(r.category.allocatedCents)}</dd><dt>Already spent</dt><dd className="text-right font-mono">{m(r.category.spentCents)}</dd><dt>Committed</dt><dd className="text-right font-mono">{m(r.category.committedCents)}</dd><dt>Remaining after purchase</dt><dd className="text-right font-mono">{m(r.categoryRemainingAfterCents ?? 0)}</dd></dl><p className="mt-2 text-xs text-muted-foreground">Solid: spent · light: committed · amber: hypothetical purchase</p></> : <p className="mt-2 text-sm text-muted-foreground">The matching monthly category plan is not available.</p>}</div>
+    <div><h3 className="font-semibold">Savings impact</h3><p className="mt-2 font-mono text-2xl font-semibold text-accent-foreground">{r.plannedSavingsCents === null ? "Not confirmed" : m(r.plannedSavingsCents)}</p><p className="text-sm text-muted-foreground">Current monthly allocation · not transferred</p><p className="mt-3 text-sm">{r.savingsProtection === "intact" ? "Planned savings can stay intact under the available monthly funding. Any category increase still needs your approval." : r.savingsProtection === "unknown" ? "Savings feasibility cannot be confirmed with the available data." : `Under these commitments, ${m(r.projectedFeasibleSavingsCents ?? 0)} remains feasible without more funding or another allocation change. Savings is not automatically reduced.`}</p><p className="mt-2 text-xs text-muted-foreground">Goal impact not estimated: no goal deadline or confirmed contribution schedule.</p></div></div>
+  </section>;
+}

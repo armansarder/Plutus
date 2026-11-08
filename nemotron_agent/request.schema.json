@@ -1,0 +1,77 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "default": "",
+      "maxLength": 2000,
+      "title": "Message",
+      "type": "string"
+    },
+    "purchase_amount": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "gt": 0,
+      "le": 1000000,
+      "title": "Purchase Amount"
+    },
+    "purchase_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Purchase Date"
+    },
+    "reserve": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "default": "200.00",
+      "ge": 0,
+      "le": 1000000,
+      "title": "Reserve"
+    },
+    "horizon_days": {
+      "default": 30,
+      "maximum": 90,
+      "minimum": 1,
+      "title": "Horizon Days",
+      "type": "integer"
+    },
+    "allow_model": {
+      "default": true,
+      "title": "Allow Model",
+      "type": "boolean"
+    },
+    "channel": {
+      "default": "web",
+      "enum": [
+        "web",
+        "photon"
+      ],
+      "title": "Channel",
+      "type": "string"
+    }
+  },
+  "required": [
+    "purchase_amount"
+  ],
+  "title": "AgentRequest",
+  "type": "object"
+}
