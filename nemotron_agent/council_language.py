@@ -78,4 +78,6 @@ def decision_copy(role, position, results, analysis, request, currency):
         low = Decimal(stress['forecast']['minimum_balance'])
         consequence = f"leave you {money(-low, currency)} short" if low < 0 else f"leave only {money(low, currency)}, below your {buffer} cash buffer"
         return 'Wait before committing to the purchase.', f"It fits the expected schedule, but if {cause}, it could {consequence}. A later date has not yet been tested against that setback."
+    if role == 'budget' and analysis and 'savings target' in analysis.summary:
+        return "Don't buy it on the selected date.", f"Buying on the selected date leaves {money(minimum, currency)}, which keeps your {buffer} cash buffer intact but erodes your planned savings target."
     return 'Wait if keeping extra flexibility matters to you.', f"The purchase fits the tested cash flow and keeps your {buffer} buffer. Waiting leaves more cash available; the forecasts cannot cover expenses that were not supplied."

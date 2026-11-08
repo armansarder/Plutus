@@ -67,11 +67,11 @@ export function WatchedPurchasesSection() {
                   </span>
                   {item.ready ? (
                     <Badge variant="default" className="bg-accent text-accent-foreground text-xs">
-                      <CheckCircle2 className="mr-1 h-3 w-3" /> Ready · Meets Reserve
+                      <CheckCircle2 className="mr-1 h-3 w-3" /> Ready · Meets Reserve &amp; Savings
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="bg-caution-soft text-caution-foreground text-xs border-caution">
-                      <AlertCircle className="mr-1 h-3 w-3" /> Reserve at Risk
+                      <AlertCircle className="mr-1 h-3 w-3" /> {item.verdict === "erodes_savings" ? "Savings Target at Risk" : item.verdict === "stress_sensitive" ? "Stress-Sensitive" : "Reserve at Risk"}
                     </Badge>
                   )}
                   {item.notified && (
@@ -83,7 +83,13 @@ export function WatchedPurchasesSection() {
                 <p className="text-xs text-muted-foreground">
                   As of {formatDateOnly(item.purchase_date)} · {item.horizon_days}-day forecast
                   {item.minimum_balance && ` · Min cash: $${item.minimum_balance}`}
+                  {Boolean(item.savings_target_cents) && ` · Target savings: ${formatMoney(item.savings_target_cents!)}`}
                 </p>
+                {item.reasons && item.reasons.length > 0 && (
+                  <p className="text-xs text-muted-foreground/80 italic">
+                    {item.reasons[0]}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center gap-2 shrink-0">

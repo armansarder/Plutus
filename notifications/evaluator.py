@@ -10,6 +10,7 @@ from urllib.request import Request, urlopen
 
 from calculation_engine.models import FinancialData, Transaction
 from calculation_engine.simulator import forecast_cash_flow
+from calculation_engine.readiness import evaluate_purchase_readiness
 from .store import get_authoritative_financial_data, save_demo_state
 
 
@@ -70,45 +71,50 @@ def queue_alert(db: sqlite3.Connection, customer_id: str, key: str, kind: str, m
     return {"key": key, "status": status, "text": message, "kind": kind}
 
 
-def evaluate_purchase(financial_data: FinancialData, item: dict[str, Any]) -> dict[str, Any]:
-    """Evaluates a saved purchase using Shiv's deterministic forecast_cash_flow engine."""
-    data = financial_data.model_copy(deep=True)
-    start = data.as_of_date
-    horizon = int(item.get("horizon_days", 30))
-    end = start + timedelta(days=horizon)
+def evaluate_purchase(financial_data: FinancialData, item: dict[str, Any], cash_plan: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Evaluates a saved purchase using the shared deterministic readiness engine.
+
+    Enforces reserve preservation, cash-planning savings protection (planning.py),
+    and applicable stress resilience (SimulatorAdapter).
+    """
+    amount = Decimal(int(item["amount_cents"])) / Decimal(100)
+    reserve = Decimal(int(item["reserve_cents"])) / Decimal(100)
     
-    purchase_date = start
+    savings_cents = int(item.get("savings_target_cents", 0))
+    if savings_cents == 0 and cash_plan:
+        savings_cents = int(cash_plan.get("savingsTargetCents", 0))
+    savings_target = Decimal(savings_cents) / Decimal(100)
+    
+    purchase_date = None
     if item.get("purchase_date"):
         try:
-            parsed = datetime.strptime(item["purchase_date"], "%Y-%m-%d").date()
-            purchase_date = max(start, parsed)
+            purchase_date = datetime.strptime(item["purchase_date"], "%Y-%m-%d").date()
         except ValueError:
-            purchase_date = start
+            purchase_date = None
+            
+    horizon = int(item.get("horizon_days", 30))
     
-    # Add hypothetical purchase transaction
-    amount_cents = int(item["amount_cents"])
-    reserve_cents = int(item["reserve_cents"])
-    purchase_amount = Decimal(amount_cents) / Decimal(100)
-    reserve = Decimal(reserve_cents) / Decimal(100)
-    
-    data.upcoming_transactions.append(Transaction(
-        id=f"watch_{item['id']}",
-        date=purchase_date,
-        description=f"Hypothetical saved purchase: {item.get('label', 'Item')}",
-        amount=-purchase_amount,
-        type="expense",
-        source_status="estimated",
-    ))
-    
-    result = forecast_cash_flow(data, start, end)
-    minimum = Decimal(result["minimum_balance"])
-    ready = minimum >= reserve
+    res = evaluate_purchase_readiness(
+        snapshot=financial_data,
+        purchase_amount=amount,
+        purchase_date=purchase_date,
+        reserve=reserve,
+        savings_target=savings_target,
+        horizon_days=horizon,
+    )
     
     return {
-        "ready": ready,
-        "minimum_balance": result["minimum_balance"],
-        "reserve": format(reserve, ".2f"),
-        "basis": f"Deterministic {horizon}-day forecast based on scheduled events only.",
+        "ready": res.ready,
+        "verdict": res.verdict,
+        "recommendation": res.recommendation,
+        "minimum_balance": res.purchase_minimum,
+        "reserve": res.reserve,
+        "savings_target": res.savings_target,
+        "protected_amount": res.protected_amount,
+        "stress_tests_passed": res.stress_tests_passed,
+        "stress_tests_total": res.stress_tests_total,
+        "reasons": res.reasons,
+        "basis": f"Deterministic multi-scenario evaluation ({res.stress_tests_passed}/{res.stress_tests_total} stress tests passed, {res.protected_amount} protected).",
     }
 
 
@@ -159,8 +165,8 @@ def check_and_evaluate_all(db: sqlite3.Connection, state: dict[str, Any], prefs:
         if prefs.get("enabled") and prefs.get("budget_alerts") and prefs.get("verified"):
             text = (
                 f"Plutus budget alert: {b['category']} spending reached {percent}% "
-                f"of your monthly plan. Open Plutus and visit the Savings Agent to review ways "
-                f"to save and stay within your budget. Replying to this text is not required."
+                f"of your monthly plan. Open Plutus Monthly Plan to review flexible spending "
+                f"and protect your savings goal. Replying to this text is not required."
             )
             key = f"{customer_id}:budget:{b['category']}:{b['period']}:{threshold}"
             events.append(queue_alert(db, customer_id, key, "budget_red_zone", text))
@@ -170,10 +176,11 @@ def check_and_evaluate_all(db: sqlite3.Connection, state: dict[str, Any], prefs:
     # 2. Saved Purchases (Watchlist) Evaluation
     financial_data = get_authoritative_financial_data(customer_id)
     watchlist_rows = db.execute("SELECT * FROM watchlist WHERE customer_id=?", (customer_id,)).fetchall()
+    cash_plan = state.get("cashPlan")
     
     for row in watchlist_rows:
         item = dict(row)
-        result = evaluate_purchase(financial_data, item)
+        result = evaluate_purchase(financial_data, item, cash_plan=cash_plan)
         previous_ready = bool(item.get("last_ready", 0))
         notified = bool(item.get("notified", 0))
         
@@ -182,8 +189,8 @@ def check_and_evaluate_all(db: sqlite3.Connection, state: dict[str, Any], prefs:
             if prefs.get("enabled") and prefs.get("purchase_alerts") and prefs.get("verified"):
                 text = (
                     f"Plutus purchase update: Your saved {item['label']} now meets your selected "
-                    f"cash-reserve rule under the current 30-day forecast. Open Plutus to review the "
-                    f"Savings Agent and financial assumptions before deciding. This is not a guarantee."
+                    f"cash-reserve rule and savings plan under the current 30-day forecast. Open Plutus to review the "
+                    f"Council comparison and financial assumptions before deciding. This is not a guarantee."
                 )
                 key = f"{customer_id}:purchase:{item['id']}:ready"
                 events.append(queue_alert(db, customer_id, key, "purchase_opportunity", text))

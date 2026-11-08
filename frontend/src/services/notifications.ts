@@ -17,13 +17,16 @@ export const watchlistItemSchema = z.object({
   label: z.string(),
   amount_cents: z.number().int(),
   reserve_cents: z.number().int(),
+  savings_target_cents: z.number().int().optional(),
   purchase_date: z.string(),
   horizon_days: z.number().int(),
   ready: z.boolean(),
   notified: z.boolean(),
+  verdict: z.string().nullable().optional(),
   minimum_balance: z.string().nullable().optional(),
   reserve: z.string().nullable().optional(),
   basis: z.string().nullable().optional(),
+  reasons: z.array(z.string()).nullable().optional(),
   created_at: z.string(),
 });
 
@@ -111,8 +114,9 @@ export async function addToWatchlist(payload: {
   label: string;
   amount_cents: number;
   reserve_cents: number;
-  purchase_date?: string;
-  horizon_days?: number;
+  savings_target_cents?: number | undefined;
+  purchase_date?: string | undefined;
+  horizon_days?: number | undefined;
 }): Promise<WatchlistItem> {
   if (isVitestMockFetch()) {
     const item: WatchlistItem = {
@@ -120,6 +124,7 @@ export async function addToWatchlist(payload: {
       label: payload.label,
       amount_cents: payload.amount_cents,
       reserve_cents: payload.reserve_cents,
+      savings_target_cents: payload.savings_target_cents ?? 0,
       purchase_date: payload.purchase_date ?? "2026-11-08",
       horizon_days: payload.horizon_days ?? 30,
       ready: false,

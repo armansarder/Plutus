@@ -112,6 +112,18 @@ class CouncilRun:
             facts['stress_count'] = {'text': f'{a.stress_tests_passed} of {a.stress_tests_total} applicable stress tests maintain the reserve. This is a test count, not a probability.', 'evidence': [self.snapshot_id + ':stress']}
             facts['safe_dates'] = {'text': (f'First ordinary reserve-preserving purchase date: {a.safe_purchase_dates[0].isoformat()}.' if a.safe_purchase_dates else 'No tested ordinary purchase date preserves the reserve throughout this horizon.'), 'evidence': [self.snapshot_id + ':safe_dates']}
             facts['capacity'] = {'text': f'Calculated spending capacity on the selected date: {a.safe_to_spend_on_purchase_date} {self.snapshot.currency}.', 'evidence': [self.snapshot_id + ':capacity']}
+        try:
+            from notifications.store import get_db, load_demo_state
+            with get_db() as db:
+                st = load_demo_state(db)
+                b = st.get('monthlyBudget', {})
+                if b and b.get('allocatedCents'):
+                    alloc_dollars = Decimal(b['allocatedCents']) / Decimal(100)
+                    spent_dollars = Decimal(b['spentCents']) / Decimal(100)
+                    pct = round((b['spentCents'] * 100 / b['allocatedCents']), 1)
+                    facts['monthly_budget'] = {'text': f"{b.get('category', 'Groceries')} budget: allocated ${alloc_dollars:.2f}, spent ${spent_dollars:.2f} ({pct}% of monthly plan).", 'evidence': [self.snapshot_id + ':budget']}
+        except Exception:
+            pass
         return facts
 
     def context(self):

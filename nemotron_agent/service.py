@@ -120,11 +120,15 @@ def run_agent(request, snapshot, source, provider=None):
             reason = 'model_protocol_failed'
     for name in NAMES:
         simulate(name, 'server')
+    savings_target = DecimalValue(getattr(request, 'savings_target', '0.00'))
+    total_protected = DecimalValue(request.reserve) + savings_target
     safe = adapter.safe_dates()
     stress = [results[n] for n in ('delayed_income', 'unexpected_expense') if results[n]['applicable']]
     passed = sum(r['maintains_reserve'] for r in stress)
     purchase_ok = results['purchase']['maintains_reserve']
-    verdict = ('consider_purchase' if purchase_ok and passed == len(stress) else
+    minimum = results['purchase']['forecast']['minimum_balance']
+    savings_ok = DecimalValue(minimum) >= total_protected
+    verdict = ('consider_purchase' if purchase_ok and savings_ok and passed == len(stress) else
                'consider_waiting' if safe else 'reserve_at_risk')
     evidence = ['purchase', 'delayed_income', 'unexpected_expense']
     if mode == 'nemotron':
@@ -151,7 +155,10 @@ def run_agent(request, snapshot, source, provider=None):
     minimum = results['purchase']['forecast']['minimum_balance']
     summaries = {
         'consider_purchase': f"The purchase maintains your reserve under expected conditions and all {len(stress)} applicable stress test{'s' if len(stress) != 1 else ''}.",
-        'consider_waiting': ('The selected purchase maintains your reserve under expected conditions, but not every applicable stress test. Consider delaying or reducing it; listed safe dates are tested under ordinary conditions only.' if purchase_ok else f'Buying on {safe[0]} maintains your reserve under ordinary conditions; the selected date does not. That later date has not been stress-tested.' if safe else 'No ordinary reserve-preserving date was found.'),
+        'consider_waiting': (f"The purchase preserves your {request.reserve} reserve, but erodes your {savings_target:.2f} planned savings target ({total_protected:.2f} total protected)." if purchase_ok and not savings_ok else
+                             'The selected purchase maintains your reserve under expected conditions, but not every applicable stress test. Consider delaying or reducing it; listed safe dates are tested under ordinary conditions only.' if purchase_ok else
+                             f'Buying on {safe[0]} maintains your reserve under ordinary conditions; the selected date does not. That later date has not been stress-tested.' if safe else
+                             'No ordinary reserve-preserving date was found.'),
         'reserve_at_risk': 'No tested purchase date maintains your reserve throughout this forecast.'}
     summary = (summaries[verdict] + f' Lowest projected purchase balance: {minimum} {snapshot.currency}. '
                'These are conditional simulations; no payment was executed.')
@@ -167,10 +174,12 @@ def run_agent(request, snapshot, source, provider=None):
         'No fees, interest, or unscheduled daily spending are inferred.',
         'Free-text message is retained only in the request; structured purchase fields drive this MVP.',
     ]
+    if savings_target > DecimalValue('0.00'):
+        assumptions.append(f"Planned savings target of {savings_target:.2f} is protected on top of the {request.reserve} reserve ({total_protected:.2f} total protected).")
     return AgentResponse.model_validate({
         'request_id': request_id, 'mode': mode, 'model': provider.model if model_shared else None,
         'fallback_reason': reason, 'summary': summary,
-        'risk_level': 'high' if DecimalValue(minimum) < 0 else 'medium' if not purchase_ok or passed < len(stress) else 'low',
+        'risk_level': 'high' if DecimalValue(minimum) < 0 else 'medium' if not purchase_ok or not savings_ok or passed < len(stress) else 'low',
         'scenarios': [results[n] for n in NAMES], 'safe_purchase_dates': safe,
         'safe_to_spend_on_purchase_date': adapter.capacity(), 'stress_tests_passed': passed, 'stress_tests_total': len(stress),
         'provenance': {'source': source, 'snapshot_as_of': snapshot.as_of_date,

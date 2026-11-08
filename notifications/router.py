@@ -1,6 +1,7 @@
 """FastAPI router for Plutus notification preferences, watchlist, and operator controls."""
 import json
 import os
+from decimal import Decimal
 from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import APIRouter, Header, HTTPException
@@ -14,6 +15,9 @@ from .models import (
     SpendRequest,
     AdvancePaydayRequest,
     MessagingStatusResponse,
+    CashPlanUpdateRequest,
+    CashPlanResponse,
+    MonthlyBudgetResponse,
 )
 from .store import (
     get_db,
@@ -86,6 +90,45 @@ def update_preferences(payload: NotificationPreferencesRequest, customer_id: str
         )
 
 
+@router.get("/api/notifications/cash-plan", response_model=CashPlanResponse)
+def get_cash_plan(customer_id: str = "synthetic_demo"):
+    with get_db() as db:
+        state = load_demo_state(db)
+        return state.get("cashPlan", {
+            "savingsTargetCents": 20000,
+            "reserveCents": 20000,
+            "essentialBufferCents": 0,
+        })
+
+
+@router.put("/api/notifications/cash-plan", response_model=CashPlanResponse)
+def update_cash_plan(payload: CashPlanUpdateRequest, customer_id: str = "synthetic_demo"):
+    with get_db() as db:
+        state = load_demo_state(db)
+        state["cashPlan"] = {
+            "savingsTargetCents": payload.savings_target_cents,
+            "reserveCents": payload.reserve_cents,
+            "essentialBufferCents": payload.essential_buffer_cents,
+        }
+        save_demo_state(db, state)
+        return state["cashPlan"]
+
+
+@router.get("/api/notifications/budget", response_model=MonthlyBudgetResponse)
+def get_monthly_budget(customer_id: str = "synthetic_demo"):
+    with get_db() as db:
+        state = load_demo_state(db)
+        b = state["monthlyBudget"]
+        pct = round((b["spentCents"] * 100 / b["allocatedCents"]), 1) if b["allocatedCents"] > 0 else 0.0
+        return {
+            "category": b["category"],
+            "allocatedCents": b["allocatedCents"],
+            "spentCents": b["spentCents"],
+            "period": b["period"],
+            "percent": pct,
+        }
+
+
 @router.get("/api/notifications/history", response_model=list[AlertEventResponse])
 def get_history(customer_id: str = "synthetic_demo", limit: int = 50):
     with get_db() as db:
@@ -110,6 +153,8 @@ def get_history(customer_id: str = "synthetic_demo", limit: int = 50):
 def get_watchlist(customer_id: str = "synthetic_demo"):
     with get_db() as db:
         financial_data = get_authoritative_financial_data(customer_id)
+        state = load_demo_state(db)
+        cash_plan = state.get("cashPlan")
         rows = db.execute(
             "SELECT * FROM watchlist WHERE customer_id=? ORDER BY created_at DESC",
             (customer_id,)
@@ -118,19 +163,22 @@ def get_watchlist(customer_id: str = "synthetic_demo"):
         items = []
         for r in rows:
             item = dict(r)
-            eval_res = evaluate_purchase(financial_data, item)
+            eval_res = evaluate_purchase(financial_data, item, cash_plan=cash_plan)
             items.append(WatchlistItemResponse(
                 id=item["id"],
                 label=item["label"],
                 amount_cents=item["amount_cents"],
                 reserve_cents=item["reserve_cents"],
+                savings_target_cents=item.get("savings_target_cents", 0),
                 purchase_date=item["purchase_date"],
                 horizon_days=item["horizon_days"],
                 ready=eval_res["ready"],
                 notified=bool(item["notified"]),
+                verdict=eval_res.get("verdict"),
                 minimum_balance=eval_res["minimum_balance"],
                 reserve=eval_res["reserve"],
                 basis=eval_res["basis"],
+                reasons=eval_res.get("reasons"),
                 created_at=item["created_at"],
             ))
         return items
@@ -143,6 +191,8 @@ def add_to_watchlist(payload: WatchlistCreateRequest, customer_id: str = "synthe
         now = datetime.now(timezone.utc).isoformat()
         state = load_demo_state(db)
         purchase_date = payload.purchase_date or state["asOf"]
+        cash_plan = state.get("cashPlan")
+        savings_target_cents = payload.savings_target_cents or (cash_plan.get("savingsTargetCents", 0) if cash_plan else 0)
         
         item_dict = {
             "id": item_id,
@@ -150,6 +200,7 @@ def add_to_watchlist(payload: WatchlistCreateRequest, customer_id: str = "synthe
             "label": payload.label,
             "amount_cents": payload.amount_cents,
             "reserve_cents": payload.reserve_cents,
+            "savings_target_cents": savings_target_cents,
             "purchase_date": purchase_date,
             "horizon_days": payload.horizon_days,
             "created_at": now,
@@ -157,15 +208,15 @@ def add_to_watchlist(payload: WatchlistCreateRequest, customer_id: str = "synthe
         }
         
         financial_data = get_authoritative_financial_data(customer_id)
-        eval_res = evaluate_purchase(financial_data, item_dict)
+        eval_res = evaluate_purchase(financial_data, item_dict, cash_plan=cash_plan)
         
         db.execute("""
             INSERT INTO watchlist 
-            (id, customer_id, label, amount_cents, reserve_cents, purchase_date, horizon_days, last_ready, notified, last_result, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (id, customer_id, label, amount_cents, reserve_cents, savings_target_cents, purchase_date, horizon_days, last_ready, notified, last_result, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             item_id, customer_id, payload.label, payload.amount_cents, payload.reserve_cents,
-            purchase_date, payload.horizon_days, 1 if eval_res["ready"] else 0, 0,
+            savings_target_cents, purchase_date, payload.horizon_days, 1 if eval_res["ready"] else 0, 0,
             json.dumps(eval_res), now, now
         ))
         db.commit()
@@ -175,13 +226,16 @@ def add_to_watchlist(payload: WatchlistCreateRequest, customer_id: str = "synthe
             label=payload.label,
             amount_cents=payload.amount_cents,
             reserve_cents=payload.reserve_cents,
+            savings_target_cents=savings_target_cents,
             purchase_date=purchase_date,
             horizon_days=payload.horizon_days,
             ready=eval_res["ready"],
             notified=False,
+            verdict=eval_res.get("verdict"),
             minimum_balance=eval_res["minimum_balance"],
             reserve=eval_res["reserve"],
             basis=eval_res["basis"],
+            reasons=eval_res.get("reasons"),
             created_at=now,
         )
 
@@ -240,6 +294,9 @@ def operator_spend(
     with get_db() as db:
         state = load_demo_state(db)
         state["monthlyBudget"]["spentCents"] += payload.amount_cents
+        spend_dollars = Decimal(payload.amount_cents) / Decimal(100)
+        new_balance = max(Decimal("0.00"), Decimal(state["balance"]) - spend_dollars)
+        state["balance"] = format(new_balance, ".2f")
         save_demo_state(db, state)
         
         prefs = load_preferences(db, customer_id)

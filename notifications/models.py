@@ -30,6 +30,7 @@ class WatchlistCreateRequest(Strict):
     label: str = Field(min_length=1, max_length=100)
     amount_cents: int = Field(gt=0, le=100_000_000)
     reserve_cents: int = Field(ge=0, le=100_000_000)
+    savings_target_cents: int = Field(default=0, ge=0, le=100_000_000)
     purchase_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     horizon_days: int = Field(default=30, ge=1, le=90)
 
@@ -39,13 +40,16 @@ class WatchlistItemResponse(Strict):
     label: str
     amount_cents: int
     reserve_cents: int
+    savings_target_cents: int = 0
     purchase_date: str
     horizon_days: int
     ready: bool
     notified: bool
+    verdict: str | None = None
     minimum_balance: str | None = None
     reserve: str | None = None
     basis: str | None = None
+    reasons: list[str] | None = None
     created_at: str
 
 
@@ -71,4 +75,25 @@ class MessagingStatusResponse(Strict):
     demo: bool = True
     channel: str | None = None
     instructions: str | None = None
+
+
+class CashPlanUpdateRequest(Strict):
+    savings_target_cents: int = Field(ge=0, le=100_000_000)
+    reserve_cents: int = Field(ge=0, le=100_000_000)
+    essential_buffer_cents: int = Field(default=0, ge=0, le=100_000_000)
+
+
+class CashPlanResponse(Strict):
+    savingsTargetCents: int
+    reserveCents: int
+    essentialBufferCents: int = 0
+
+
+class MonthlyBudgetResponse(Strict):
+    category: str
+    allocatedCents: int
+    spentCents: int
+    period: str
+    percent: float
+
 

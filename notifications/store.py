@@ -67,6 +67,11 @@ def initial_demo_state() -> dict[str, Any]:
             "period": "2026-11",
             "lastObservedAbove": False,
         },
+        "cashPlan": {
+            "savingsTargetCents": 20000,   # $200.00
+            "reserveCents": 20000,         # $200.00
+            "essentialBufferCents": 0,     # $0.00
+        },
         "scheduled": [
             {"id": "rent", "date": "2026-11-11", "amount": "-900.00", "description": "Rent", "type": "expense", "source_status": "confirmed"},
             {"id": "pay_1", "date": "2026-11-15", "amount": "1300.00", "description": "Paycheck", "type": "income", "source_status": "estimated"},
@@ -106,6 +111,7 @@ def get_db():
             label TEXT NOT NULL,
             amount_cents INTEGER NOT NULL,
             reserve_cents INTEGER NOT NULL,
+            savings_target_cents INTEGER NOT NULL DEFAULT 0,
             purchase_date TEXT NOT NULL,
             horizon_days INTEGER NOT NULL DEFAULT 30,
             last_ready INTEGER NOT NULL DEFAULT 0,
@@ -115,6 +121,10 @@ def get_db():
             updated_at TEXT NOT NULL
         )
     """)
+    try:
+        db.execute("ALTER TABLE watchlist ADD COLUMN savings_target_cents INTEGER NOT NULL DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
     db.execute("""
         CREATE TABLE IF NOT EXISTS alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

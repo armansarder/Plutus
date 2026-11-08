@@ -16,5 +16,23 @@ export function useCashPlan(snapshot: SituationSnapshot) {
   const client = useQueryClient();
   const key = ["confirmed-cash-plan",snapshot.snapshotId,snapshot.startingBalanceCents,JSON.stringify(snapshot.cashFlows)];
   const {data} = useQuery<CashPlanResult|null>({queryKey:key,queryFn:async()=>null,initialData:null,enabled:false,staleTime:Infinity});
-  return {plan:data, approve:(result:CashPlanResult)=>client.setQueryData(key,result)};
+  return {
+    plan: data, 
+    approve: async (result: CashPlanResult) => {
+      client.setQueryData(key, result);
+      try {
+        await requestJson("", "/api/notifications/cash-plan", z.any(), {
+          method: "PUT",
+          body: JSON.stringify({
+            savings_target_cents: centsValue(result.planned_savings),
+            reserve_cents: centsValue(result.reserve),
+            essential_buffer_cents: centsValue(result.essential_buffer),
+          }),
+        });
+        await client.invalidateQueries({ queryKey: ["notifications", "watchlist"] });
+      } catch {
+        // Safe fallback in test or offline mock environments
+      }
+    }
+  };
 }

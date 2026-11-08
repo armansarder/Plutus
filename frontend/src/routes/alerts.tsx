@@ -82,7 +82,17 @@ function AlertCard({ alert, snap }: { alert: PlutusAlert; snap: FinancialSnapsho
 }
 
 function Alerts() {
-  return DATA_MODE === "remote" ? <BackendCustomerPage page="alerts" /> : <DemoAlerts />;
+  return DATA_MODE === "remote" ? (
+    <div>
+      <BackendCustomerPage page="alerts" />
+      <div className="mt-8 space-y-6">
+        <WatchedPurchasesSection />
+        <TextNotificationSettings />
+      </div>
+    </div>
+  ) : (
+    <DemoAlerts />
+  );
 }
 function DemoAlerts() {
   const { data: snap } = useSuspenseQuery(snapshotQueryOptions);

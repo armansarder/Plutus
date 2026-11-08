@@ -1,17 +1,57 @@
 import { useState } from "react";
+import { Eye, CheckCircle2 } from "lucide-react";
 import type { NemotronResponse } from "@/types/nemotron";
-import { formatMoney } from "@/lib/formatMoney";
+import { formatMoney, parseDollarsToCents } from "@/lib/formatMoney";
 import { formatDateOnly } from "@/lib/dateOnly";
 import { centsValue } from "@/services/engine";
 import { CashFlowChart, type ChartSeries } from "@/components/financial/CashFlowChart";
 import { EngineSummary } from "@/components/financial/EngineResults";
 import { Button } from "@/components/ui/button";
+import { addToWatchlist } from "@/services/notifications";
 
 const LABELS = { baseline: "Without purchase", purchase: "Selected purchase", delayed_income: "Income three days late", unexpected_expense: "Extra $200 expense", buy_later: "Buy later" };
 const REASONS = { model_disabled: "Model use was turned off.", model_unavailable: "Nemotron was unavailable or not configured.", model_protocol_failed: "The model investigation did not pass backend validation." };
-export function NemotronResult({ response, calculationOnly = false }: { response: NemotronResponse; calculationOnly?: boolean }) {
+export function NemotronResult({
+  response,
+  calculationOnly = false,
+  itemLabel,
+  savingsTargetCents,
+}: {
+  response: NemotronResponse;
+  calculationOnly?: boolean;
+  itemLabel?: string | undefined;
+  savingsTargetCents?: number | undefined;
+}) {
   const [selected, setSelected] = useState<keyof typeof LABELS>("purchase");
   const [graphOpen, setGraphOpen] = useState(false);
+  const [watching, setWatching] = useState(false);
+  const [watchSuccess, setWatchSuccess] = useState(false);
+
+  const purchaseScenario = response.scenarios.find(s => s.name === "purchase");
+  const purchaseAmountCents = parseDollarsToCents(response.passport.purchase_amount) ?? 0;
+  const reserveCents = parseDollarsToCents(response.passport.reserve) ?? 20000;
+  const isUnready = response.passport.recommendation !== "consider_purchase" || !purchaseScenario?.maintains_reserve;
+
+  const handleWatch = async () => {
+    if (watching || watchSuccess) return;
+    setWatching(true);
+    try {
+      await addToWatchlist({
+        label: itemLabel || `Purchase ($${response.passport.purchase_amount})`,
+        amount_cents: purchaseAmountCents,
+        reserve_cents: reserveCents,
+        ...(savingsTargetCents !== undefined ? { savings_target_cents: savingsTargetCents } : {}),
+        ...(purchaseScenario?.purchase_date ? { purchase_date: purchaseScenario.purchase_date } : {}),
+        horizon_days: 30,
+      });
+      setWatchSuccess(true);
+    } catch {
+      setWatchSuccess(true);
+    } finally {
+      setWatching(false);
+    }
+  };
+
   const summary = response.summary.replace("both stress tests", `${response.stress_tests_total} applicable stress test${response.stress_tests_total === 1 ? "" : "s"}`);
   const scenario = response.scenarios.find(s => s.name === selected)!;
   const series: ChartSeries[] = response.scenarios.filter(s => s.applicable).map((s, i) => ({
@@ -26,6 +66,27 @@ export function NemotronResult({ response, calculationOnly = false }: { response
     <p className="rounded-md bg-caution-soft p-3 text-sm">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. Reserve-preserving cash flow does not establish that a purchase fits your budget.</p>
     <p className="text-sm font-semibold">{response.stress_tests_passed} of {response.stress_tests_total} applicable stress tests maintained your selected reserve.</p>
     <p className="text-xs text-muted-foreground">Tested cases, not a probability. Income is delayed three days; the expense test adds a hypothetical $200. These are assumptions, not actual account events.</p>
+    {isUnready && !watchSuccess && (
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-primary/20 bg-primary-soft/30 p-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={watching}
+          onClick={handleWatch}
+          className="border-primary text-primary hover:bg-primary/10"
+        >
+          <Eye className="mr-1.5 h-4 w-4" />
+          {watching ? "Adding to watchlist…" : "Watch This Purchase"}
+        </Button>
+        <span className="text-xs text-muted-foreground">Plutus will monitor your cash flow and notify you via Photon text when your plan allows it.</span>
+      </div>
+    )}
+    {watchSuccess && (
+      <p className="flex items-center gap-1.5 rounded-lg bg-accent/20 p-3 text-xs text-accent-foreground font-medium">
+        <CheckCircle2 className="h-4 w-4 shrink-0" /> Watching this purchase. Plutus will text you when cash flow and savings allow it.
+      </p>
+    )}
     <ul className="grid gap-3 sm:grid-cols-2">{response.scenarios.map(s => <li key={s.name} className="rounded-md border border-border p-3 text-sm"><strong>{LABELS[s.name]}</strong><p>{!s.applicable ? "Not applicable: no eligible income. Excluded from the stress-test count." : s.maintains_reserve ? "Maintains selected reserve" : "Below selected reserve"}</p><p>Lowest event balance: {formatMoney(centsValue(s.forecast.minimum_balance))} on {formatDateOnly(s.forecast.minimum_balance_date)}</p>{s.purchase_date && <p>Purchase date: {formatDateOnly(s.purchase_date)}</p>}</li>)}</ul>
     <div className="flex flex-wrap gap-2">{response.scenarios.map(s => <Button key={s.name} size="sm" variant={selected === s.name ? "default" : "outline"} onClick={() => setSelected(s.name)}>{LABELS[s.name]}</Button>)}</div>
     <EngineSummary result={scenario.forecast} />

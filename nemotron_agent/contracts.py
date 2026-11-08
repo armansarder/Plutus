@@ -10,6 +10,7 @@ class AgentRequest(Contract):
     purchase_amount: Annotated[Money, Field(gt=0, le=1000000)]
     purchase_date: Day | None = None
     reserve: Annotated[Money, Field(ge=0, le=1000000)] = '200.00'
+    savings_target: Annotated[Money, Field(ge=0, le=1000000)] = '0.00'
     horizon_days: int = Field(default=30, ge=1, le=90, strict=True)
     allow_model: bool = True
     channel: Literal['web', 'photon'] = 'web'
