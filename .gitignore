@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.log
+.test-tmp*/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+calculation_engine/private_data/
