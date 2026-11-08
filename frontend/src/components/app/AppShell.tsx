@@ -5,6 +5,13 @@ import { useState } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FinancialDataBadge } from "@/components/financial/FinancialDataBadge";
+import { useCustomerFinancialData } from "./CustomerFinancialData";
+
+function BackendDataBadge() {
+  const query = useCustomerFinancialData();
+  const label = query.isError ? "Backend data unavailable" : query.isPending ? "Loading backend data…" : query.data.backend?.source === "nessie_sandbox" ? "Nessie sandbox data" : "Backend-connected data";
+  return <span className="text-xs text-muted-foreground">{label}</span>;
+}
 
 const navCls =
   "rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -23,7 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <nav aria-label="Main" className="hidden items-center gap-0.5 xl:flex">
             {links.map((link) => <Link key={link.to} to={link.to} activeOptions={{ exact: true }} className={navCls} activeProps={{ className: "bg-primary-soft text-primary" }}>{link.label}</Link>)}
           </nav>
-          <div className="ml-auto">{backendConnected ? <span className="text-xs text-muted-foreground">Backend-connected data</span> : <FinancialDataBadge persona="Alex" />}</div>
+          <div className="ml-auto">{backendConnected ? <BackendDataBadge /> : <FinancialDataBadge persona="Alex" />}</div>
           <Button variant="ghost" size="icon" className="xl:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
           {open && <nav aria-label="Mobile" className="grid w-full gap-1 border-t border-border pt-3 xl:hidden">{links.map((link) => <Link key={link.to} to={link.to} activeOptions={{ exact: true }} onClick={() => setOpen(false)} className={`${navCls} flex min-h-11 items-center justify-between`} activeProps={{ className: "bg-primary-soft text-primary" }}>{link.label}<ArrowUpRight className="h-4 w-4" /></Link>)}</nav>}
         </div>

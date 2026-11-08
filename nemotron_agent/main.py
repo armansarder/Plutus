@@ -23,13 +23,19 @@ def demo_snapshot():
 
 
 def create_app(source=None, settings=None, provider=None):
-    mode = os.getenv('AGENT_DATA_SOURCE', 'demo')
-    if mode not in ('demo', 'engine'):
-        raise ValueError('AGENT_DATA_SOURCE must be demo or engine')
+    mode = os.getenv('AGENT_DATA_SOURCE') or ('nessie' if os.getenv('FINPILOT_DATA_SOURCE') == 'nessie' else 'demo')
+    if mode not in ('demo', 'engine', 'nessie'):
+        raise ValueError('AGENT_DATA_SOURCE must be demo, engine, or nessie')
+    if mode == 'demo' and os.getenv('FINPILOT_DATA_SOURCE') == 'nessie':
+        raise ValueError('Conflicting data sources: select AGENT_DATA_SOURCE=nessie or engine')
     label = 'synthetic_demo' if source is None and mode == 'demo' else 'configured_engine_source'
     if source is None and mode == 'demo':
         source = FunctionAdapter(demo_snapshot)
-    app = create_engine_app(source=source, settings=settings)
+    app = create_engine_app(source=source, settings=settings,
+                           data_source_mode='nessie' if mode == 'nessie' else None)
+    from calculation_engine.nessie_adapter import NessieAdapter
+    if isinstance(app.state.financial_source, NessieAdapter):
+        label = 'nessie_sandbox'
     app.title = 'Plutus Agent and Simulation API'
     # Reuse the exact ownership-checked data dependency from the engine route.
     route = next(r for r in app.routes if getattr(r, 'path', None) == '/api/financial-data')

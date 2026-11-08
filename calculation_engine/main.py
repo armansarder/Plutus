@@ -35,23 +35,32 @@ class DecimalJSONRoute(APIRoute):
         return handle
 
 
-def create_app(source=None, settings: SecuritySettings | None = None, history_source=None):
+def create_app(source=None, settings: SecuritySettings | None = None, history_source=None,
+               data_source_mode: str | None = None):
     settings = settings if settings is not None else SecuritySettings.from_env()
-    source_mode = os.getenv('FINPILOT_DATA_SOURCE', 'mock')
+    source_mode = data_source_mode or os.getenv('FINPILOT_DATA_SOURCE', 'mock')
     if source is None:
         if source_mode == 'nessie':
             from .nessie_adapter import NessieAdapter
+            from .nessie_adapter import DEFAULT_NESSIE_BASE_URL
             if not settings.api_token or not settings.customer_id:
                 raise ValueError('Nessie requires FINPILOT_API_TOKEN and FINPILOT_CUSTOMER_ID')
-            schedule_path = os.getenv('FINPILOT_UPCOMING_FILE')
+            if os.getenv('FINPILOT_UPCOMING_FILE'):
+                raise ValueError('Unset FINPILOT_UPCOMING_FILE: Nessie mode uses source-dated bills, not inferred schedules')
+            nessie_records = NessieHistorySource(
+                api_key=os.getenv('NESSIE_API_KEY', ''), customer_id=settings.customer_id,
+                base_url=os.getenv('NESSIE_BASE_URL', DEFAULT_NESSIE_BASE_URL),
+                account_id=os.getenv('NESSIE_ACCOUNT_ID') or None, select_single=True,
+                cache_seconds=30.0)
             source = NessieAdapter(
                 api_key=os.getenv('NESSIE_API_KEY', ''),
-                account_id=os.getenv('NESSIE_ACCOUNT_ID', ''),
+                account_id=os.getenv('NESSIE_ACCOUNT_ID') or None,
                 customer_id=settings.customer_id,
-                base_url=os.getenv('NESSIE_BASE_URL', ''),
+                base_url=os.getenv('NESSIE_BASE_URL', DEFAULT_NESSIE_BASE_URL),
                 currency=os.getenv('FINPILOT_CURRENCY', 'USD'),
-                upcoming_source=JsonFileAdapter(schedule_path) if schedule_path else None,
+                raw_source=nessie_records,
             )
+            history_source = nessie_records
         elif source_mode in ('mock', 'file'):
             path = os.getenv('FINPILOT_DATA_FILE')
             if source_mode == 'file' and not path:
@@ -129,7 +138,10 @@ def create_app(source=None, settings: SecuritySettings | None = None, history_so
     @app.get('/api/financial-data', operation_id='get_financial_data',
              response_model=FinancialResponse, response_model_exclude_none=True)
     def financial_data(data=Depends(get_data)):
-        return {'data': data.model_dump(mode='json')}
+        from .nessie_adapter import NessieAdapter
+        return {'data': data.model_dump(mode='json'),
+                'source': 'nessie_sandbox' if isinstance(app.state.financial_source, NessieAdapter)
+                else 'synthetic_demo' if data.customer_id == 'synthetic_demo' else 'configured_backend'}
 
     @app.post('/api/simulate', operation_id='simulate_purchase',
               response_model=SimulationResponse, response_model_exclude_none=True)

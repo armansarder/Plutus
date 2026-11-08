@@ -27,14 +27,27 @@ Never expose NVIDIA or Nessie keys, or put the service token in committed fronte
 code, Vite public variables, URLs, or localStorage. For deployment use an authenticated
 application proxy and the existing production security settings with TLS.
 
-Live integrated data: use `AGENT_DATA_SOURCE=engine` and the *same* existing engine
+Nessie-backed Plutus: use `AGENT_DATA_SOURCE=nessie` and
+`FINPILOT_DATA_SOURCE=nessie`, with `NESSIE_API_KEY`,
+`NESSIE_BASE_URL=https://prod-api.nessieisreal.com`, `FINPILOT_CUSTOMER_ID`, and an
+optional unambiguous `NESSIE_ACCOUNT_ID` selection. All engine routes and this
+agent share the selected account's intraday balance and source-dated future bills;
+history stays separate. No paychecks or recurring dates are inferred. Unset
+`FINPILOT_UPCOMING_FILE` in this mode. See `calculation_engine/NESSIE.md` for exact
+Git Bash startup commands, selection/error rules and read-only verification.
+The existing `AGENT_DATA_SOURCE=engine` alias also works when the engine source is
+Nessie. An explicit demo/Nessie conflict is rejected instead of using demo data.
+
+Other integrated sources: use `AGENT_DATA_SOURCE=engine` and the *same* existing engine
 settings that Azzam verified (`FINPILOT_DATA_SOURCE=nessie`, customer/account IDs,
 Nessie key/base URL, and `FINPILOT_UPCOMING_FILE`). If those are in the root `.env`,
 start with `python -m uvicorn nemotron_agent.main:app --env-file .env --port 8000`.
-The upcoming schedule must match the current UTC snapshot date. Refresh extraction
-and transformation through Azzam's existing workflow; the agent does not seed or
-write Nessie data. Missing or stale source data returns 503, never fake live data.
-`AGENT_DATA_SOURCE` defaults to `demo` deliberately; always inspect provenance.
+For non-Nessie externally supplied schedules, the schedule must match the current
+UTC snapshot date. The agent does not seed or write Nessie data. Missing or stale
+source data returns 503, never fake live data. Nessie mode reads explicit bill dates
+directly rather than consuming the pipeline's inferred schedule.
+Without an explicit agent mode, `FINPILOT_DATA_SOURCE=nessie` selects Nessie;
+otherwise the agent defaults to `demo`. Always inspect provenance.
 
 ## Request
 

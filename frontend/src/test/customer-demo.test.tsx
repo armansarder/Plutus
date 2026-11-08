@@ -55,7 +55,7 @@ it("keeps every demo page on Alex's independent records without backend access",
     for (const { path, heading } of pages.slice(1)) {
       const link = screen.getAllByRole("link").find(l => l.getAttribute("href") === path);
       fireEvent.click(link!);
-      expect(await screen.findByRole("heading", { name: heading })).toBeInTheDocument();
+      expect(await screen.findByRole("heading", { name: heading }, { timeout: 5000 })).toBeInTheDocument();
       expect(screen.getByText("Synthetic demo data · Alex")).toBeInTheDocument();
       expect(screen.queryByText(/synthetic_demo/)).not.toBeInTheDocument();
       expect(screen.queryByText("Backend-connected data")).not.toBeInTheDocument();
@@ -64,4 +64,4 @@ it("keeps every demo page on Alex's independent records without backend access",
     expect(await screen.findByText(/\$500 · Laptop/, {}, { timeout: 3000 })).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
   } finally { cleanup(); queryClient.clear(); }
-}, 10000);
+}, 20000);

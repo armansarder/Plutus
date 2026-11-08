@@ -28,7 +28,7 @@ const pages = [
   { path: "/cash-flow", Component: CashFlowRoute.options.component!, message: "A look at what's next." },
   { path: "/alerts", Component: AlertsRoute.options.component!, message: "We don't have enough information to assess your plan yet." },
   { path: "/suggestions", Component: SuggestionsRoute.options.component!, message: "We don't have your monthly spending plan yet." },
-  { path: "/talk", Component: TalkRoute.options.component!, message: "Personalized answers aren't available for this customer yet." },
+  { path: "/talk", Component: TalkRoute.options.component!, message: "Explore a purchase with Plutus." },
 ] as const;
 const payload = financialPayload;
 let clients: QueryClient[] = [];

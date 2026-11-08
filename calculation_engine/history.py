@@ -12,6 +12,7 @@ import json
 import re
 import threading
 import time
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from decimal import Decimal
@@ -37,7 +38,7 @@ CATEGORY_MAP = {
 BILL_KEYWORDS = (('rent', 'Housing'), ('mortgage', 'Housing'), ('electric', 'Utilities'),
                  ('water', 'Utilities'), ('phone', 'Utilities'), ('internet', 'Utilities'),
                  ('insurance', 'Insurance'))
-COUNTED_STATUSES = ('completed', 'pending', 'executed')
+COUNTED_STATUSES = ('completed', 'executed')
 ID_PATTERN = re.compile(r'[A-Za-z0-9_-]{1,128}')
 CENT = Decimal('0.01')
 
@@ -101,7 +102,21 @@ def _check_accounts(accounts, customer_id):
             raise ValueError('Account ownership does not match the configured customer')
         if not ID_PATTERN.fullmatch(str(a.get('_id', ''))):
             raise ValueError('Invalid account ID from source')
+    if len({a['_id'] for a in accounts}) != len(accounts):
+        raise ValueError('Duplicate account IDs from source')
     return [a for a in accounts if a.get('type') in CASH_ACCOUNT_TYPES]
+
+
+def select_cash_account(accounts, customer_id, account_id=None):
+    """No first-account guessing: an ambiguous selection must be configured."""
+    cash = _check_accounts(accounts, customer_id)
+    if account_id:
+        matches = [a for a in cash if a['_id'] == account_id]
+    else:
+        matches = [a for a in cash if a['type'] == 'Checking'] or cash
+    if len(matches) != 1:
+        raise ValueError('Configure one owned Nessie Checking/Savings account explicitly')
+    return matches[0]
 
 
 @dataclass
@@ -110,6 +125,8 @@ class NessieHistorySource:
     customer_id: str
     base_url: str
     cache_seconds: float = 60.0
+    account_id: str | None = None
+    select_single: bool = False
     _cache: tuple | None = field(default=None, repr=False)
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
@@ -118,6 +135,8 @@ class NessieHistorySource:
             raise ValueError('A server-side Nessie API key is required')
         if not ID_PATTERN.fullmatch(self.customer_id or ''):
             raise ValueError('Invalid configured customer ID')
+        if self.account_id is not None and not ID_PATTERN.fullmatch(self.account_id):
+            raise ValueError('Invalid configured account ID')
         if self.base_url not in tuple('https://' + host for host in NESSIE_HOSTS):
             raise ValueError('Use an explicit supported Nessie HTTPS origin without a trailing slash')
 
@@ -128,23 +147,35 @@ class NessieHistorySource:
 
     def load_raw(self):
         with self._lock:
-            if self._cache and time.monotonic() - self._cache[0] < self.cache_seconds:
-                return self._cache[1]
-        accounts = _check_accounts(
-            self._get(f'/customers/{self.customer_id}/accounts'), self.customer_id)
+            if (self._cache and time.monotonic() - self._cache[0] < self.cache_seconds
+                    and self._cache[1]['fetched_at'][:10] == datetime.now(timezone.utc).date().isoformat()):
+                return deepcopy(self._cache[1])
+        available = self._get(f'/customers/{self.customer_id}/accounts')
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        accounts = ([select_cash_account(available, self.customer_id, self.account_id)]
+                    if self.select_single or self.account_id else _check_accounts(available, self.customer_id))
         raw = {'customer_id': self.customer_id, 'accounts': accounts}
         for kind in TRANSACTION_KINDS:
             rows = []
             for account in accounts:
                 # Nessie returns 404 (not []) for some empty collections, e.g. transfers.
-                for record in self._get(f"/accounts/{account['_id']}/{kind}", empty_on_404=True):
-                    if isinstance(record, dict):
-                        rows.append({**record, '_source_account_id': account['_id'],
-                                     '_source_account_type': account['type']})
+                records = self._get(f"/accounts/{account['_id']}/{kind}", empty_on_404=True)
+                if not isinstance(records, list) or len(records) > 2000 or any(not isinstance(r, dict) for r in records):
+                    raise ValueError('Invalid Nessie transaction collection')
+                owner_key = {'purchases': 'payer_id', 'withdrawals': 'payer_id',
+                             'deposits': 'payee_id', 'bills': 'account_id'}.get(kind)
+                for record in records:
+                    if owner_key and owner_key in record and record[owner_key] != account['_id']:
+                        raise ValueError('Transaction belongs to a different account')
+                    rows.append({**record, '_source_account_id': account['_id'],
+                                 '_source_account_type': account['type']})
             raw[kind] = rows
         raw['merchants'] = self._get('/merchants', empty_on_404=True)
+        if not isinstance(raw['merchants'], list) or any(not isinstance(r, dict) for r in raw['merchants']):
+            raise ValueError('Invalid Nessie merchant collection')
+        raw['fetched_at'] = fetched_at
         with self._lock:
-            self._cache = (time.monotonic(), raw)
+            self._cache = (time.monotonic(), deepcopy(raw))
         return raw
 
 
@@ -180,7 +211,7 @@ def _amount(value):
     if isinstance(value, bool) or not isinstance(value, (int, float, str, Decimal)):
         raise ValueError('Invalid amount in source')
     amount = Decimal(str(value))
-    if not amount.is_finite():
+    if not amount.is_finite() or amount.copy_abs() > Decimal('1000000000000') or amount != amount.quantize(CENT):
         raise ValueError('Invalid amount in source')
     return abs(amount).quantize(CENT)
 
@@ -318,5 +349,6 @@ def build_history(source, *, currency='USD', month=None, months_back=6, today=No
         months=summaries, selected_month=month, transactions=transactions,
         notes=['Historical transactions only; already reflected in the current balance.',
                'Transfers between own accounts are excluded from spending and income.',
+               'Only completed/executed records count toward income or spending; pending records do not.',
                "Bills with status 'recurring' are future schedule, not history."],
     ).model_dump(mode='json')

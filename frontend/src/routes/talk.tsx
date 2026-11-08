@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { agentAdapter } from "@/services/agent";
 import type { AgentResponse } from "@/types/agent";
 import { DATA_MODE } from "@/services/config";
-import { BackendCustomerPage } from "@/components/app/BackendCustomerPage";
+import { BackendTalk } from "@/components/chat/BackendTalk";
 
 export const Route = createFileRoute("/talk")({
   head: () => ({ meta: [
@@ -35,7 +35,7 @@ function speechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 }
 
 function Talk() {
-  return DATA_MODE === "remote" ? <BackendCustomerPage page="talk" /> : <DemoTalk />;
+  return DATA_MODE === "remote" ? <BackendTalk /> : <DemoTalk />;
 }
 function DemoTalk() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

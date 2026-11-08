@@ -8,11 +8,11 @@ Eight focused pages: Home (/), Current Situation (/dashboard), Monthly Plan (/mo
 - Temporary budget reads/drafts/approval: `BudgetPlanAdapter` in `src/services/budgets.ts`; synthetic fixture and state in `src/mocks/`. Plan edits reset on reload.
 - Last submitted hypothetical requests stay in React memory across client navigation. Cash Flow recalculates through SimulationAdapter against the current approved plan. Suggestions are labeled example prompts, not live AI.
 - Deterministic mock simulation: `src/mocks/syntheticSimulationAdapter.ts` and `assessBudget.ts`. Shared results drive category bars, savings, comparisons, explanations and cash charts.
-- `VITE_DATA_MODE` selects the source through `src/services/config.ts`. Backend-connected snapshots, purchase calculations, comparisons, forecasts and optional history use the existing secure FastAPI proxy. Budget and agent endpoints remain unconnected. No silent synthetic fallback after remote errors.
-- Arman's future budget proposal enters through `BudgetProposalAdapter` and `budgetProposalSchema`. Proposals are unapproved until the user reviews/edits/confirms; no Nemotron call is implemented.
+- `VITE_DATA_MODE` selects the source through `src/services/config.ts`. Backend-connected snapshots, purchase calculations, comparisons, forecasts, history and the confirmed agent endpoint use the secure FastAPI proxy. Category budget endpoints remain unconnected. No silent synthetic fallback after remote errors.
+- Arman's future budget proposal enters through `BudgetProposalAdapter` and `budgetProposalSchema`. Budget proposals remain unconnected; the remote Talk page uses the existing Nemotron purchase-analysis agent instead.
 - December's plan is deliberately unavailable. December comparisons show unknown budget/savings impact; cash forecasts disclose absent December bills and undated earmarks. Goal delay is not estimated without a deadline and confirmed contribution schedule.
 - Tests: `bunx vitest run`; accounting uses integer cents and end-of-day date-only aggregation. See `SECURITY_HANDOFF.md` for frontend protections and hosting/backend responsibilities.
-- The existing Python engine powers remote Simulator and Cash Flow. No Nemotron, Photon, account linking, sign-in, database, investing functionality, or payment execution is connected in this phase. Demo alerts and generated history remain confined to Alex mode.
+- The existing Python engine powers remote Simulator and Cash Flow; Talk connects to the existing Nemotron agent through the authenticated proxy. No Photon, account linking, sign-in, database, investing functionality, or payment execution is connected. Demo alerts and generated history remain confined to Alex mode.
 
 This project was built with [Lovable](https://lovable.dev).
 
@@ -44,6 +44,18 @@ npm run dev
 
 ## Application-wide customer data modes and engine integration
 
+Nessie setup is implemented in the existing backend adapter. See
+[`calculation_engine/NESSIE.md`](../calculation_engine/NESSIE.md) for exact Git Bash
+commands. Select `AGENT_DATA_SOURCE=nessie`, `FINPILOT_DATA_SOURCE=nessie` and the
+server-side Nessie customer/account configuration; keep `VITE_DATA_MODE=remote`.
+The shared snapshot now preserves the backend's explicit `source` field, and the
+header and page provenance show **Nessie sandbox data** on every financial page.
+The account's intraday balance and explicitly dated future bills drive Simulator,
+Cash Flow and Talk. History reads the same selected account. Alex's demo and the
+$800 backend fixture remain separate explicit modes, never failure fallbacks.
+Unknown category budgets, savings allocations and inferred future income remain
+unavailable. No raw extraction/seed script is run to start the app.
+
 `VITE_DATA_MODE` selects one customer source for the entire application. It is
 `synthetic_demo` by default (Alex's existing $1,800 frontend dataset), or `remote`
 (the customer configured in FastAPI, currently the $800 `synthetic_demo` customer).
@@ -60,8 +72,8 @@ category budgets and savings allocations are unavailable. The remote Simulator c
 Cash Flow calls `POST /api/forecast` for 30 daily closing balances, and
 `GET /api/history?months=12` when History is selected. History errors do not block
 forecasts. The last completed purchase comparison is shared in memory with Cash Flow.
-Alerts do not claim an all-clear; personalized suggestions and chat remain unavailable.
-No Nemotron or Photon connection is added. Alex's calculations, approved demo budgets,
+Alerts do not claim an all-clear; personalized budget suggestions remain unavailable.
+Talk uses `/api/agent/run` with explicitly confirmed purchase fields; no Photon connection is added. Alex's calculations, approved demo budgets,
 history and assistant remain available only in `synthetic_demo` mode.
 
 From `frontend/`, set these in the PowerShell session that starts Vite:
@@ -81,7 +93,7 @@ token and backend URL to the server runtime. Use the full TanStack server build;
 a static file host cannot serve this proxy. Never put the token in a `VITE_`
 variable, browser storage, URLs, or committed files.
 
-The browser requests only the five allowlisted financial paths on its own origin. The server
+The browser requests only the allowlisted financial paths and `/api/agent/run` on its own origin. The server
 adds the bearer token, uses fixed upstream paths, permits only bounded `month`/`months`
 queries on history, rejects unknown request fields, bounds JSON bodies, forbids
 redirects, allows HTTP only on loopback, times out after 12 seconds, and returns
@@ -147,3 +159,60 @@ npm test
 npx tsc --noEmit
 npm run build
 ```
+
+## Talk to Plutus with the existing Nemotron agent
+
+In remote mode, `/talk` now calls the confirmed `POST /api/agent/run` contract
+through the same authenticated proxy and backend origin as Current Situation.
+The response is a flat schema-1.0 object, not a `{ data: ... }` envelope. The
+Alex demo assistant and its unrelated fixtures are used only in synthetic mode.
+
+The current agent supports purchase analysis, not general conversational intent
+extraction. Enter a question, then explicitly confirm purchase amount/date, cash
+reserve and a 1–90-day horizon before sending. Text does not override those fields;
+prior chat turns are not supplied to the agent. Every request returns baseline,
+purchase, three-day delayed income, hypothetical $200 expense and buy-later
+scenarios. The UI shows backend figures, applicable stress counts, projected
+balances, ordinary reserve-preserving dates, capacity and source assumptions.
+Budget affordability remains unknown without category budgets and protected savings.
+
+Recent analyses are kept only in the existing in-memory query cache, scoped to
+customer snapshot and opening balance. Navigation preserves completed turns;
+leaving during a request cancels it and offers an explicit retry. Clear conversation
+removes the visible history; a full refresh clears it too. No browser storage,
+conversation backend, Photon delivery or automatic retry is added.
+
+To test locally:
+
+1. Use the existing combined server (`nemotron_agent.main:app`) on port 8003.
+   Keep its financial/customer settings unchanged. If replacing an engine-only
+   entrypoint, use `AGENT_DATA_SOURCE=engine` with the same existing source settings,
+   rather than switching financial datasets. See `nemotron_agent/INTEGRATION.md`.
+2. Keep `FINPILOT_API_TOKEN` only in the backend and frontend **server** environment.
+   Set `FINPILOT_BACKEND_URL=http://127.0.0.1:8003` and `VITE_DATA_MODE=remote`, then
+   start Vite from `frontend/` with `npm run dev -- --port 8080`.
+3. For actual model investigation, configure `NVIDIA_API_KEY` and, if needed,
+   `NVIDIA_MODEL` on the agent server (`nemotron_agent/.env` is already loaded by
+   its entrypoint), then restart that service. Never put these values in Vite
+   variables or browser code.
+4. Open `/talk`, ask about a purchase, enter its amount/date, and submit. With
+   valid model access, the result says “Nemotron investigation”. With a missing key,
+   provider failure or rejected model protocol, the backend may still return a
+   valid calculation labeled “Deterministic fallback” with its actual reason.
+   Turning off the model checkbox explicitly requests deterministic-only analysis.
+   HTTP/source/authentication failures stay errors; no mock reply is substituted.
+5. With the existing token privately configured, run the authenticated synthetic
+   live check from `frontend/`:
+
+```powershell
+$env:PLUTUS_AGENT_LIVE_CHECK = '1'
+npx vitest run src/test/nemotron-live.test.ts
+```
+
+The live check verifies adapter → proxy → agent and reports only statuses and
+actual Nemotron/fallback mode. Without opt-in it is skipped; no NVIDIA calls occur
+in the ordinary test suite. The agent route has a 60-second proxy deadline for up
+to four sequential 12-second provider calls. Other financial routes keep their
+12-second deadline. General budgeting/savings chat and free-text purchase extraction
+still require future backend capabilities; this integration does not pretend to
+provide them.
