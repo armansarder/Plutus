@@ -613,3 +613,16 @@ or duplicate review rounds in the primary answer. Show the latest review per rol
 retain earlier rounds and references behind expandable evidence. Budget/Risk may
 disagree when ordinary affordability and stress resilience differ. Do not promise
 that a date tested only under expected income will survive delayed income.
+
+
+### Council evidence presentation
+
+Agreement is valid; identical role explanations are not the intended UI. Budget
+reports expected purchase minimum/date and reserve; Risk reports the worst applicable
+setback minimum/date and missing stress coverage; Simulator compares baseline and
+purchase ending balances and purchase minimum; Leader synthesizes the supported
+verdict and remaining limits. All figures come from the same engine evidence.
+Never manufacture objections or claim unknown expenses are covered. Display the
+selected agent once at the top and other roles below, with their validated selected
+findings expandable. Scenario graphs start expanded in separate panels using the
+existing shared scale; inapplicable late-income scenarios remain excluded.

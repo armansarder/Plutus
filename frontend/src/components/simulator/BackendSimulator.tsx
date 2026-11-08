@@ -4,7 +4,6 @@ import { Link } from "@tanstack/react-router";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
 import { PageHeading } from "@/components/app/PageHeading";
 import { useDecision } from "@/components/app/DecisionContext";
-import { BackendSource } from "@/components/financial/BackendRecords";
 import { EngineSummary, EngineTimeline, EngineComparisonChart } from "@/components/financial/EngineResults";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,8 +51,8 @@ function PurchaseCalculator({ snapshot }: { snapshot: SituationSnapshot }) {
   }
   const comparison = !mutation.isError && !mutation.isPending ? mutation.data?.comparison : undefined;
   const result = comparison?.scenarios.find(s => s.name === selected);
-  return <div><PageHeading eyebrow={`${snapshot.customer.displayName} · Try a decision`} title="What if you bought it?" description="Compare buying now, buying later or skipping a purchase using your backend records." /><BackendSource snapshot={snapshot} />
-    <p className="mb-6 rounded-md bg-caution-soft p-4 text-sm">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. A positive checking balance alone does not mean a purchase is affordable.</p>
+  return <div><PageHeading eyebrow={`Your account · Try a decision`} title="What if you bought it?" description="Compare buying now, buying later or skipping a purchase using your backend records." />
+    <details className="mb-6 text-sm text-muted-foreground"><summary className="cursor-pointer">What this simulation includes</summary><p className="mt-2">This simulation uses your balance, scheduled income and expenses, and the purchase details you enter. It does not apply your saved cash plan or category budgets. Expenses missing from your schedule are not included.</p></details>
     <div className="grid items-start gap-8 lg:grid-cols-[320px_1fr]"><form className="panel space-y-4 p-5" noValidate onSubmit={e => { e.preventDefault(); submit(); }}>
       <h2 className="font-display text-lg font-semibold">What are you thinking of buying?</h2><p className="text-xs text-muted-foreground">Simulation only. No money moves.</p>
       <div><Label htmlFor="backend-amount">Purchase amount (USD)</Label><Input id="backend-amount" inputMode="decimal" autoComplete="off" value={amount} onChange={e => setAmount(e.target.value)} /></div>

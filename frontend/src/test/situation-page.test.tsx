@@ -20,7 +20,7 @@ it("shows a retryable error without substituting demo data", async () => { load.
 it("renders backend balance and prompts for explicit savings and cash allocations", async () => {
   load.mockResolvedValue({ customer: { displayName: "synthetic_demo" }, startDate: "2026-11-07", startingBalanceCents: 80000, cashFlows: [{ id: "pay", date: "2026-11-09", type: "income", amountCents: 100000, label: "Income", provenance: "assumed" }], backend: { synthetic: true, notes: [], basis: "opening" } });
   page(); expect(await screen.findByText("$800")).toBeInTheDocument();
-  expect(screen.getByText(/Synthetic sample dataset/)).toHaveTextContent("estimated upcoming");
+  expect(screen.getByText(/Your account/)).toBeInTheDocument();
   expect(screen.getByText("Set a target")).toBeInTheDocument();
   expect(screen.getByText("Set your cash plan")).toBeInTheDocument();
   expect(screen.getByRole("button", {name:"Preview my plan"})).toBeInTheDocument();

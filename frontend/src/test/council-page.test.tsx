@@ -29,15 +29,15 @@ function page() {client = new QueryClient({defaultOptions: {queries: {retry: fal
 it("opens isolated specialist tabs without sharing the other chat's history", async () => {
   page(); await screen.findByText("Council Leader", {selector: "h2"});
   await waitFor(() => expect(councilAdapter.create).toHaveBeenCalledWith("council"));
-  fireEvent.click(screen.getByRole("tab", {name: "Budget Agent"}));
+  fireEvent.click(screen.getByRole("tab", {name: "Budget Advisor"}));
   await waitFor(() => expect(councilAdapter.create).toHaveBeenCalledWith("budget"));
   expect(screen.queryByText("Test purchase")).not.toBeInTheDocument();
-  expect(screen.getByLabelText("Question for Budget Agent")).toBeInTheDocument();
+  expect(screen.getByLabelText("Question for Budget Advisor")).toBeInTheDocument();
 });
 it("submits confirmed fields and shows actual reviews, evidence charts and original engine results", async () => {
   page(); await waitFor(() => expect(councilAdapter.create).toHaveBeenCalled());
   fireEvent.change(screen.getByLabelText("Question for Council Leader"), {target: {value: "Can I buy a laptop?"}});
-  fireEvent.click(screen.getByLabelText("Include a confirmed purchase comparison"));
+  fireEvent.click(screen.getByLabelText("Check if I can afford a purchase"));
   fireEvent.change(screen.getByLabelText("Purchase amount (USD)"), {target: {value: "400"}});
   fireEvent.change(screen.getByLabelText("Purchase date"), {target: {value: "2026-11-08"}});
   fireEvent.click(screen.getByRole("button", {name: "Send to Council Leader"}));
@@ -87,7 +87,7 @@ it("offers a same-snapshot comparison for this-or-that questions without silentl
 
 it("asks for the two prices in the reported cash/laptop/downpayment question", async () => {
   page(); await waitFor(() => expect(councilAdapter.create).toHaveBeenCalled());
-  fireEvent.click(screen.getByLabelText("Include a confirmed purchase comparison"));
+  fireEvent.click(screen.getByLabelText("Check if I can afford a purchase"));
   fireEvent.change(screen.getByLabelText("Question for Council Leader"), {target:{value:"I have 2500$, should i buy a laptop, or a downpayment for car, or should i save my money for a better time?"}});
   fireEvent.click(screen.getByRole("button", {name:"Send to Council Leader"}));
   expect(screen.getByLabelText("Laptop price (USD)")).toHaveValue("");
@@ -109,7 +109,7 @@ it("offers confirmed calculations when the running service has no model configur
   page();
   expect(await screen.findByText("AI reviews are not configured on the running service")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", {name: "Use calculation only"}));
-  expect(screen.getByLabelText("Include a confirmed purchase comparison")).toBeChecked();
+  expect(screen.getByLabelText("Check if I can afford a purchase")).toBeChecked();
   expect(screen.getByLabelText("Purchase amount (USD)")).toHaveValue("");
   expect(screen.getByLabelText(/Use Nemotron specialist reviews/)).not.toBeChecked();
 });
@@ -126,10 +126,14 @@ it("shows one latest clear decision per agent and keeps technical evidence colla
   const cards = screen.getAllByRole("region", {name: /recommendation$/});
   expect(cards).toHaveLength(4);
   expect(screen.getByRole("region", {name: "Council Leader recommendation"})).toHaveTextContent("Wait for your income, then recheck.");
-  expect(screen.getByRole("region", {name: "Budget Agent recommendation"})).toHaveTextContent("Don't buy it on the selected date.");
-  expect(screen.getByRole("region", {name: "Simulator Agent recommendation"})).toHaveTextContent("Try buying on November 16 instead.");
+  expect(screen.getByRole("region", {name: "Budget Advisor recommendation"})).toHaveTextContent("Don't buy it on the selected date.");
+  expect(screen.getByRole("region", {name: "Simulator Advisor recommendation"})).toHaveTextContent("Try buying on November 16 instead.");
   expect(screen.queryByText(/^Position:/)).not.toBeInTheDocument();
   for (const reference of screen.getAllByText(/^Calculation references:/)) expect(reference).not.toBeVisible();
-  expect(screen.getByText("Agent discussion and supporting evidence")).toBeVisible();
-  expect(screen.getByText("Projected balances and reserve")).not.toBeVisible();
+  expect(screen.getByText("Advisor discussion and supporting evidence")).toBeVisible();
+  expect(screen.getByText("Projected balances and reserve")).toBeVisible();
+  expect(screen.getAllByRole("region", {name: / chart$/})).toHaveLength(5);
+  expect(screen.getByRole("button", {name: "Separate charts"})).toHaveAttribute("aria-pressed", "true");
+  expect(screen.getAllByText("Council Leader · Overall tradeoffs")).toHaveLength(1);
+  expect(screen.getAllByText("Evidence selected by this advisor")).toHaveLength(3);
 });

@@ -242,3 +242,21 @@ and backend contracts are unchanged.
 Design references:
 - https://www.datawrapper.de/blog/what-to-consider-when-creating-small-multiple-line-charts
 - https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-charts/
+
+
+Council presentation: scenario graphs now start expanded in separate panels with
+shared axes; users can collapse the section or focus on one scenario. The top
+answer represents the selected agent, followed by other participating specialists
+without duplicating that agent's card. Each specialist has a role-specific evidence
+summary and expandable model-selected findings. Existing saved chats keep their
+original summaries; submit a fresh analysis after restarting the backend.
+
+
+Frontend cleanup: Talk to Plutus now opens Council/specialist chats directly; the
+legacy Purchase analysis selector is removed. VITE_COUNCIL_ENABLED=false shows an
+explicit disabled state with a Simulator link. The simulator and backend v1 API
+remain available. Suggestions and Alerts are removed from desktop/mobile navigation
+and Home; their old URLs redirect to Current situation. Monthly planning, Council
+evidence, charts, Passport, Trust Shield and backend messaging behavior are unchanged.
+
+Monthly Plan is also retired: its navigation/Home links are removed and /monthly-plan redirects to /dashboard, where CashPlanEditor remains available.

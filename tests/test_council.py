@@ -267,5 +267,70 @@ def test_budget_and_risk_can_give_different_supported_decisions():
     assert choices('risk', results, analysis, 'evidence_review') == ['consider_waiting']
     title, reason = decision_copy('risk', 'consider_waiting', results, analysis, request, 'USD')
     assert title == 'Wait before committing to the purchase.'
-    assert 'unexpected $200 expense' in reason
-    assert 'has not yet been tested' in reason
+    assert 'extra $200 expense' in reason
+    assert results['unexpected_expense']['forecast']['minimum_balance'].replace('.00', '') in reason
+    assert 'breaches the buffer' in reason
+
+
+def test_agreement_still_contributes_distinct_engine_evidence():
+    from decimal import Decimal
+    from nemotron_agent.council_language import choices, decision_copy, money
+    from nemotron_agent.adapter import SimulatorAdapter
+    from nemotron_agent.contracts import AgentRequest
+    from nemotron_agent.service import run_agent
+    snapshot = fixture().model_copy(deep=True)
+    snapshot.current_balance = Decimal('3000.00')
+    request = AgentRequest(purchase_amount='100.00', reserve='200.00', allow_model=False)
+    adapter = SimulatorAdapter(snapshot, request)
+    results = {n: adapter.forecast(n) for n in ['baseline','purchase','delayed_income','unexpected_expense','buy_later']}
+    analysis = run_agent(request, snapshot, 'synthetic_demo')
+    assert analysis.passport.recommendation == 'consider_purchase'
+    copies = {}
+    for role in ['council','budget','risk','simulator']:
+        assert choices(role,results,analysis,'synthesis' if role=='council' else 'evidence_review') == ['consider_purchase']
+        copies[role] = decision_copy(role,'consider_purchase',results,analysis,request,'USD')
+    assert len({v[1] for v in copies.values()}) == 4
+    assert money(results['purchase']['forecast']['minimum_balance'],'USD') in copies['budget'][1]
+    assert 'tested setbacks' in copies['risk'][1]
+    worst = min((v for k,v in results.items() if k in ('delayed_income','unexpected_expense') and v['applicable']),key=lambda r:Decimal(r['forecast']['minimum_balance']))
+    assert money(worst['forecast']['minimum_balance'],'USD') in copies['risk'][1]
+    assert money(results['baseline']['forecast']['ending_balance'],'USD') in copies['simulator'][1]
+    assert money(results['purchase']['forecast']['ending_balance'],'USD') in copies['simulator'][1]
+    assert 'unknown future expenses' in copies['council'][1]
+    assert all('You can buy' not in title for title,_ in copies.values())
+
+
+def test_missing_income_is_not_presented_as_a_successful_delay_test():
+    from decimal import Decimal
+    from nemotron_agent.council_language import decision_copy
+    from nemotron_agent.adapter import SimulatorAdapter
+    from nemotron_agent.contracts import AgentRequest
+    from nemotron_agent.service import run_agent
+    snapshot=fixture().model_copy(deep=True)
+    snapshot.current_balance=Decimal('3000.00')
+    snapshot.upcoming_transactions=[e for e in snapshot.upcoming_transactions if e.type!='income']
+    request=AgentRequest(purchase_amount='100.00',reserve='200.00',allow_model=False)
+    adapter=SimulatorAdapter(snapshot,request)
+    results={n:adapter.forecast(n) for n in ['baseline','purchase','delayed_income','unexpected_expense','buy_later']}
+    analysis=run_agent(request,snapshot,'synthetic_demo')
+    title,reason=decision_copy('risk','consider_purchase',results,analysis,request,'USD')
+    assert not results['delayed_income']['applicable']
+    assert 'Late income could not be tested' in reason
+    assert analysis.stress_tests_total==1
+
+
+def test_no_safe_purchase_date_produces_distinct_role_explanations():
+    from decimal import Decimal
+    from nemotron_agent.council_language import decision_copy
+    from nemotron_agent.adapter import SimulatorAdapter
+    from nemotron_agent.contracts import AgentRequest
+    from nemotron_agent.service import run_agent
+    snapshot=fixture().model_copy(deep=True)
+    snapshot.current_balance=Decimal('10.00')
+    request=AgentRequest(purchase_amount='400.00',reserve='200.00',allow_model=False)
+    adapter=SimulatorAdapter(snapshot,request)
+    results={n:adapter.forecast(n) for n in ['baseline','purchase','delayed_income','unexpected_expense','buy_later']}
+    analysis=run_agent(request,snapshot,'synthetic_demo')
+    assert analysis.passport.recommendation=='reserve_at_risk'
+    copies=[decision_copy(role,'reserve_at_risk',results,analysis,request,'USD') for role in ['council','budget','risk','simulator']]
+    assert len({reason for _,reason in copies})==4

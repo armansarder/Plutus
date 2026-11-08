@@ -13,7 +13,7 @@ import { snapshotQueryOptions } from "@/services/financial";
 import { budgetQueryOptions } from "@/services/budgets";
 import { DATA_MODE } from "@/services/config";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
-import { BackendSource, BackendTransactions } from "@/components/financial/BackendRecords";
+import { BackendTransactions } from "@/components/financial/BackendRecords";
 import { baselineQueryOptions } from "@/services/simulation";
 import { yearHistoryQueryOptions } from "@/services/history";
 import { CashPlanEditor } from "@/components/financial/CashPlanEditor";
@@ -49,7 +49,7 @@ function Situation() {
     <section className="mt-9 border-y border-border py-8"><span className="rounded-md bg-caution-soft px-3 py-1 text-xs font-semibold text-caution-foreground">{gap ? "Needs attention" : "Watch fun spending"}</span><h2 className="mt-4 font-display text-2xl font-semibold">{gap ? "Your plan needs a little adjustment." : "A little care with fun spending this week."}</h2><p className="mt-3 max-w-2xl text-muted-foreground">{gap ? `${formatMoney(summary.deficit ?? 0)} of your plan isn't covered by expected monthly income and known commitments.` : fun ? `You have ${formatMoney(Math.max(0, rawRemaining(fun)))} left for fun. Your ${formatMoney(summary.savings)} savings plan can stay intact — check a purchase before you commit.` : "Review your monthly categories before making a purchase."}</p></section>
     <HealthIndicators plan={plan} baseline={baseline.results[0] ?? null} />
     <Milestones plan={plan} history={history} />
-    <div className="mt-8 flex flex-wrap gap-3"><Button asChild><Link to="/simulator">Try a decision <ArrowRight className="h-4 w-4" /></Link></Button><Button variant="outline" asChild><Link to="/monthly-plan">See my monthly plan</Link></Button></div>
+    <div className="mt-8 flex flex-wrap gap-3"><Button asChild><Link to="/simulator">Try a decision <ArrowRight className="h-4 w-4" /></Link></Button></div>
   </div>;
 }
 
@@ -62,8 +62,7 @@ export function BackendSituation() {
 function BackendSituationDetails({snap}:{snap:SituationSnapshot}) {
   const {plan} = useCashPlan(snap);
   const payday = snap.cashFlows.filter(t => t.type === "income" && t.date >= snap.startDate).sort((a, b) => a.date.localeCompare(b.date))[0];
-  return <div><PageHeading eyebrow={`${snap.customer.displayName} · ${formatDateOnly(snap.startDate)}`} title="Here's where you stand." description="Your backend account snapshot and upcoming scheduled events." />
-    <BackendSource snapshot={snap} />
+  return <div><PageHeading eyebrow={`Your account · ${formatDateOnly(snap.startDate)}`} title="Here's where you stand." description="Your backend account snapshot and upcoming scheduled events." />
     <section aria-label="Key figures" className="grid gap-4 sm:grid-cols-2">
       <MetricCard icon={Wallet} label="Current account balance" value={formatMoney(snap.startingBalanceCents)} hint="Snapshot balance · not all available to spend" />
       <MetricCard icon={PiggyBank} label="Planned savings this month" value={plan?formatMoney(centsValue(plan.planned_savings)):"Set a target"} hint="Your chosen allocation; not a bank transfer" />

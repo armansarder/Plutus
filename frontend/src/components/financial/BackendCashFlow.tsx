@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
 import { PageHeading } from "@/components/app/PageHeading";
 import { useDecision } from "@/components/app/DecisionContext";
-import { BackendSource } from "./BackendRecords";
 import { CashFlowChart } from "./CashFlowChart";
 import { EngineComparisonChart, EngineSummary, EngineTimeline } from "./EngineResults";
 import { Button } from "@/components/ui/button";
@@ -23,8 +22,8 @@ function Forecast({ snapshot }: { snapshot: SituationSnapshot }) {
   const result = comparison?.scenarios.find(s => s.name === selected);
   const query = useQuery({ queryKey: ["engine-forecast", snapshot], queryFn: ({ signal }) => engineAdapter.forecast(snapshot, signal), retry: false, staleTime: 30000 });
   const forecast = !query.isError ? query.data : undefined;
-  return <div><PageHeading eyebrow={`${snapshot.customer.displayName} · Cash flow`} title="A look at what's next." description="Projected balances from your backend records, with expenses before same-day income." /><BackendSource snapshot={snapshot} />
-    <p className="mb-6 rounded-md bg-caution-soft p-4 text-sm">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. Only supplied events are projected; schedule completeness is not verified.</p>
+  return <div><PageHeading eyebrow={`Your account · Cash flow`} title="A look at what's next." description="Projected balances from your backend records, with expenses before same-day income." />
+    <details className="mb-4 text-sm text-muted-foreground"><summary className="cursor-pointer">Calculation limits</summary><p className="mt-2">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. Only supplied events are projected; schedule completeness is not verified.</p></details>
     <div role="tablist" aria-label="Cash flow view" className="mb-7 flex flex-wrap gap-2">
       <Button role="tab" aria-selected={view === "forecast"} variant={view === "forecast" ? "default" : "outline"} onClick={() => setView("forecast")}>Next 30 days</Button>
       <Button role="tab" aria-selected={view === "decision"} variant={view === "decision" ? "default" : "outline"} onClick={() => setView("decision")} disabled={!comparison}>Last purchase comparison</Button>

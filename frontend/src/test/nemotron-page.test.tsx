@@ -34,7 +34,7 @@ it("submits confirmed fields to the real endpoint and labels deterministic fallb
   expect(screen.getByText(/Budget affordability cannot yet be determined/)).toBeInTheDocument();
   expect(screen.queryByText(/Fits your plan/)).not.toBeInTheDocument();
   expect(screen.queryByText(/Fun budget left/)).not.toBeInTheDocument();
-  expect(screen.getByText(/synthetic_demo · Talk to Plutus/)).toBeInTheDocument();
+  expect(screen.getByText(/Your account · Talk to Plutus/)).toBeInTheDocument();
   const [url, init] = vi.mocked(fetch).mock.calls[1]!;
   expect(url).toBe("/api/agent/run");
   expect(JSON.parse(init!.body as string)).toEqual({ message: "What if my paycheck arrives late?", purchase_amount: "400.00", purchase_date: "2026-11-08", reserve: "200.00", horizon_days: 30, allow_model: false, channel: "web" });

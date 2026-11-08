@@ -4,11 +4,8 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 vi.mock("@/services/config", () => ({ DATA_MODE: "synthetic_demo", API_BASE_URL: "" }));
 import { Route as CurrentSituationRoute } from "@/routes/dashboard";
-import { Route as MonthlyPlanRoute } from "@/routes/monthly-plan";
 import { Route as SimulatorRoute } from "@/routes/simulator";
 import { Route as CashFlowRoute } from "@/routes/cash-flow";
-import { Route as AlertsRoute } from "@/routes/alerts";
-import { Route as SuggestionsRoute } from "@/routes/suggestions";
 import { Route as TalkRoute } from "@/routes/talk";
 import { AppShell } from "@/components/app/AppShell";
 import { DecisionProvider } from "@/components/app/DecisionContext";
@@ -40,11 +37,8 @@ it("keeps every demo page on Alex's independent records without backend access",
     expect(history.months).toHaveLength(10);
     const pages = [
       { path: "/dashboard", Component: CurrentSituationRoute.options.component!, heading: "Here's where you stand." },
-      { path: "/monthly-plan", Component: MonthlyPlanRoute.options.component!, heading: "Make room for what matters." },
       { path: "/simulator", Component: SimulatorRoute.options.component!, heading: "What if you bought it?" },
       { path: "/cash-flow", Component: CashFlowRoute.options.component!, heading: "A look at what's next." },
-      { path: "/alerts", Component: AlertsRoute.options.component!, heading: "A gentle heads-up." },
-      { path: "/suggestions", Component: SuggestionsRoute.options.component!, heading: "A few possibilities for you." },
       { path: "/talk", Component: TalkRoute.options.component!, heading: "Ask Plutus anything about your money." },
     ];
     const root = createRootRouteWithContext<{ queryClient: QueryClient }>()({ component: () => <DecisionProvider><AppShell><Outlet /></AppShell></DecisionProvider> });

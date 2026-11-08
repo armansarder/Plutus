@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Calculator, ShieldCheck } from "lucide-react";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
 import { PageHeading } from "@/components/app/PageHeading";
-import { BackendSource } from "@/components/financial/BackendRecords";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,7 +67,7 @@ function Conversation({ snapshot }: { snapshot: SituationSnapshot }) {
     setQuestion("");
   }
   function clear() { active.current?.controller.abort(); active.current = null; setPending(false); queryClient.setQueryData(key, []); }
-  return <div><PageHeading eyebrow={`${snapshot.customer.displayName} · Talk to Plutus`} title="Explore a purchase with Plutus." description="Ask about purchase cash flow, timing, a late paycheck or an unexpected expense." /><BackendSource snapshot={snapshot} />
+  return <div><PageHeading eyebrow={`Your account · Talk to Plutus`} title="Explore a purchase with Plutus." description="Ask about purchase cash flow, timing, a late paycheck or an unexpected expense." />
     <div className="mb-6 grid gap-3 sm:grid-cols-2"><div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4"><Calculator className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><p className="text-sm font-semibold">Your confirmed fields drive the result</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">This view compares purchase amount, date and reserve. For specialist conversations, use Council & specialists.</p></div></div><div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><p className="text-sm font-semibold">Stress assumptions stay explicit</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">Tests an extra $200 expense and, when eligible income exists, a three-day delay. Budget and savings advice is unavailable.</p></div></div></div>
     <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4 sm:px-7"><p className="text-xs text-muted-foreground">Last 10 analyses kept in memory. Refreshing clears the conversation.</p><Button variant="ghost" size="sm" onClick={clear}>Clear conversation</Button></div>
       {!turns.length && <div className="mx-auto max-w-xl px-5 py-10 text-center"><span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary"><Calculator className="h-6 w-6" /></span><h2 className="font-display text-2xl font-semibold">Compare before you commit.</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">See the purchase, a later date, and adverse scenarios side by side. Confirm the details below to begin.</p></div>}

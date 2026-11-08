@@ -4,11 +4,8 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 vi.mock("@/services/config", () => ({ DATA_MODE: "remote", API_BASE_URL: "" }));
 import { Route as DashboardRoute } from "@/routes/dashboard";
-import { Route as MonthlyRoute } from "@/routes/monthly-plan";
 import { Route as SimulatorRoute } from "@/routes/simulator";
 import { Route as CashFlowRoute } from "@/routes/cash-flow";
-import { Route as AlertsRoute } from "@/routes/alerts";
-import { Route as SuggestionsRoute } from "@/routes/suggestions";
 import { Route as TalkRoute } from "@/routes/talk";
 import { AppShell } from "@/components/app/AppShell";
 import { financialDataAdapter, snapshotQueryOptions } from "@/services/financial";
@@ -23,12 +20,9 @@ import { financialPayload, forecastPayload } from "./fixtures/engineResponses";
 
 const pages = [
   { path: "/dashboard", Component: DashboardRoute.options.component!, message: "Here's where you stand." },
-  { path: "/monthly-plan", Component: MonthlyRoute.options.component!, message: "Choose a savings target and the cash you want to protect." },
   { path: "/simulator", Component: SimulatorRoute.options.component!, message: "What if you bought it?" },
   { path: "/cash-flow", Component: CashFlowRoute.options.component!, message: "A look at what's next." },
-  { path: "/alerts", Component: AlertsRoute.options.component!, message: "We don't have enough information to assess your plan yet." },
-  { path: "/suggestions", Component: SuggestionsRoute.options.component!, message: "We don't have your monthly spending plan yet." },
-  { path: "/talk", Component: TalkRoute.options.component!, message: "Explore a purchase with Plutus." },
+  { path: "/talk", Component: TalkRoute.options.component!, message: "Council chats are disabled" },
 ] as const;
 const payload = financialPayload;
 let clients: QueryClient[] = [];
@@ -39,11 +33,10 @@ afterEach(() => { cleanup(); clients.forEach(c => c.clear()); clients = []; vi.r
 it.each(pages)("uses the backend customer and honest availability on $path", async ({ Component, message, path }) => {
   render(<QueryClientProvider client={client()}><Component /></QueryClientProvider>);
   expect(await screen.findByText(message)).toBeInTheDocument();
-  expect(screen.getByText(/synthetic_demo/)).toBeInTheDocument();
-  expect(screen.getByText(/Synthetic sample dataset/)).toBeInTheDocument();
+  expect(screen.getByText(/Your account/)).toBeInTheDocument();
   expect(document.body.textContent).not.toMatch(/\$1,800|\$1,600|\$600|Reserved ticket|Emergency fund|Fun & Entertainment/);
   if (path === "/dashboard") expect(screen.getByText("$800")).toBeInTheDocument();
-  if (["/dashboard", "/alerts"].includes(path)) {
+  if (path === "/dashboard") {
     expect(screen.getByText(/Backend-only expense/)).toHaveTextContent("Estimated");
     expect(screen.getByText("−$900")).toBeInTheDocument();
   }
@@ -58,7 +51,7 @@ it.each(pages)("does not fall back after a backend failure on $path", async ({ C
   expect(screen.queryByText(/\$1,800|\$600|Reserved ticket/)).not.toBeInTheDocument();
   vi.mocked(fetch).mockImplementation(async () => Response.json(payload));
   fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-  expect(await screen.findByText(/synthetic_demo/)).toBeInTheDocument();
+  expect(await screen.findByText(/Your account/)).toBeInTheDocument();
 });
 
 it("keeps customer identity and one shared snapshot while navigating all financial pages", async () => {
@@ -76,7 +69,7 @@ it("keeps customer identity and one shared snapshot while navigating all financi
     expect(link).toBeDefined();
     fireEvent.click(link!);
     expect(await screen.findByText(message)).toBeInTheDocument();
-    expect(screen.getByText(/synthetic_demo/)).toBeInTheDocument();
+    expect(screen.getByText(/Your account/)).toBeInTheDocument();
     expect(screen.getByText("Backend-connected data")).toBeInTheDocument();
     expect(screen.queryByText("Synthetic sample data · Alex")).not.toBeInTheDocument();
   }
@@ -101,7 +94,7 @@ it("shares the legacy and global snapshot queries and blocks unconnected capabil
 it("does not preload demo dependencies from any remote route loader", async () => {
   const queryClient = client();
   const ensure = vi.spyOn(queryClient, "ensureQueryData");
-  for (const route of [DashboardRoute, MonthlyRoute, SimulatorRoute, CashFlowRoute, AlertsRoute, SuggestionsRoute]) {
+  for (const route of [DashboardRoute, SimulatorRoute, CashFlowRoute]) {
     const loader = route.options.loader;
     if (typeof loader !== "function") throw new Error("Expected loader");
     await (loader as (args: { context: { queryClient: QueryClient } }) => unknown)({ context: { queryClient } });
