@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NemotronResult } from "./NemotronResult";
 import { nemotronAdapter } from "@/services/nemotron";
-import { forecastStart, moneyString } from "@/services/engine";
-import { parseDollarsToCents } from "@/lib/formatMoney";
-import { addDays, isDateOnly } from "@/lib/dateOnly";
+import { forecastStart, moneyString, centsValue } from "@/services/engine";
+import { parseDollarsToCents, formatMoney } from "@/lib/formatMoney";
+import { addDays, isDateOnly, formatDateOnly } from "@/lib/dateOnly";
 import type { SituationSnapshot } from "@/services/situation";
 import type { NemotronRequest, NemotronResponse } from "@/types/nemotron";
 
@@ -59,28 +59,27 @@ function Conversation({ snapshot }: { snapshot: SituationSnapshot }) {
   function submit() {
     if (active.current) return;
     const cents = parseDollarsToCents(amount), reserveCents = parseDollarsToCents(reserve), days = Number(horizon);
-    if (!question.trim()) { setError("Add a question about this purchase."); return; }
     if (cents === null || cents <= 0 || cents > 100_000_000 || reserveCents === null || reserveCents > 100_000_000) { setError("Enter a purchase from $0.01 to $1,000,000 and a reserve from $0 to $1,000,000."); return; }
     if (!Number.isInteger(days) || days < 1 || days > 90 || !isDateOnly(date) || date < forecastStart(snapshot) || date > addDays(forecastStart(snapshot), days - 1)) { setError("Choose a horizon of 1–90 days and a purchase date inside that window."); return; }
     void run({ message: question.trim(), purchase_amount: moneyString(cents), purchase_date: date, reserve: moneyString(reserveCents), horizon_days: days, allow_model: allowModel, channel: "web" });
     setQuestion("");
   }
   function clear() { active.current?.controller.abort(); active.current = null; setPending(false); queryClient.setQueryData(key, []); }
-  return <div><PageHeading eyebrow={`${snapshot.customer.displayName} · Talk to Plutus`} title="Explore a purchase with Plutus." description="Ask about purchase cash flow, timing, a late paycheck or an unexpected expense." /><BackendSource snapshot={snapshot} />
-    <p className="mb-5 text-sm text-muted-foreground">Confirm the purchase fields below before sending. The agent analyzes these fields; it does not interpret your question or remember earlier questions. Every analysis includes a three-day income delay and an extra $200 expense test. Budget and savings advice is not available yet.</p>
+  return <div><PageHeading eyebrow={`${snapshot.customer.displayName} · Talk to Plutus`} title="Explore a purchase with Plutus." description="See how a purchase could affect your cash, and what you can do instead." /><BackendSource snapshot={snapshot} />
+    <p className="mb-5 text-sm text-muted-foreground">Enter the purchase and the safety cushion you want to keep. Plutus checks those fields; free-text notes are not interpreted, and earlier questions are not sent to the agent.</p>
     <div className="panel p-4 sm:p-6"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><p className="text-xs text-muted-foreground">Last 10 analyses kept in memory. Refreshing clears the conversation.</p><Button variant="outline" size="sm" onClick={clear}>Clear conversation</Button></div>
       <div className="space-y-5" aria-live="polite" aria-busy={pending}>{turns.map(turn => <article key={turn.id}>
-        <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm text-primary-foreground">{turn.question}</p>
-        <p className="mt-2 text-xs text-muted-foreground">Confirmed fields: ${turn.input.purchase_amount} purchase · ${turn.input.reserve} reserve · {turn.input.purchase_date} · {turn.input.horizon_days} days</p>
-        {turn.state === "pending" && <p role="status" className="mt-3 text-sm">Investigating your purchase and stress scenarios… This can take up to a minute.</p>}
+        <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm text-primary-foreground">{turn.question || "Purchase to review"}</p>
+        <p className="mt-2 text-xs text-muted-foreground">{formatMoney(centsValue(turn.input.purchase_amount))} purchase{turn.input.purchase_date ? ` on ${formatDateOnly(turn.input.purchase_date)}` : ""} · {formatMoney(centsValue(turn.input.reserve))} cushion · {turn.input.horizon_days} days</p>
+        {turn.state === "pending" && <p role="status" className="mt-3 text-sm">Checking your purchase and what could go wrong… This can take up to a minute.</p>}
         {(turn.state === "failed" || turn.state === "cancelled") && <div role="alert" className="mt-3 rounded-lg bg-secondary p-4 text-sm"><p>{turn.state === "cancelled" ? "Analysis cancelled when you left the page." : "The agent could not complete this request. It may be unavailable, or your financial snapshot may have changed. Check the fields or refresh Current Situation. No demo response was substituted."}</p><Button className="mt-3" variant="outline" disabled={pending} onClick={() => void run(turn.input, turn.id)}>Try again</Button></div>}
         {turn.response && turn.state === "completed" && <NemotronResult response={turn.response} />}
       </article>)}</div>
       <form className="mt-6 space-y-4 border-t border-border pt-5" noValidate onSubmit={event => { event.preventDefault(); submit(); }}>
-        <div><Label htmlFor="agent-question">Your question</Label><Input id="agent-question" maxLength={2000} autoComplete="off" placeholder="What if my paycheck arrives late after this purchase?" value={question} onChange={event => setQuestion(event.target.value)} /></div>
-        <div className="grid gap-4 sm:grid-cols-2"><div><Label htmlFor="agent-amount">Purchase amount (USD)</Label><Input id="agent-amount" inputMode="decimal" autoComplete="off" value={amount} onChange={event => setAmount(event.target.value)} /></div><div><Label htmlFor="agent-reserve">Cash reserve to preserve (USD)</Label><Input id="agent-reserve" inputMode="decimal" autoComplete="off" value={reserve} onChange={event => setReserve(event.target.value)} /></div><div><Label htmlFor="agent-date">Purchase date</Label><Input id="agent-date" type="date" min={forecastStart(snapshot)} max={addDays(forecastStart(snapshot), Math.max(1, Math.min(90, Number(horizon) || 30)) - 1)} value={date} onChange={event => setDate(event.target.value)} /></div><div><Label htmlFor="agent-horizon">Forecast horizon (days)</Label><Input id="agent-horizon" type="number" min={1} max={90} step={1} value={horizon} onChange={event => setHorizon(event.target.value)} /></div></div>
+        <div><Label htmlFor="agent-question">Your question</Label><Input id="agent-question" maxLength={2000} autoComplete="off" placeholder="Optional note about this purchase" value={question} onChange={event => setQuestion(event.target.value)} /><p className="mt-1 text-xs text-muted-foreground">Optional. Use “Why?” or “What should I do instead?” on a result to explore the evidence already checked.</p></div>
+        <div className="grid gap-4 sm:grid-cols-2"><div><Label htmlFor="agent-amount">Purchase amount (USD)</Label><Input id="agent-amount" inputMode="decimal" autoComplete="off" value={amount} onChange={event => setAmount(event.target.value)} /></div><div><Label htmlFor="agent-reserve">Safety cushion to keep (USD)</Label><Input id="agent-reserve" inputMode="decimal" autoComplete="off" value={reserve} onChange={event => setReserve(event.target.value)} /></div><div><Label htmlFor="agent-date">Purchase date</Label><Input id="agent-date" type="date" min={forecastStart(snapshot)} max={addDays(forecastStart(snapshot), Math.max(1, Math.min(90, Number(horizon) || 30)) - 1)} value={date} onChange={event => setDate(event.target.value)} /></div><div><Label htmlFor="agent-horizon">Days to look ahead</Label><Input id="agent-horizon" type="number" min={1} max={90} step={1} value={horizon} onChange={event => setHorizon(event.target.value)} /></div></div>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={allowModel} onChange={event => setAllowModel(event.target.checked)} />Ask Nemotron to investigate (shares reduced purchase figures with the model)</label>
-        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}<Button type="submit" disabled={pending}>{pending ? "Investigating…" : "Send question and analyze purchase"}</Button>
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}<Button type="submit" disabled={pending}>{pending ? "Checking…" : "Check this purchase"}</Button>
       </form>
     </div></div>;
 }

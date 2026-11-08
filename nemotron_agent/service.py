@@ -11,6 +11,7 @@ from calculation_engine.data_loader import decode_json
 from calculation_engine.models import Contract
 from .contracts import AgentResponse, ScenarioName
 from .adapter import SimulatorAdapter
+from .explanations import decision_summary
 from .check import completion
 
 NAMES = ['baseline', 'purchase', 'delayed_income', 'unexpected_expense', 'buy_later']
@@ -153,8 +154,7 @@ def run_agent(request, snapshot, source, provider=None):
         'consider_purchase': 'The purchase maintains your reserve in the baseline purchase and both stress tests.',
         'consider_waiting': 'Consider a later purchase date; the proposed purchase does not maintain your reserve in every test.',
         'reserve_at_risk': 'No tested purchase date maintains your reserve throughout this forecast.'}
-    summary = (summaries[verdict] + f' Lowest projected purchase balance: {minimum} {snapshot.currency}. '
-               'These are conditional simulations; no payment was executed.')
+    summary = decision_summary(results, request.reserve, snapshot.currency)
     snapshot_id = hashlib.sha256(snapshot.model_dump_json().encode()).hexdigest()[:24]
     request_id = str(uuid4())
     assumptions = [

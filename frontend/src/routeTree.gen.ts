@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as CashFlowRouteImport } from './routes/cash-flow'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as FutureLabRouteImport } from './routes/future-lab'
 import { Route as MonthlyPlanRouteImport } from './routes/monthly-plan'
 import { Route as SimulatorRouteImport } from './routes/simulator'
 import { Route as SuggestionsRouteImport } from './routes/suggestions'
@@ -36,6 +37,11 @@ const CashFlowRoute = CashFlowRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FutureLabRoute = FutureLabRouteImport.update({
+  id: '/future-lab',
+  path: '/future-lab',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MonthlyPlanRoute = MonthlyPlanRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/alerts': typeof AlertsRoute
   '/cash-flow': typeof CashFlowRoute
   '/dashboard': typeof DashboardRoute
+  '/future-lab': typeof FutureLabRoute
   '/monthly-plan': typeof MonthlyPlanRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/alerts': typeof AlertsRoute
   '/cash-flow': typeof CashFlowRoute
   '/dashboard': typeof DashboardRoute
+  '/future-lab': typeof FutureLabRoute
   '/monthly-plan': typeof MonthlyPlanRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/alerts': typeof AlertsRoute
   '/cash-flow': typeof CashFlowRoute
   '/dashboard': typeof DashboardRoute
+  '/future-lab': typeof FutureLabRoute
   '/monthly-plan': typeof MonthlyPlanRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/cash-flow'
     | '/dashboard'
+    | '/future-lab'
     | '/monthly-plan'
     | '/simulator'
     | '/suggestions'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/cash-flow'
     | '/dashboard'
+    | '/future-lab'
     | '/monthly-plan'
     | '/simulator'
     | '/suggestions'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/cash-flow'
     | '/dashboard'
+    | '/future-lab'
     | '/monthly-plan'
     | '/simulator'
     | '/suggestions'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AlertsRoute: typeof AlertsRoute
   CashFlowRoute: typeof CashFlowRoute
   DashboardRoute: typeof DashboardRoute
+  FutureLabRoute: typeof FutureLabRoute
   MonthlyPlanRoute: typeof MonthlyPlanRoute
   SimulatorRoute: typeof SimulatorRoute
   SuggestionsRoute: typeof SuggestionsRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/future-lab': {
+      id: '/future-lab'
+      path: '/future-lab'
+      fullPath: '/future-lab'
+      preLoaderRoute: typeof FutureLabRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/monthly-plan': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlertsRoute: AlertsRoute,
   CashFlowRoute: CashFlowRoute,
   DashboardRoute: DashboardRoute,
+  FutureLabRoute: FutureLabRoute,
   MonthlyPlanRoute: MonthlyPlanRoute,
   SimulatorRoute: SimulatorRoute,
   SuggestionsRoute: SuggestionsRoute,

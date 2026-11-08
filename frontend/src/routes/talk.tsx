@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { AlertCircle, Mic, SendHorizontal, Sparkles } from "lucide-react";
 import { PageHeading } from "@/components/app/PageHeading";
 import { AffordabilityCard } from "@/components/chat/AffordabilityCard";
-import { DevilsAdvocate } from "@/components/chat/DevilsAdvocate";
 import { PhotonSection } from "@/components/chat/PhotonSection";
 import { Button } from "@/components/ui/button";
 import { agentAdapter } from "@/services/agent";
@@ -103,9 +102,8 @@ function DemoTalk() {
             <li key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
               <div className={m.role === "user" ? "max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm text-primary-foreground" : "max-w-[85%] rounded-2xl rounded-bl-sm bg-secondary px-4 py-2.5 text-sm text-foreground"}>
                 {m.error && <AlertCircle className="mr-1.5 inline h-4 w-4 text-destructive" aria-hidden />}
-                {m.text}
+                {!m.response?.affordability && m.text}
                 {m.response && <AffordabilityCard response={m.response} />}
-                {m.response && <DevilsAdvocate response={m.response} />}
               </div>
             </li>
           ))}

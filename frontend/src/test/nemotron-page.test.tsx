@@ -22,16 +22,16 @@ async function fill(allowModel = false) {
   fireEvent.change(screen.getByLabelText("Purchase date"), { target: { value: "2026-11-08" } });
   if (!allowModel) fireEvent.click(screen.getByRole("checkbox"));
 }
-function send() { fireEvent.click(screen.getByRole("button", { name: "Send question and analyze purchase" })); }
+function send() { fireEvent.click(screen.getByRole("button", { name: "Check this purchase" })); }
 
 it("submits confirmed fields to the real endpoint and labels deterministic fallback honestly", async () => {
   const demo = vi.spyOn(SyntheticAgentAdapter.prototype, "ask");
   page(); await fill();
   expect(fetch).toHaveBeenCalledTimes(1);
   send();
-  expect(await screen.findByText("Deterministic fallback · Not a completed Nemotron investigation")).toBeInTheDocument();
-  expect(screen.getByText(/0 of 2 applicable stress tests/)).toBeInTheDocument();
-  expect(screen.getByText(/Budget affordability cannot yet be determined/)).toBeInTheDocument();
+  expect(await screen.findByText("Deterministic fallback")).toBeInTheDocument();
+  expect(screen.queryByText(/0 of 2 applicable stress tests/)).not.toBeInTheDocument();
+  expect(screen.getByText(/does not confirm full budget affordability/)).toBeInTheDocument();
   expect(screen.queryByText(/Fits your plan/)).not.toBeInTheDocument();
   expect(screen.queryByText(/Fun budget left/)).not.toBeInTheDocument();
   expect(screen.getByText(/synthetic_demo · Talk to Plutus/)).toBeInTheDocument();
@@ -58,41 +58,42 @@ it("shows pending state and retries a real failure without fabricated answers", 
   expect(screen.queryByText(/Nemotron investigation/)).not.toBeInTheDocument();
   vi.mocked(fetch).mockImplementation(async url => Response.json(url === "/api/financial-data" ? financialPayload : agentNemotron));
   fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-  expect(await screen.findByText("Nemotron investigation · Backend-validated result")).toBeInTheDocument();
+  expect(await screen.findByText("Nemotron investigation")).toBeInTheDocument();
   expect(screen.getByText("What if my paycheck arrives late?")).toBeInTheDocument();
 });
 
 it("keeps completed conversation in memory across navigation, with explicit clearing", async () => {
   const view = page(); await fill(); send();
-  await screen.findByText(/Deterministic fallback ·/);
+  await screen.findByText(/Deterministic fallback/);
   view.rerender(view.wrap(<div>Another page</div>));
   view.rerender(view.wrap(<BackendTalk />));
-  expect(await screen.findByText(/Deterministic fallback ·/)).toBeInTheDocument();
+  expect(await screen.findByText(/Deterministic fallback/)).toBeInTheDocument();
   expect(fetch).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByRole("button", { name: "Clear conversation" }));
   await waitFor(() => expect(screen.queryByText("What if my paycheck arrives late?")).not.toBeInTheDocument());
-  expect(screen.queryByText(/Deterministic fallback ·/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Deterministic fallback/)).not.toBeInTheDocument();
 });
 
 it("cancels pending analysis on navigation and rejects late responses", async () => {
   let complete!: (response: Response) => void;
   vi.mocked(fetch).mockImplementation(async url => url === "/api/agent/run" ? new Promise<Response>(resolve => { complete = resolve; }) : Response.json(financialPayload));
   const view = page(); await fill(); send();
-  expect(await screen.findByRole("status")).toHaveTextContent("Investigating");
-  expect(screen.getByRole("button", { name: "Investigating…" })).toBeDisabled();
+  expect(await screen.findByRole("status")).toHaveTextContent("Checking");
+  expect(screen.getByRole("button", { name: /Checking/ })).toBeDisabled();
   view.rerender(view.wrap(<div>Another page</div>));
   complete(Response.json(agentNemotron));
   view.rerender(view.wrap(<BackendTalk />));
   expect(await screen.findByRole("alert")).toHaveTextContent("Analysis cancelled");
-  await waitFor(() => expect(screen.queryByText(/Nemotron investigation · Backend/)).not.toBeInTheDocument());
+  await waitFor(() => expect(screen.queryByText(/Nemotron investigation/)).not.toBeInTheDocument());
 });
 
-it("renders no-income applicability without inflating stress counts", () => {
+it("renders no-income applicability without inflating stress counts", async () => {
   const response = structuredClone(agentFallback);
   response.scenarios.find(s => s.name === "delayed_income")!.applicable = false;
   response.stress_tests_total = 1;
   response.stress_tests_passed = 0;
   render(<NemotronResult response={response} />);
-  expect(screen.getByText(/0 of 1 applicable stress tests/)).toBeInTheDocument();
+  fireEvent.click(screen.getByText("Explore the details"));
+  expect(await screen.findByText(/0 of 1 applicable stress tests/)).toBeInTheDocument();
   expect(screen.getByText(/Not applicable: no eligible income/)).toBeInTheDocument();
 });
