@@ -22,7 +22,7 @@ def demo_snapshot():
     return data
 
 
-def create_app(source=None, settings=None, provider=None):
+def create_app(source=None, settings=None, provider=None, council_provider=None):
     mode = os.getenv('AGENT_DATA_SOURCE') or ('nessie' if os.getenv('FINPILOT_DATA_SOURCE') == 'nessie' else 'demo')
     if mode not in ('demo', 'engine', 'nessie'):
         raise ValueError('AGENT_DATA_SOURCE must be demo, engine, or nessie')
@@ -44,6 +44,15 @@ def create_app(source=None, settings=None, provider=None):
     @app.post('/api/agent/run', response_model=AgentResponse, operation_id='run_agent')
     def agent_run(body: AgentRequest, snapshot=Depends(snapshot_dependency)):
         return run_agent(body, snapshot, label, provider=provider)
+
+    from notifications.router import install_notifications
+    install_notifications(app, snapshot_dependency, label)
+    if os.getenv('PLUTUS_DEMO_MODE', 'false').lower() == 'true':
+        from notifications.operator_demo import install_operator_demo
+        install_operator_demo(app)
+
+    from .council_api import install_council
+    install_council(app, snapshot_dependency, label, provider=council_provider)
 
     @app.get('/health')
     def health():

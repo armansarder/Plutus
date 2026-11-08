@@ -20,9 +20,11 @@ export async function requestJson<T>(
   init: Omit<RequestInit, "signal"> & { signal?: AbortSignal | undefined } = {},
 ): Promise<T> {
   const { signal, ...rest } = init;
+  // Covers a stalled browser connection as well as the proxy/provider deadlines.
+  const deadline = AbortSignal.timeout(70000);
   const res = await fetch(`${baseUrl}${path}`, {
     ...rest,
-    signal: signal ?? null,
+    signal: signal ? AbortSignal.any([signal, deadline]) : deadline,
     credentials: "same-origin",
     cache: "no-store",
     headers: { "Content-Type": "application/json", Accept: "application/json", ...init.headers },

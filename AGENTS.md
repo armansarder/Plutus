@@ -565,3 +565,81 @@ This council plan is a blueprint. Do not deploy additional agents, change curren
 runtime prompts, create API routes, install frameworks, alter financial math, or
 start persistence/hosting while carrying out the documentation request. Future
 implementation must keep claims of completed features aligned with tested behavior.
+
+
+## Council v2 implementation update
+
+The council blueprint above now has an opt-in local implementation. See
+`nemotron_agent/COUNCIL.md` for tested behavior and rollout. Runtime roles/prompts are
+in `council_prompts.py`; contracts in `council_contracts.py`; bounded async workflow
+in `council.py`; session-owned memory in `council_store.py`; routes in `council_api.py`.
+The frontend uses `councilProxy.server.ts`, `services/council.ts`, `types/council.ts`
+and `CouncilWorkspace.tsx`. Both flags default off; v1 is preserved. This update
+supersedes "design only" for those implemented pieces, not the optional ML/debt/
+production-auth/persistence proposals. Do not claim proposed endpoints such as
+independent retained run polling exist; conversation history is the run record.
+Role model calls select schema-constrained verified findings; engine templates own
+numerical prose. Common key patterns are redacted; arbitrary personal text is not
+guaranteed anonymized. Production council activation is blocked pending real user
+authentication. Keep generated council JSON contracts and UI validators synchronized.
+
+
+### Authorized Nessie sample-data maintenance
+
+The runtime and agent tools remain read-only. User-approved sandbox population is
+implemented separately in `pipeline/populate_nessie.py`; it is a dry run unless
+`--apply` is supplied. It preserves credentials/customer IDs, uses frozen private
+plans and remote sample markers, refuses conflicting records, and never retries an
+uncertain POST automatically. Do not run the older seed scripts. The explicitly
+approved one-account recovery is in `pipeline/recover_sample_account.py`; it verifies
+the full adapter/history before changing only the configured account ID.
+
+Nessie requires `recurring_date` on bill creation and derives the GET-only
+`upcoming_payment_date`. Future pending deposits with explicit source dates are now
+projected as estimated income; past/same-day deposits are never replayed.
+
+The frontend purchase intake in `services/purchaseIntent.ts` proposes one purchase
+or two cash alternatives, anchored to the displayed browser timezone. The user
+confirms fields before calculation. Alternatives share one engine snapshot through
+`/api/compare`; choosing one for specialist review is explicit. This does not add
+unrestricted model parsing or new financial tools.
+
+### User-facing response clarity
+
+Every completed purchase-review agent must give a direct, evidence-supported
+`recommendation` and a brief plain-language `summary` explaining its choice. Do not
+show internal position enums, raw evidence hashes, generic methodology boilerplate,
+or duplicate review rounds in the primary answer. Show the latest review per role;
+retain earlier rounds and references behind expandable evidence. Budget/Risk may
+disagree when ordinary affordability and stress resilience differ. Do not promise
+that a date tested only under expected income will survive delayed income.
+
+
+### Council evidence presentation
+
+Agreement is valid; identical role explanations are not the intended UI. Budget
+reports expected purchase minimum/date and reserve; Risk reports the worst applicable
+setback minimum/date and missing stress coverage; Simulator compares baseline and
+purchase ending balances and purchase minimum; Leader synthesizes the supported
+verdict and remaining limits. All figures come from the same engine evidence.
+Never manufacture objections or claim unknown expenses are covered. Display the
+selected agent once at the top and other roles below, with their validated selected
+findings expandable. Scenario graphs start expanded in separate panels using the
+existing shared scale; inapplicable late-income scenarios remain excluded.
+
+
+## Plutus-v1-final Photon integration
+
+Notifications extend the combined branch without replacing Council prompts, labels,
+charts, source adapters or numerical contracts. `notifications/router.py` binds all
+preference/watch/history access to configured customer AND account; arbitrary client
+customer/account selectors and operator tools are rejected. `evaluator.py` uses the
+same `run_agent(..., allow_model=False)` calculations against one current snapshot.
+Budget warnings require a user-entered category limit and actual normalized history.
+There is no synthetic operator state in this runtime. Photon defaults to preview;
+real sending needs server-enrolled recipient, shared sender secret and explicit
+notification enablement. Do not send messages during implementation verification.
+No model can send messages. Generic notifications omit balances, IDs and merchant
+records. Log submission honestly; never equate it with confirmed delivery. Persistent
+claims suppress duplicate and uncertain retries. Polling is opt-in, one worker,
+minimum 60 seconds. See PHOTON_INTEGRATION.md for configuration and limitations.

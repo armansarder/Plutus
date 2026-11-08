@@ -1,0 +1,19 @@
+{
+  "name": "plutus-photon-sender",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx sender.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "spectrum-ts": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
+  }
+}
+

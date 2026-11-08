@@ -19,7 +19,7 @@ const navCls =
 export function AppShell({ children }: { children: ReactNode }) {
   const backendConnected = DATA_MODE === "remote";
   const [open, setOpen] = useState(false);
-  const links = [{ to: "/", label: "Home" }, { to: "/dashboard", label: "Current situation" }, { to: "/monthly-plan", label: "Monthly plan" }, { to: "/simulator", label: "Simulator" }, { to: "/cash-flow", label: "Cash flow" }, { to: "/suggestions", label: "Suggestions" }, { to: "/alerts", label: "Alerts" }, { to: "/talk", label: "Talk to Plutus" }] as const;
+  const links = [{ to: "/", label: "Home" }, { to: "/dashboard", label: "Current situation" }, { to: "/simulator", label: "Simulator" }, { to: "/cash-flow", label: "Cash flow" }, { to: "/talk", label: "Talk to Plutus" }, { to: "/alerts", label: "Alerts" }, { to: "/operator", label: "Demo operator" }] as const;
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur">
@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="page-enter mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">{children}</main>
       <footer className="border-t border-border">
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-muted-foreground sm:px-6">
-          {backendConnected ? "Using the connected customer's records across all pages." : "Synthetic demo data for Alex."} No real money moves. Your plan stays under your control. Projections are illustrative, not financial advice. Plutus is not a bank.
+          {backendConnected ? "Using the connected customer's records across all pages." : "Synthetic sample data for Alex."} No real money moves. Your plan stays under your control. Projections are illustrative, not financial advice. Plutus is not a bank.
         </p>
       </footer>
     </div>

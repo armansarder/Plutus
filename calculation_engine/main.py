@@ -143,6 +143,12 @@ def create_app(source=None, settings: SecuritySettings | None = None, history_so
                 'source': 'nessie_sandbox' if isinstance(app.state.financial_source, NessieAdapter)
                 else 'synthetic_demo' if data.customer_id == 'synthetic_demo' else 'configured_backend'}
 
+    from .planning import CashPlanRequest, CashPlanResult, preview_cash_plan
+
+    @app.post('/api/cash-plan/preview', response_model=CashPlanResult, operation_id='preview_cash_plan')
+    def cash_plan(body: CashPlanRequest, data=Depends(get_data)):
+        return preview_cash_plan(data, body)
+
     @app.post('/api/simulate', operation_id='simulate_purchase',
               response_model=SimulationResponse, response_model_exclude_none=True)
     def simulate(body: PurchaseRequest, data=Depends(get_data)):

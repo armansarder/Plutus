@@ -1,0 +1,44 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "enabled": {
+      "title": "Enabled",
+      "type": "boolean"
+    },
+    "model_configured": {
+      "default": false,
+      "title": "Model Configured",
+      "type": "boolean"
+    },
+    "roles": {
+      "items": {
+        "enum": [
+          "council",
+          "budget",
+          "risk",
+          "simulator"
+        ],
+        "type": "string"
+      },
+      "title": "Roles",
+      "type": "array"
+    },
+    "temporary": {
+      "const": true,
+      "default": true,
+      "title": "Temporary",
+      "type": "boolean"
+    },
+    "scope": {
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "enabled",
+    "roles",
+    "scope"
+  ],
+  "title": "CouncilStatus",
+  "type": "object"
+}

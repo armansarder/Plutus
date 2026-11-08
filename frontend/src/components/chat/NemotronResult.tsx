@@ -1,3 +1,4 @@
+import { WatchPurchaseButton } from "@/components/notifications/WatchPurchaseButton";
 import { useState } from "react";
 import type { NemotronResponse } from "@/types/nemotron";
 import { formatMoney } from "@/lib/formatMoney";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 const LABELS = { baseline: "Without purchase", purchase: "Selected purchase", delayed_income: "Income three days late", unexpected_expense: "Extra $200 expense", buy_later: "Buy later" };
 const REASONS = { model_disabled: "Model use was turned off.", model_unavailable: "Nemotron was unavailable or not configured.", model_protocol_failed: "The model investigation did not pass backend validation." };
-export function NemotronResult({ response }: { response: NemotronResponse }) {
+export function NemotronResult({ response, calculationOnly = false }: { response: NemotronResponse; calculationOnly?: boolean }) {
   const [selected, setSelected] = useState<keyof typeof LABELS>("purchase");
   const [graphOpen, setGraphOpen] = useState(false);
   const summary = response.summary.replace("both stress tests", `${response.stress_tests_total} applicable stress test${response.stress_tests_total === 1 ? "" : "s"}`);
@@ -19,11 +20,12 @@ export function NemotronResult({ response }: { response: NemotronResponse }) {
     result: { id: s.name, lowestBalanceCents: centsValue(s.forecast.minimum_balance), lowestBalanceDate: s.forecast.minimum_balance_date, dailyBalances: s.forecast.daily_balances.map(d => ({ date: d.date, endOfDayBalanceCents: centsValue(d.ending_balance) })) },
   }));
   return <div className="mt-3 space-y-4 rounded-lg border border-border bg-card p-4">
-    <p className="font-semibold">{response.mode === "nemotron" ? "Nemotron investigation · Backend-validated result" : "Deterministic fallback · Not a completed Nemotron investigation"}</p>
-    {response.fallback_reason && <p className="text-sm text-muted-foreground">{REASONS[response.fallback_reason]} The backend calculation engine completed the analysis.</p>}
+    <p className="font-semibold">{calculationOnly ? "Verified calculation evidence · Council reviews shown above" : response.mode === "nemotron" ? "Nemotron investigation · Backend-validated result" : "Deterministic fallback · Not a completed Nemotron investigation"}</p>
+    {!calculationOnly && response.fallback_reason && <p className="text-sm text-muted-foreground">{REASONS[response.fallback_reason]} The backend calculation engine completed the analysis.</p>}
     <p className="text-sm">{summary}</p>
+    {!calculationOnly && <WatchPurchaseButton analysis={response} />}
     {response.passport.recommendation === "consider_waiting" && response.scenarios.find(s => s.name === "purchase")?.maintains_reserve && <p className="text-sm">The selected purchase preserves the reserve under ordinary conditions but is stress-sensitive. A later ordinary purchase date is not automatically stress-safe.</p>}
-    <p className="rounded-md bg-caution-soft p-3 text-sm">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. Reserve-preserving cash flow does not establish that a purchase fits your budget.</p>
+    <details className="mb-4 text-sm text-muted-foreground"><summary className="cursor-pointer">Calculation limits</summary><p className="mt-2">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. Reserve-preserving cash flow does not establish that a purchase fits your budget.</p></details>
     <p className="text-sm font-semibold">{response.stress_tests_passed} of {response.stress_tests_total} applicable stress tests maintained your selected reserve.</p>
     <p className="text-xs text-muted-foreground">Tested cases, not a probability. Income is delayed three days; the expense test adds a hypothetical $200. These are assumptions, not actual account events.</p>
     <ul className="grid gap-3 sm:grid-cols-2">{response.scenarios.map(s => <li key={s.name} className="rounded-md border border-border p-3 text-sm"><strong>{LABELS[s.name]}</strong><p>{!s.applicable ? "Not applicable: no eligible income. Excluded from the stress-test count." : s.maintains_reserve ? "Maintains selected reserve" : "Below selected reserve"}</p><p>Lowest event balance: {formatMoney(centsValue(s.forecast.minimum_balance))} on {formatDateOnly(s.forecast.minimum_balance_date)}</p>{s.purchase_date && <p>Purchase date: {formatDateOnly(s.purchase_date)}</p>}</li>)}</ul>

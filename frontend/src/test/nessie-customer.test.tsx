@@ -4,11 +4,8 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 vi.mock("@/services/config", () => ({ DATA_MODE: "remote", API_BASE_URL: "" }));
 import { Route as Dashboard } from "@/routes/dashboard";
-import { Route as MonthlyPlan } from "@/routes/monthly-plan";
 import { Route as Simulator } from "@/routes/simulator";
 import { Route as CashFlow } from "@/routes/cash-flow";
-import { Route as Alerts } from "@/routes/alerts";
-import { Route as Suggestions } from "@/routes/suggestions";
 import { Route as Talk } from "@/routes/talk";
 import { AppShell } from "@/components/app/AppShell";
 import { BackendSituationAdapter } from "@/services/situation";
@@ -24,23 +21,27 @@ it("keeps the same Nessie customer and accurate source badge across every financ
   try {
     const pages = [
       { path: "/dashboard", route: Dashboard, heading: "Here's where you stand." },
-      { path: "/monthly-plan", route: MonthlyPlan, heading: "Make room for what matters." },
       { path: "/simulator", route: Simulator, heading: "What if you bought it?" },
       { path: "/cash-flow", route: CashFlow, heading: "A look at what's next." },
-      { path: "/alerts", route: Alerts, heading: "A gentle heads-up." },
-      { path: "/suggestions", route: Suggestions, heading: "A few possibilities for you." },
-      { path: "/talk", route: Talk, heading: "Explore a purchase with Plutus." },
+      { path: "/talk", route: Talk, heading: "Council chats are disabled" },
     ];
     const root = createRootRouteWithContext<{ queryClient: QueryClient }>()({ component: () => <AppShell><Outlet /></AppShell> });
     const tree = root.addChildren(pages.map(({ path, route }) => createRoute({ getParentRoute: () => root, path, component: route.options.component! })));
     const router = createRouter({ routeTree: tree, history: createMemoryHistory({ initialEntries: ["/dashboard"] }), context: { queryClient } });
     render(<QueryClientProvider client={queryClient}><RouterProvider router={router} /></QueryClientProvider>);
     expect(await screen.findByText("$1,250.25")).toBeInTheDocument();
+    expect(screen.queryByRole("link", {name:"Suggestions"})).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", {name:"Alerts"}).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button",{name:"Open menu"}));
+    expect(screen.queryByRole("link", {name:"Suggestions"})).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", {name:"Alerts"}).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button",{name:"Close menu"}));
     for (const { path, heading } of pages) {
       fireEvent.click(screen.getAllByRole("link").find(l => l.getAttribute("href") === path)!);
       expect(await screen.findByRole("heading", { name: heading })).toBeInTheDocument();
       expect(screen.getByText("Nessie sandbox data")).toBeInTheDocument();
-      expect(screen.getByText(/nessie_test_customer/)).toBeInTheDocument();
+      expect(screen.getByText(/Your account/)).toBeInTheDocument();
+      expect(screen.queryByText(/nessie_test_customer/)).not.toBeInTheDocument();
       expect(document.body.textContent).not.toMatch(/synthetic_demo|\$1,800|\$600|Alex|Emergency fund/);
     }
     expect(fetch.mock.calls.filter(c => c[0] === "/api/financial-data")).toHaveLength(1);

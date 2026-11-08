@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { agentAdapter } from "@/services/agent";
 import type { AgentResponse } from "@/types/agent";
 import { DATA_MODE } from "@/services/config";
-import { BackendTalk } from "@/components/chat/BackendTalk";
+import { TalkWorkspace } from "@/components/chat/TalkWorkspace";
 
 export const Route = createFileRoute("/talk")({
   head: () => ({ meta: [
@@ -35,7 +35,7 @@ function speechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 }
 
 function Talk() {
-  return DATA_MODE === "remote" ? <BackendTalk /> : <DemoTalk />;
+  return DATA_MODE === "remote" ? <TalkWorkspace /> : <DemoTalk />;
 }
 function DemoTalk() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -83,7 +83,7 @@ function DemoTalk() {
   return (
     <div>
       <PageHeading eyebrow="Talk to Plutus" title="Ask Plutus anything about your money." description="Explore financial choices, understand your budget, and plan your next move." />
-      <p className="mb-6 text-sm text-muted-foreground">Demo assistant · Answers use the same simulation engine as the Simulator · Not financial advice</p>
+      <p className="mb-6 text-sm text-muted-foreground">Sample assistant · Answers use the same simulation engine as the Simulator · Not financial advice</p>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {SUGGESTED.map((q) => (

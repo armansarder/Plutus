@@ -4,7 +4,6 @@ import { Link } from "@tanstack/react-router";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
 import { PageHeading } from "@/components/app/PageHeading";
 import { useDecision } from "@/components/app/DecisionContext";
-import { BackendSource } from "@/components/financial/BackendRecords";
 import { EngineSummary, EngineTimeline, EngineComparisonChart } from "@/components/financial/EngineResults";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,8 +51,8 @@ function PurchaseCalculator({ snapshot }: { snapshot: SituationSnapshot }) {
   }
   const comparison = !mutation.isError && !mutation.isPending ? mutation.data?.comparison : undefined;
   const result = comparison?.scenarios.find(s => s.name === selected);
-  return <div><PageHeading eyebrow={`${snapshot.customer.displayName} · Try a decision`} title="What if you bought it?" description="Compare buying now, buying later or skipping a purchase using your backend records." /><BackendSource snapshot={snapshot} />
-    <p className="mb-6 rounded-md bg-caution-soft p-4 text-sm">Budget affordability cannot yet be determined. Category budgets and protected savings are unavailable. A positive checking balance alone does not mean a purchase is affordable.</p>
+  return <div><PageHeading eyebrow={`Your account · Try a decision`} title="What if you bought it?" description="Compare buying now, buying later or skipping a purchase using your backend records." />
+    <details className="mb-6 text-sm text-muted-foreground"><summary className="cursor-pointer">What this simulation includes</summary><p className="mt-2">This simulation uses your balance, scheduled income and expenses, and the purchase details you enter. It does not apply your saved cash plan or category budgets. Expenses missing from your schedule are not included.</p></details>
     <div className="grid items-start gap-8 lg:grid-cols-[320px_1fr]"><form className="panel space-y-4 p-5" noValidate onSubmit={e => { e.preventDefault(); submit(); }}>
       <h2 className="font-display text-lg font-semibold">What are you thinking of buying?</h2><p className="text-xs text-muted-foreground">Simulation only. No money moves.</p>
       <div><Label htmlFor="backend-amount">Purchase amount (USD)</Label><Input id="backend-amount" inputMode="decimal" autoComplete="off" value={amount} onChange={e => setAmount(e.target.value)} /></div>
@@ -63,7 +62,7 @@ function PurchaseCalculator({ snapshot }: { snapshot: SituationSnapshot }) {
       <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? "Comparing…" : "Compare choices"}</Button>
     </form><div aria-live="polite" aria-busy={mutation.isPending}>
       {mutation.isPending && <p role="status">Calculating your purchase and alternatives…</p>}
-      {mutation.isError && <div role="alert"><p>We couldn't calculate these choices. Check the dates or refresh Current Situation if your records changed. No demo results were substituted.</p><Button className="mt-3" onClick={submit}>Try again</Button></div>}
+      {mutation.isError && <div role="alert"><p>We couldn't calculate these choices. Check the dates or refresh Current Situation if your records changed. No sample results were substituted.</p><Button className="mt-3" onClick={submit}>Try again</Button></div>}
       {!mutation.data && !mutation.isPending && !mutation.isError && <p className="panel p-6 text-muted-foreground">Enter a purchase to see its effect on your cash.</p>}
       {comparison && result && <><p className="mb-4 text-sm text-muted-foreground">Last completed comparison: {formatMoney(centsValue(mutation.data!.input.purchase.purchase_amount))} purchase on {formatDateOnly(mutation.data!.input.purchase.purchase_date)}, or later on {formatDateOnly(mutation.data!.input.later)}. Edit the form and compare again to update these results.</p><div className="mb-4 flex flex-wrap gap-2">{comparison.scenarios.map(s => <Button key={s.name} variant={s.name === selected ? "default" : "outline"} onClick={() => setSelected(s.name)}>{s.name}</Button>)}</div><h2 className="mb-3 font-display text-2xl">{selected}</h2><EngineSummary result={result} /><EngineComparisonChart comparison={comparison} selected={selected} /><EngineTimeline result={result} /><Button asChild className="mt-6"><Link to="/cash-flow">See cash flow</Link></Button></>}
     </div></div></div>;

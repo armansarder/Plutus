@@ -4,6 +4,24 @@ Nessie is Capital One's banking **sandbox**, not a real bank connection. All
 financial routes and the existing Nemotron agent share one server-selected
 customer and cash account. No Nessie write methods or seed scripts run.
 
+The app and model tools remain read-only. A separate, explicit maintenance command
+`python -m pipeline.populate_nessie` previews an approved sample dataset for the
+configured Alex Adams account; `--apply` opts into sandbox-only additions. It never
+creates customers/accounts, deletes records, replaces keys, or directly sets balances.
+Plans are frozen under ignored `calculation_engine/private_data/`; stable remote
+markers prevent repeat additions. Do not use the older seed scripts.
+
+Current integration also projects explicitly dated future **pending deposits** as
+estimated income. Past/same-day deposits and future completed deposits are excluded
+from upcoming cash flow. Income is never inferred from historical patterns.
+
+Provider compatibility: bill creation must include `recurring_date`, even for
+one-time bills. Nessie derives `upcoming_payment_date` and rejects sending that
+derived field on POST. The provider accepts missing recurring dates but then rejects
+GET, so the loader verifies bill reads after each bill write. Existing malformed bills
+require provider-side repair using their IDs; the app never silently discards them.
+Missing source data remains an error.
+
 References reviewed: [published docs](https://nessieisreal.com/docs),
 [official account SDK](https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/account.js),
 [deposit SDK](https://github.com/nessieisreal/nessie-javascript-sdk/blob/master/lib/deposit.js),

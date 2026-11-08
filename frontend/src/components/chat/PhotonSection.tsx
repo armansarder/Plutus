@@ -30,7 +30,7 @@ export function PhotonSection() {
           <span className={failed || !status ? "h-2.5 w-2.5 rounded-full bg-muted-foreground" : status.connected ? "h-2.5 w-2.5 rounded-full bg-accent-foreground" : "h-2.5 w-2.5 rounded-full bg-caution"} />
         </span>
         <span className="font-medium text-foreground">
-          {failed ? "Messaging status unavailable." : !status ? "Checking messaging status…" : status.connected ? `Connected via ${status.channel}` : "Messaging demo — not connected."}
+          {failed ? "Messaging status unavailable." : !status ? "Checking messaging status…" : status.connected ? `Connected via ${status.channel}` : "Messaging — not connected."}
         </span>
       </div>
       {status?.instructions && <p className="mt-3 text-sm text-muted-foreground">{status.instructions}</p>}

@@ -22,7 +22,8 @@ function Pages() { const [cash, setCash] = useState(false); return <><button onC
 it("shows backend-calculated purchase alternatives and retains them in Cash Flow", async () => {
   page(<Pages />);
   const submit = await screen.findByRole("button", { name: "Compare choices" });
-  expect(screen.getByText(/Budget affordability cannot yet be determined/)).toBeInTheDocument();
+  expect(screen.getByText("What this simulation includes")).toBeVisible();
+  expect(screen.queryByText(/Budget affordability cannot yet be determined/)).not.toBeInTheDocument();
   expect(screen.queryByText("Fits your plan")).not.toBeInTheDocument();
   fireEvent.click(submit);
   expect(await screen.findByText("A cash shortfall is projected.")).toBeInTheDocument();
@@ -36,7 +37,7 @@ it("shows backend-calculated purchase alternatives and retains them in Cash Flow
   expect(screen.getByText("−$100")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("tab", { name: "Last purchase comparison" }));
   expect(await screen.findByText("−$500")).toBeInTheDocument();
-  expect(screen.getByText(/synthetic_demo/)).toBeInTheDocument();
+  expect(screen.getByText(/Your account/)).toBeInTheDocument();
   expect(document.body.textContent).not.toMatch(/\$1,800|\$600|Reserved ticket|Emergency fund/);
 });
 
@@ -53,7 +54,7 @@ it("shows a retryable calculation failure and never displays old demo results", 
   vi.mocked(fetch).mockImplementation(async url => url === "/api/simulate" ? new Response("", { status: 422 }) : Response.json(payloads[url as string]));
   page(<BackendSimulator />);
   fireEvent.click(await screen.findByRole("button", { name: "Compare choices" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("No demo results were substituted");
+  expect(await screen.findByRole("alert")).toHaveTextContent("No sample results were substituted");
   expect(screen.queryByText("Fits your plan")).not.toBeInTheDocument();
   vi.mocked(fetch).mockImplementation(async url => Response.json(payloads[url as string]));
   fireEvent.click(screen.getByRole("button", { name: "Try again" }));
@@ -65,7 +66,7 @@ it("keeps the forecast working when history is unavailable, with an independent 
   page(<BackendCashFlow />);
   expect(await screen.findByText(/Daily closing balances/)).toBeInTheDocument();
   fireEvent.click(screen.getByRole("tab", { name: "History" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("No demo history has been substituted");
+  expect(await screen.findByRole("alert")).toHaveTextContent("No sample history has been substituted");
   vi.mocked(fetch).mockImplementation(async url => Response.json(payloads[url as string]));
   fireEvent.click(screen.getByRole("button", { name: "Try again" }));
   expect(await screen.findByText("2026-10")).toBeInTheDocument();
@@ -79,7 +80,7 @@ it("keeps the forecast working when history is unavailable, with an independent 
 it("keeps loading and forecast errors explicit without synthetic fallback", async () => {
   vi.mocked(fetch).mockImplementation(async url => url === "/api/forecast" ? new Response("", { status: 503 }) : Response.json(payloads[url as string]));
   page(<BackendCashFlow />);
-  expect(await screen.findByRole("alert")).toHaveTextContent("No demo results were substituted");
+  expect(await screen.findByRole("alert")).toHaveTextContent("No sample results were substituted");
   vi.mocked(fetch).mockImplementation(async url => Response.json(payloads[url as string]));
   fireEvent.click(screen.getByRole("button", { name: "Try again" }));
   await waitFor(() => expect(screen.getByText(/Daily closing balances/)).toBeInTheDocument());

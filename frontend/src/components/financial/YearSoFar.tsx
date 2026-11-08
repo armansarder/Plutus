@@ -37,7 +37,7 @@ export function YearSoFar({ history }: { history: YearHistory }) {
   return (
     <div>
       <p className="mb-4 text-xs text-muted-foreground">
-        Past activity · Simulated history — demo data, not bank records.
+        Past activity · Simulated history — synthetic data, not bank records.
       </p>
       <div className="h-64 w-full" aria-hidden>
         <ResponsiveContainer width="100%" height="100%">

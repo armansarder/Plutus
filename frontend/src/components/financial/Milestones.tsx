@@ -26,7 +26,7 @@ export function Milestones({ plan, history }: { plan: BudgetPlan | null; history
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-muted-foreground">From synthetic demo data.</p>
+        <p className="mt-4 text-xs text-muted-foreground">From synthetic sample data.</p>
       </details>
     </section>
   );
