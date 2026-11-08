@@ -223,3 +223,16 @@ Set `VITE_COUNCIL_ENABLED=true` with remote mode and enable the backend local co
 to add Council, Budget, Risk and Simulator chats alongside original purchase analysis.
 See [COUNCIL.md](../nemotron_agent/COUNCIL.md) for configuration, supported calculations,
 session isolation, handoffs, memory expiry, cancellation and rollback.
+
+### Council chart readability
+
+Council timelines default to separate scenario panels on a shared date/dollar scale.
+Each panel shows the engine-provided lowest balance/date and final balance. Focus
+mode enlarges one scenario; comparison with a dashed no-purchase baseline is opt-in.
+The cash-buffer line, zero line and event minimum markers remain intact. Exact values
+are available as tables. This is a frontend presentation change; financial results
+and backend contracts are unchanged.
+
+Design references:
+- https://www.datawrapper.de/blog/what-to-consider-when-creating-small-multiple-line-charts
+- https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-charts/

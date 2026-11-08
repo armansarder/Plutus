@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { LineChart, Line, ReferenceLine, ReferenceDot, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from "recharts";
+import { CouncilGraph } from "./CouncilGraph";
 import { CustomerFinancialData } from "@/components/app/CustomerFinancialData";
 import { PageHeading } from "@/components/app/PageHeading";
 import { BackendSource } from "@/components/financial/BackendRecords";
@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError } from "@/services/apiClient";
 import { assertCouncilSnapshot, councilAdapter } from "@/services/council";
-import { centsValue, forecastStart, moneyString } from "@/services/engine";
-import { parseDollarsToCents, formatMoney } from "@/lib/formatMoney";
+import { forecastStart, moneyString } from "@/services/engine";
+import { parseDollarsToCents } from "@/lib/formatMoney";
 import { addDays, isDateOnly } from "@/lib/dateOnly";
 import type { SituationSnapshot } from "@/services/situation";
 import type { CouncilConversation, CouncilMessage, CouncilRole, CouncilRun } from "@/types/council";
@@ -144,13 +144,4 @@ export function CouncilAnswer({result, onHandoff}: {result: CouncilRun; onHandof
     <details className="rounded-xl border border-border p-4"><summary className="cursor-pointer text-sm font-semibold">Observed action log and limitations</summary><ol className="mt-3 space-y-1 text-xs">{result.events.map(e => <li key={e.sequence}>{e.sequence}. {LABELS[e.role]} · {e.action.replaceAll("_", " ")} · {e.status}</li>)}</ol><ul className="mt-3 space-y-2 text-xs text-muted-foreground">{result.limitations.map(l => <li key={l}>{l}</li>)}</ul></details>
     {onHandoff && <Button variant="outline" onClick={onHandoff}>Share these findings with Council</Button>}
   </div>;
-}
-
-function CouncilGraph({chart}: {chart: NonNullable<CouncilRun["chart"]>}) {
-  const data = chart.series[0]?.points.map((p, i) => Object.fromEntries([["date", p.date], ...chart.series.map(s => [s.scenario, centsValue(s.points[i]!.balance)])])) ?? [];
-  const colors = ["#64748b", "#2563eb", "#d97706", "#dc2626", "#059669"];
-  return <section className="min-w-0 rounded-xl border border-border p-4" aria-label="Verified scenario projections"><h3 className="font-semibold">Projected balances and reserve</h3><p className="my-2 text-xs text-muted-foreground">Conditional projections, not probabilities. Dots show event-level minimums, which can be below daily closing lines.</p>
-    <div className="h-80 min-w-0"><ResponsiveContainer width="100%" height="100%"><LineChart data={data} margin={{top: 15, right: 15, left: 10, bottom: 20}}><CartesianGrid strokeDasharray="3 3" opacity={.2} /><XAxis dataKey="date" tick={{fontSize: 10}} minTickGap={45} /><YAxis tick={{fontSize: 10}} tickFormatter={v => formatMoney(Number(v))} width={80} /><Tooltip formatter={v => formatMoney(Number(v))} /><Legend wrapperStyle={{fontSize: 11}} /><ReferenceLine y={0} stroke="#dc2626" /><ReferenceLine y={centsValue(chart.reserve)} stroke="#d97706" strokeDasharray="5 5" label="Reserve" />{chart.series.map((s, i) => <Line type="stepAfter" isAnimationActive={false} key={s.scenario} dataKey={s.scenario} name={s.scenario.replaceAll("_", " ")} stroke={colors[i]} dot={false} strokeWidth={2} />)}{chart.markers.filter(m => m.kind === "minimum").map(m => <ReferenceDot key={m.scenario} x={m.date} y={centsValue(m.balance)} r={4} fill={colors[chart.series.findIndex(s => s.scenario === m.scenario)]} stroke="white" ifOverflow="extendDomain" />)}</LineChart></ResponsiveContainer></div>
-    <details><summary className="cursor-pointer text-sm">Accessible values and shortfall markers</summary><div className="mt-3 overflow-x-auto"><table className="w-full text-left text-xs"><thead><tr><th className="p-2">Scenario / marker</th><th className="p-2">Date</th><th className="p-2">Balance</th></tr></thead><tbody>{chart.markers.map((m, i) => <tr key={i}><td className="p-2">{m.scenario.replaceAll("_", " ")} · {m.kind.replaceAll("_", " ")}</td><td className="p-2">{m.date}</td><td className="p-2">{formatMoney(centsValue(m.balance))}</td></tr>)}</tbody></table><table className="mt-4 w-full text-left text-xs"><thead><tr><th className="p-2">Scenario</th><th className="p-2">Date</th><th className="p-2">Daily close</th><th className="p-2">Change vs baseline</th></tr></thead><tbody>{chart.series.flatMap(s => s.points.map(p => <tr key={s.scenario + p.date}><td className="p-2">{s.scenario}</td><td className="p-2">{p.date}</td><td className="p-2">{formatMoney(centsValue(p.balance))}</td><td className="p-2">{formatMoney(centsValue(p.difference_from_baseline))}</td></tr>))}</tbody></table></div></details>
-  </section>;
 }
