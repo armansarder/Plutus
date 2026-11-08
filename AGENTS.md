@@ -584,6 +584,26 @@ guaranteed anonymized. Production council activation is blocked pending real use
 authentication. Keep generated council JSON contracts and UI validators synchronized.
 
 
+### Authorized Nessie sample-data maintenance
+
+The runtime and agent tools remain read-only. User-approved sandbox population is
+implemented separately in `pipeline/populate_nessie.py`; it is a dry run unless
+`--apply` is supplied. It preserves credentials/customer IDs, uses frozen private
+plans and remote sample markers, refuses conflicting records, and never retries an
+uncertain POST automatically. Do not run the older seed scripts. The explicitly
+approved one-account recovery is in `pipeline/recover_sample_account.py`; it verifies
+the full adapter/history before changing only the configured account ID.
+
+Nessie requires `recurring_date` on bill creation and derives the GET-only
+`upcoming_payment_date`. Future pending deposits with explicit source dates are now
+projected as estimated income; past/same-day deposits are never replayed.
+
+The frontend purchase intake in `services/purchaseIntent.ts` proposes one purchase
+or two cash alternatives, anchored to the displayed browser timezone. The user
+confirms fields before calculation. Alternatives share one engine snapshot through
+`/api/compare`; choosing one for specialist review is explicit. This does not add
+unrestricted model parsing or new financial tools.
+
 ### User-facing response clarity
 
 Every completed purchase-review agent must give a direct, evidence-supported

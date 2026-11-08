@@ -15,7 +15,7 @@ def install_council(app, snapshot_dependency, source, provider=None):
     if enabled and not settings.api_token:
         raise ValueError('Council requires FINPILOT_API_TOKEN and the signed-session frontend proxy')
     if enabled and settings.mode == 'production':
-        raise ValueError('Council demo sessions require local mode; integrate real application authentication before production')
+        raise ValueError('Council sessions require local mode; integrate real application authentication before production')
     store = CouncilStore(limit=32, ttl=1800)
     app.state.council_store = store
     router = APIRouter(prefix='/api/v2')
@@ -31,8 +31,11 @@ def install_council(app, snapshot_dependency, source, provider=None):
 
     @router.get('/council/status', response_model=CouncilStatus)
     def status():
+        key = os.getenv('NVIDIA_API_KEY', '')
+        configured = bool(key and 'PASTE_' not in key and not any(c.isspace() for c in key))
         return CouncilStatus(enabled=enabled, roles=['council', 'budget', 'risk', 'simulator'],
-            scope='Temporary signed-browser sessions for one configured customer; local demo only. No user login or durable storage.')
+            model_configured=configured,
+            scope='Temporary signed-browser sessions for one configured customer; local use only. No user login or durable storage.')
 
     @router.post('/conversations', response_model=ConversationView)
     async def create(body: ConversationCreate, identity=Depends(owner)):
@@ -75,7 +78,7 @@ def install_council(app, snapshot_dependency, source, provider=None):
             except TimeoutError:
                 raise HTTPException(503, 'Financial snapshot timed out') from None
             if len(snapshot.upcoming_transactions) > 200:
-                raise HTTPException(422, 'Council demo supports at most 200 scheduled events per snapshot')
+                raise HTTPException(422, 'Council supports at most 200 scheduled events per snapshot')
             current = fingerprint(snapshot)
             if body.expected_snapshot_id and body.expected_snapshot_id != current:
                 raise HTTPException(409, 'Snapshot changed; start a new chat or refresh the decision')

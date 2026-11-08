@@ -56,7 +56,7 @@ it("keeps every demo page on Alex's independent records without backend access",
       const link = screen.getAllByRole("link").find(l => l.getAttribute("href") === path);
       fireEvent.click(link!);
       expect(await screen.findByRole("heading", { name: heading }, { timeout: 5000 })).toBeInTheDocument();
-      expect(screen.getByText("Synthetic demo data · Alex")).toBeInTheDocument();
+      expect(screen.getByText("Synthetic sample data · Alex")).toBeInTheDocument();
       expect(screen.queryByText(/synthetic_demo/)).not.toBeInTheDocument();
       expect(screen.queryByText("Backend-connected data")).not.toBeInTheDocument();
     }

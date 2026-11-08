@@ -25,6 +25,14 @@ council, not a general financial chatbot or trained predictive model.
 
 ## Startup
 
+For this Windows workspace, use `.\.venv\Scripts\python.exe start_local.py` from
+the repository root. It loads both backend configuration files, uses the existing
+service token for the frontend server, and enables Council locally. Saving either
+backend `.env` restarts the services; temporary conversations reset on restart.
+`GET /api/v2/council/status` includes `model_configured`, which reports whether this
+backend process has a nonempty, syntactically valid key, not provider reachability.
+The matching status contract is `council-status.schema.json`.
+
 From the updated repository root, use your existing Python environment or:
 
 ```sh

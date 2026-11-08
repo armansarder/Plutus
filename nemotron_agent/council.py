@@ -260,8 +260,8 @@ class CouncilRun:
             mode = 'partial'
         if status == 'complete' and mode == 'partial':
             status = 'partial'
-        limitations = ['Temporary, session-isolated demo chats; restart or expiry clears history.',
-            'Shared customer demo, not a multi-user login system. No payment or external message is executed.',
+        limitations = ['Temporary, session-isolated chats; restart or expiry clears history.',
+            'One configured customer; no multi-user login system. No payment or external message is executed.',
             'Only purchase cash-flow calculations are supported. Debt interest, goal dates and probabilities are unavailable.',
             'Model selects verified findings; financial prose and charts are assembled from engine evidence.']
         latest = next((v for v in reversed(self.reviews) if v.role == self.role), None)
@@ -292,8 +292,11 @@ class CouncilRun:
             # No parsing/execution of implied amounts. Education can run without numbers.
             numeric_intent = bool(re.search(r'[$€£]|\d|\b(buy|purchase|afford|repay|pay off|invest|retire)\b', self.request.message, re.I))
             if numeric_intent:
-                return self.output('needs_clarification', 'Numerical analysis needs confirmed structured fields. Debt, investment and retirement calculations are not supported.',
-                    'For purchase cash flow, confirm the amount, date, reserve and horizon below. For debt-interest comparisons a validated debt module is still required.')
+                if re.search(r'\blaptop\b',self.request.message,re.I) and re.search(r'\bcar\b',self.request.message,re.I):
+                    return self.output('needs_clarification', 'We can compare buying the laptop, paying cash upfront for the car, and keeping your money. First I need the cost of each choice.',
+                        'What is the laptop price and the car down payment? Your stated cash balance is context, not a purchase price. Car financing and ongoing costs need separate inputs.')
+                return self.output('needs_clarification', 'What would the purchase cost, and when would you make it?',
+                    'Confirm the price and date below, plus the cash reserve you want to keep. A balance you mention is kept separate from the purchase price and your connected account snapshot.')
         if self.role == 'council' and self.request.analysis:
             # Framing is a real Leader call. It does not receive specialist conclusions.
             await self.review('council', 'framing')

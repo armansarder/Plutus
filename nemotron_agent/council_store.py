@@ -44,7 +44,7 @@ class CouncilStore:
         now = time.monotonic()
         for key in list(self.items):
             item = self.items[key]
-            if not item.active and now - item.updated > self.ttl:
+            if not item.active and now - item.updated >= self.ttl:
                 del self.items[key]
 
     def create(self, owner, role):

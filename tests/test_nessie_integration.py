@@ -184,6 +184,27 @@ def test_no_inferred_schedule_or_history_replay(nessie, monkeypatch):
     assert any('flat forecast' in note for note in data.source_notes)
 
 
+def test_explicit_future_pending_income_is_estimated_and_not_replayed(nessie):
+    nessie['raw']['deposits'].extend([
+        {'_id':'future_pay', 'transaction_date':nessie['day'](4), 'amount':600, 'status':'pending'},
+        {'_id':'today_pay', 'transaction_date':nessie['day'](0), 'amount':900, 'status':'pending'},
+        {'_id':'future_completed', 'transaction_date':nessie['day'](5), 'amount':900, 'status':'completed'},
+    ])
+    data = app_for_customer().state.financial_source.load()
+    assert data.current_balance == Decimal('1250.25')
+    incomes = [t for t in data.upcoming_transactions if t.type == 'income']
+    assert len(incomes) == 1 and incomes[0].amount == Decimal('600.00')
+    assert incomes[0].source_status == 'estimated'
+
+
+def test_future_income_ownership_and_precision_fail_closed(nessie):
+    nessie['raw']['deposits'].append({'_id':'future_pay', 'transaction_date':nessie['day'](4),
+                                     'amount':'1.001','status':'pending'})
+    with TestClient(app_for_customer()) as client:
+        response = client.get('/api/financial-data', headers={'Authorization':'Bearer '+TOKEN})
+        assert response.status_code == 503
+
+
 def test_cache_does_not_return_expired_records_after_failure(nessie, monkeypatch):
     app = app_for_customer()
     data = app.state.financial_source.load()

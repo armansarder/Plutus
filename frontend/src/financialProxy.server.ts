@@ -3,8 +3,9 @@ import { z } from "zod";
 import { purchaseRequestSchema, compareRequestSchema, forecastRequestSchema, engineSimulationSchema, engineComparisonSchema, engineForecastSchema, engineHistorySchema } from "./types/engine";
 import { nemotronRequestSchema, nemotronResponseSchema } from "./types/nemotron";
 import { ENDPOINTS } from "./services/endpoints";
+import { cashPlanRequestSchema, cashPlanResultSchema } from "./types/cashPlan";
 
-export const FINANCIAL_PROXY_PATHS = ["/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", ENDPOINTS.agentRun] as const;
+export const FINANCIAL_PROXY_PATHS = ["/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", "/api/cash-plan/preview", ENDPOINTS.agentRun] as const;
 
 async function readBody(request: Request) {
   const reader = request.body?.getReader();
@@ -38,7 +39,8 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
   const url = new URL(request.url);
   if (!(FINANCIAL_PROXY_PATHS as readonly string[]).includes(url.pathname)) return error(404, "Financial route not found");
   const agent = url.pathname === ENDPOINTS.agentRun;
-  const post = agent || ["/api/simulate", "/api/compare", "/api/forecast"].includes(url.pathname);
+  const plan = url.pathname === "/api/cash-plan/preview";
+  const post = plan || agent || ["/api/simulate", "/api/compare", "/api/forecast"].includes(url.pathname);
   if (request.method !== (post ? "POST" : "GET")) return error(405, "Method not allowed");
   if (url.pathname === "/api/history") {
     const keys = [...url.searchParams.keys()];
@@ -53,7 +55,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
     const length = request.headers.get("content-length");
     if (length && (!/^\d+$/.test(length) || Number(length) > 16384)) return error(413, "Request body exceeds size limit");
     try {
-      const schema = agent ? nemotronRequestSchema : url.pathname === "/api/simulate" ? purchaseRequestSchema : url.pathname === "/api/compare" ? compareRequestSchema : forecastRequestSchema;
+      const schema = plan ? cashPlanRequestSchema : agent ? nemotronRequestSchema : url.pathname === "/api/simulate" ? purchaseRequestSchema : url.pathname === "/api/compare" ? compareRequestSchema : forecastRequestSchema;
       body = await readBody(request);
       schema.parse(JSON.parse(body)); // Forward original JSON so backend duplicate-key checks still apply.
     } catch { return error(422, "Check purchase amounts, dates and scenario inputs"); }
@@ -72,6 +74,10 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
       cache: "no-store", redirect: "error", signal: AbortSignal.any([request.signal, AbortSignal.timeout(agent ? 60000 : 12000)]),
     });
     if (!response.ok) return error([401, 403, 422, 429, 503].includes(response.status) ? response.status : 502, "Financial service request failed");
+    if (plan) {
+      const result = cashPlanResultSchema.safeParse(await response.json());
+      return result.success ? Response.json(result.data,{headers}) : error(502,"Invalid cash plan response");
+    }
     if (agent) {
       const result = nemotronResponseSchema.safeParse(await response.json());
       if (!result.success) return error(502, "Invalid agent service response");

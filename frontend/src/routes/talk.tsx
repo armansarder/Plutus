@@ -85,7 +85,7 @@ function DemoTalk() {
   return (
     <div>
       <PageHeading eyebrow="Talk to Plutus" title="Ask Plutus anything about your money." description="Explore financial choices, understand your budget, and plan your next move." />
-      <p className="mb-6 text-sm text-muted-foreground">Demo assistant · Answers use the same simulation engine as the Simulator · Not financial advice</p>
+      <p className="mb-6 text-sm text-muted-foreground">Sample assistant · Answers use the same simulation engine as the Simulator · Not financial advice</p>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {SUGGESTED.map((q) => (

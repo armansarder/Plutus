@@ -53,7 +53,7 @@ it("requires explicit purchase fields rather than interpreting amounts in a ques
 it("shows pending state and retries a real failure without fabricated answers", async () => {
   vi.mocked(fetch).mockImplementation(async url => url === "/api/agent/run" ? new Response("", { status: 503 }) : Response.json(financialPayload));
   page(); await fill(true); send();
-  expect(await screen.findByRole("alert")).toHaveTextContent("No demo response was substituted");
+  expect(await screen.findByRole("alert")).toHaveTextContent("No sample response was substituted");
   expect(screen.queryByText(/Deterministic fallback/)).not.toBeInTheDocument();
   expect(screen.queryByText(/Nemotron investigation/)).not.toBeInTheDocument();
   vi.mocked(fetch).mockImplementation(async url => Response.json(url === "/api/financial-data" ? financialPayload : agentNemotron));

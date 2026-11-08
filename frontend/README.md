@@ -26,6 +26,12 @@ Open your project in the [Lovable editor](https://lovable.dev) and keep building
 
 ## Development
 
+`npm run dev` now starts both the local Nessie API and website with the existing
+backend `.env` files. It also works from the repository root. Use
+http://127.0.0.1:8080/dashboard; no token copying is needed. Install Python backend
+dependencies first. Use `npm run dev:frontend -- --port 8080` only when deliberately
+managing the backend and server-side environment separately.
+
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh

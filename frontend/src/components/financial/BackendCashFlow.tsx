@@ -35,7 +35,7 @@ function Forecast({ snapshot }: { snapshot: SituationSnapshot }) {
       <p className="mb-4 text-sm text-muted-foreground">Last submitted simulation, kept only for this session. Re-run the Simulator after records change.</p><EngineSummary result={result} /><EngineComparisonChart comparison={comparison} selected={selected} /><EngineTimeline result={result} />
     </> : <>
       {query.isPending && <p role="status">Loading your backend cash forecast…</p>}
-      {query.isError && <div role="alert"><p>We couldn't load your forecast. No demo results were substituted.</p><Button className="mt-3" onClick={() => void query.refetch()}>Try again</Button></div>}
+      {query.isError && <div role="alert"><p>We couldn't load your forecast. No sample results were substituted.</p><Button className="mt-3" onClick={() => void query.refetch()}>Try again</Button></div>}
       {forecast && <><EngineSummary result={forecast} /><section className="mt-8 border-y border-border py-6"><h2 className="font-display text-2xl">Your next 30 days</h2><p className="my-3 text-sm text-muted-foreground">{formatDateOnly(forecast.start_date)} – {formatDateOnly(forecast.end_date)} · Daily closing balances. The minimum marker reflects event order and may be lower than the day's closing balance.</p><CashFlowChart series={[{ shortName: "Backend forecast", color: "var(--brand)", result: { id: "forecast", lowestBalanceDate: forecast.minimum_balance_date, lowestBalanceCents: centsValue(forecast.minimum_balance), dailyBalances: forecast.daily_balances.map(d => ({ date: d.date, endOfDayBalanceCents: centsValue(d.ending_balance) })) } }]} events={[]} /></section><EngineTimeline result={forecast} /></>}
     </>}
   </div>;
@@ -43,7 +43,7 @@ function Forecast({ snapshot }: { snapshot: SituationSnapshot }) {
 function BackendHistory({ snapshot }: { snapshot: SituationSnapshot }) {
   const query = useQuery({ queryKey: ["engine-history", snapshot.snapshotId, snapshot.customer.displayName], queryFn: ({ signal }) => engineAdapter.history(snapshot, signal), retry: false, staleTime: 30000 });
   if (query.isPending) return <p role="status">Loading historical records…</p>;
-  if (query.isError) return <div role="alert"><h2 className="font-display text-2xl">History is unavailable.</h2><p className="my-3">The backend could not supply historical records. Your forecast is still available in Next 30 days. No demo history has been substituted.</p><Button onClick={() => void query.refetch()}>Try again</Button></div>;
+  if (query.isError) return <div role="alert"><h2 className="font-display text-2xl">History is unavailable.</h2><p className="my-3">The backend could not supply historical records. Your forecast is still available in Next 30 days. No sample history has been substituted.</p><Button onClick={() => void query.refetch()}>Try again</Button></div>;
   const history = query.data;
   return <section><h2 className="font-display text-2xl">Your history</h2><p className="my-3 text-sm text-muted-foreground">Historical activity is already reflected in your current balance and is never added to the forecast. Net income is not a protected savings allocation.</p>
     {!history.months.length && <p>No historical records were supplied.</p>}

@@ -54,6 +54,32 @@ class NessieAccount(BaseModel):
     balance: Money
 
 
+def scheduled_deposits(raw, as_of, account_id):
+    """Explicit future pending deposits only; never infer paydays from history."""
+    events = []
+    for deposit in raw.get('deposits', []):
+        if deposit.get('_source_account_id') != account_id:
+            raise ValueError('Deposit does not belong to the selected account')
+        if str(deposit.get('status', '')).lower() != 'pending':
+            continue
+        when = deposit.get('transaction_date')
+        if not when:
+            continue
+        day = parse_date(when)
+        if day <= as_of:
+            continue
+        id_ = str(deposit.get('_id', ''))
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', id_):
+            raise ValueError('Invalid deposit ID')
+        amount = parse_money(deposit.get('amount'))
+        if amount <= 0:
+            raise ValueError('Invalid scheduled deposit amount')
+        events.append(Transaction(id=f'nessie_deposit_{id_}_{day.isoformat()}', date=day,
+            description=str(deposit.get('description') or 'Scheduled deposit')[:200],
+            amount=amount, type='income', source_status='estimated'))
+    return events
+
+
 @dataclass
 class NessieAdapter:
     api_key: str = field(repr=False)
@@ -110,17 +136,20 @@ class NessieAdapter:
         if records is not None:
             if self.upcoming_source is not None:
                 raise ValueError('Do not combine inferred schedules with source-dated Nessie bills')
-            upcoming = scheduled_bills(records, as_of, account.id)
+            upcoming = scheduled_bills(records, as_of, account.id) + scheduled_deposits(records, as_of, account.id)
+            if any(str(r.get('description', r.get('nickname',''))).startswith('Plutus sample v1')
+                   for kind in ('purchases','deposits','withdrawals','bills') for r in records.get(kind, [])):
+                notes.append('Includes labeled fictional sample records stored in the Nessie sandbox for presentation.')
             notes.extend([
                 f'Selected {account.type} account; history uses the same account scope.',
-                'Only explicitly dated future pending/recurring bill payments are projected; dates are source estimates.',
+                'Only explicitly dated future pending/recurring bills and pending deposits are projected; dates and amounts are source estimates.',
                 'No paychecks, subscriptions or later recurring bill occurrences are inferred from history.',
-                'Future income, unscheduled spending, budgets and protected savings are unknown.',
+                'Unscheduled income/spending, budgets and protected savings are unknown.',
                 'Historical detail is supplied by /api/history, not duplicated in this balance snapshot.',
                 'Nessie records may be cached for up to 30 seconds; source failures never use expired records.',
             ])
             if not upcoming:
-                notes.append('No eligible future bill dates supplied; a flat forecast is not evidence of affordability.')
+                notes.append('No eligible future event dates supplied; a flat forecast is not evidence of affordability.')
         elif self.upcoming_source is not None:
             schedule = load_financial_data(self.upcoming_source)
             if (schedule.customer_id != account.customer_id or schedule.currency != self.currency

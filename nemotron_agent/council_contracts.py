@@ -109,6 +109,7 @@ class ConversationView(Contract):
 
 class CouncilStatus(Contract):
     enabled: bool
+    model_configured: bool = False
     roles: list[Role]
     temporary: Literal[True] = True
     scope: str

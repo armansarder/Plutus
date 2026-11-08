@@ -9,6 +9,7 @@ import { CouncilAnswer, CouncilWorkspace } from "@/components/chat/CouncilWorksp
 import { financialPayload } from "./fixtures/engineResponses";
 import fixture from "./fixtures/council.json";
 import { councilRunSchema, type CouncilConversation } from "@/types/council";
+import { ApiError } from "@/services/apiClient";
 let client: QueryClient;
 const empty = (role: CouncilConversation["role"]): CouncilConversation => ({id: role === "council" ? fixture.conversation_id : "b".repeat(32), role, messages: [], busy: false, temporary: true});
 const view = (): CouncilConversation => ({...empty("council"), messages: [{request_key: "test_123", message: "Test purchase", result: councilRunSchema.parse(fixture)}]});
@@ -62,6 +63,62 @@ it("keeps disabled council explicit without substituting a debate", async () => 
   vi.mocked(councilAdapter.status).mockResolvedValue({enabled: false, roles: [], temporary: true, scope: "disabled"});
   page(); expect(await screen.findByText("Council is disabled")).toBeInTheDocument();
   expect(councilAdapter.create).not.toHaveBeenCalled();
+});
+
+it("turns a natural purchase question into confirmed fields before any agent call", async () => {
+  page(); await waitFor(() => expect(councilAdapter.create).toHaveBeenCalled());
+  fireEvent.change(screen.getByLabelText("Question for Council Leader"), {target:{value:"Should I buy a $500 laptop?"}});
+  fireEvent.click(screen.getByRole("button", {name:"Send to Council Leader"}));
+  expect(screen.getByLabelText("Purchase amount (USD)")).toHaveValue("500.00");
+  expect(councilAdapter.send).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", {name:"Send to Council Leader"}));
+  await waitFor(() => expect(councilAdapter.send).toHaveBeenCalledTimes(1));
+  expect(vi.mocked(councilAdapter.send).mock.calls[0]![1].analysis?.purchase_amount).toBe("500.00");
+});
+
+it("offers a same-snapshot comparison for this-or-that questions without silently choosing", async () => {
+  page(); await waitFor(() => expect(councilAdapter.create).toHaveBeenCalled());
+  fireEvent.change(screen.getByLabelText("Question for Council Leader"), {target:{value:"Should I buy a $500 laptop or a $300 tablet?"}});
+  fireEvent.click(screen.getByRole("button", {name:"Send to Council Leader"}));
+  expect(screen.getByRole("region", {name:"Confirm purchase choices"})).toBeInTheDocument();
+  expect(screen.getByRole("button", {name:"Confirm and compare choices"})).toBeInTheDocument();
+  expect(councilAdapter.send).not.toHaveBeenCalled();
+});
+
+it("asks for the two prices in the reported cash/laptop/downpayment question", async () => {
+  page(); await waitFor(() => expect(councilAdapter.create).toHaveBeenCalled());
+  fireEvent.click(screen.getByLabelText("Include a confirmed purchase comparison"));
+  fireEvent.change(screen.getByLabelText("Question for Council Leader"), {target:{value:"I have 2500$, should i buy a laptop, or a downpayment for car, or should i save my money for a better time?"}});
+  fireEvent.click(screen.getByRole("button", {name:"Send to Council Leader"}));
+  expect(screen.getByLabelText("Laptop price (USD)")).toHaveValue("");
+  expect(screen.getByLabelText("Car down payment price (USD)")).toHaveValue("");
+  expect(screen.queryByText("Clarification or unsupported calculation")).not.toBeInTheDocument();
+  expect(councilAdapter.send).not.toHaveBeenCalled();
+});
+
+it("keeps clarification replies free of projection and action-log boilerplate", () => {
+  const clarification = councilRunSchema.parse({...fixture,status:"needs_clarification",mode:"no_analysis",message:"What would each choice cost?",next_question:"Laptop price and car down payment?",reviews:[],events:[],analysis:null,chart:null,handoff_reference:null});
+  render(<CouncilAnswer result={clarification}/>);
+  expect(screen.getByText("A few details first")).toBeInTheDocument();
+  expect(screen.queryByText("Observed action log and limitations")).not.toBeInTheDocument();
+  expect(screen.queryByText(/Projections use the supplied/)).not.toBeInTheDocument();
+});
+
+it("offers confirmed calculations when the running service has no model configuration", async () => {
+  vi.mocked(councilAdapter.status).mockResolvedValue({enabled: true, roles: ["council"], temporary: true, scope: "local", model_configured: false});
+  page();
+  expect(await screen.findByText("AI reviews are not configured on the running service")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", {name: "Use calculation only"}));
+  expect(screen.getByLabelText("Include a confirmed purchase comparison")).toBeChecked();
+  expect(screen.getByLabelText("Purchase amount (USD)")).toHaveValue("");
+  expect(screen.getByLabelText(/Use Nemotron specialist reviews/)).not.toBeChecked();
+});
+
+it("explains how to recover from service authentication failure", async () => {
+  vi.mocked(councilAdapter.create).mockRejectedValue(new ApiError("Request failed (401)"));
+  page();
+  expect(await screen.findByRole("alert")).toHaveTextContent("Restart both using the shared local launcher");
+  expect(councilAdapter.send).not.toHaveBeenCalled();
 });
 
 it("shows one latest clear decision per agent and keeps technical evidence collapsed", () => {

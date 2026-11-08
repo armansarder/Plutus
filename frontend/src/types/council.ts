@@ -65,7 +65,7 @@ export const councilRunSchema = z.object({ schema_version: z.literal("2.0"), run
 export const conversationSchema = z.object({id, role: councilRoleSchema,
   messages: z.array(z.object({request_key: z.string(), message: z.string().max(2000), result: councilRunSchema})).max(10), busy: z.boolean(), temporary: z.literal(true),
 }).superRefine((c, ctx) => {if (c.messages.some(m => m.result.conversation_id !== c.id || m.result.role !== c.role)) ctx.addIssue({code: "custom", message: "Conversation context mismatch"});});
-export const councilStatusSchema = z.object({enabled: z.boolean(), roles: z.array(councilRoleSchema).max(4), temporary: z.literal(true), scope: z.string()});
+export const councilStatusSchema = z.object({enabled: z.boolean(), model_configured: z.boolean().optional(), roles: z.array(councilRoleSchema).max(4), temporary: z.literal(true), scope: z.string()});
 export type CouncilRun = z.infer<typeof councilRunSchema>;
 export type CouncilConversation = z.infer<typeof conversationSchema>;
 export type CouncilMessage = z.infer<typeof councilMessageSchema>;
