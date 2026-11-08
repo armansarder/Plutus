@@ -95,7 +95,6 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
       body = "{}";
     }
   }
-  }
   const token = process.env["FINPILOT_API_TOKEN"];
   if (!token) return error(503, "Financial service is not configured");
   try {
