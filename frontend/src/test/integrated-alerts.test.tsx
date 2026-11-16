@@ -9,9 +9,30 @@ import councilFixture from "./fixtures/council.json";
 const settings={preferences:{enabled:false,purchase_alerts:true,budget_alerts:false,threshold_percent:85,budget_category:"Groceries",budget_limit_cents:0},mode:"preview",recipient_enrolled:false,recipient_masked:"",poll_seconds:0,poll_failed:false,scope:"One configured account"};
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.unstubAllEnvs();});
 function page(){const client=new QueryClient({defaultOptions:{queries:{retry:false}}});render(<QueryClientProvider client={client}><AlertsWorkspace/></QueryClientProvider>);return client;}
+it("retries only explicit backend concurrency rejection for history",async()=>{
+ vi.stubEnv("FINPILOT_API_TOKEN","server-token-"+"x".repeat(40));
+ const fetch=vi.fn().mockResolvedValueOnce(Response.json({error:{code:"server_busy"}},{status:503})).mockResolvedValueOnce(Response.json([]));vi.stubGlobal("fetch",fetch);
+ const result=await proxyNotifications(new Request("http://localhost/api/notifications/history"));
+ expect(result.status).toBe(200);expect(await result.json()).toEqual([]);expect(fetch).toHaveBeenCalledTimes(2);
+ expect(fetch.mock.calls[1]![1].headers.Authorization).toContain("server-token-");
+});
+it("does not turn real history failures or exhausted capacity into empty success",async()=>{
+ vi.stubEnv("FINPILOT_API_TOKEN","server-token-"+"x".repeat(40));
+ const fetch=vi.fn(async()=>Response.json({error:{code:"storage_unavailable"}},{status:503}));vi.stubGlobal("fetch",fetch);
+ expect((await proxyNotifications(new Request("http://localhost/api/notifications/history"))).status).toBe(503);expect(fetch).toHaveBeenCalledTimes(1);
+ fetch.mockImplementation(async()=>Response.json({error:{code:"server_busy"}},{status:503}));fetch.mockClear();
+ expect((await proxyNotifications(new Request("http://localhost/api/notifications/history"))).status).toBe(503);expect(fetch).toHaveBeenCalledTimes(4);
+});
+it("keeps a history service error visible and recovers through Retry history",async()=>{
+ let failed=true;
+ vi.stubGlobal("fetch",vi.fn(async(url:string)=>url.endsWith("/history")&&failed?new Response(null,{status:503}):Response.json(url.endsWith("/settings")?settings:[])));
+ const c=page();expect(await screen.findByText(/History unavailable/)).toBeVisible();expect(screen.queryByText("No notifications yet.")).not.toBeInTheDocument();
+ failed=false;fireEvent.click(screen.getByRole("button",{name:"Retry history"}));expect(await screen.findByText("No notifications yet.")).toBeVisible();c.clear();
+});
 it("shows honest preview and empty states; submits preferences without customer selectors",async()=>{
  const fetch=vi.fn(async(url: string,init?:RequestInit)=>Response.json(url.endsWith("/settings")?(init?.method==="PUT"?{saved:true}:settings):[]));vi.stubGlobal("fetch",fetch);const c=page();
  expect(await screen.findByText(/Preview mode: alerts are recorded here/)).toBeVisible();expect(await screen.findByText("No purchases saved yet.")).toBeVisible();
+ expect(await screen.findByText("No notifications yet.")).toBeVisible();
  fireEvent.click(screen.getByLabelText("Enable notifications"));fireEvent.click(screen.getByRole("button",{name:"Save notification settings"}));
  await waitFor(()=>expect(fetch.mock.calls.some(([,init])=>init?.method==="PUT")).toBe(true));
  const body=JSON.parse(fetch.mock.calls.find(([,init])=>init?.method==="PUT")![1]!.body as string);

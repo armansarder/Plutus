@@ -40,6 +40,43 @@ def enable(client,**extra):
     r=client.put('/api/notifications/settings',json=prefs)
     assert r.status_code==200
 
+
+def test_history_busy_rejection_is_capacity_not_storage(setup):
+    from concurrent.futures import ThreadPoolExecutor
+    import threading
+    src,app,c,_=setup
+    release=threading.Event();entered=threading.Event();lock=threading.Lock();count=0
+    original=src.load
+    def blocked():
+        nonlocal count
+        with lock:
+            count+=1
+            if count==4:entered.set()
+        if not release.wait(10):raise RuntimeError('test synchronization timeout')
+        return original()
+    src.load=blocked
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        pending=[pool.submit(c.get,'/api/financial-data') for _ in range(4)]
+        try:
+            assert entered.wait(5)
+            response=c.get('/api/notifications/history')
+            assert response.status_code==503
+            assert response.json()['error']['code']=='server_busy'
+        finally:release.set()
+        assert all(p.result().status_code==200 for p in pending)
+    assert c.get('/api/notifications/history').status_code==200
+    assert c.get('/api/notifications/history').json()==[]
+
+
+def test_history_storage_failure_is_not_an_empty_success(setup,monkeypatch):
+    from notifications import router
+    def broken():raise OSError('private database path')
+    monkeypatch.setattr(router,'database',broken)
+    _,_,c,_=setup
+    response=c.get('/api/notifications/history')
+    assert response.status_code==500
+    assert 'private database path' not in response.text
+
 def test_same_engine_readiness_transition_and_duplicate_suppression(setup):
     src,app,c,_=setup
     assert c.get('/api/notifications/settings').json()['mode']=='preview'

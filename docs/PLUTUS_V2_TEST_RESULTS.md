@@ -184,3 +184,19 @@ approval review. Browser automation host was unavailable. No screenshot pass cla
 - `scripts/free_demo_smoke.py`: PASS
 - `diff --check`: PASS
 - Changed-file credential-pattern scan: PASS (bounded pattern scan, not proof about all history).
+
+## Notification history concurrency recovery
+
+- `-m pytest tests -q`: PASS 112 passed, 1 skipped, 2 warnings in 12.30s
+- `test --prefix frontend`: PASS Test Files  31 passed | 2 skipped (33); Tests  169 passed | 2 skipped (171)
+- `frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json`: PASS
+- `run check --prefix photon_service`: PASS
+- `run build --prefix frontend`: PASS
+- `scripts/local_smoke.py`: PASS
+- `scripts/production_tls_smoke.py`: PASS
+- `scripts/nessie_wire_smoke.py`: PASS
+- `scripts/check_render.mjs`: PASS
+- `scripts/check_render_free.mjs`: PASS
+- `scripts/free_demo_smoke.py`: PASS
+- `diff --check`: PASS
+- Changed-file credential-pattern scan: PASS (bounded pattern scan, not proof about all history).

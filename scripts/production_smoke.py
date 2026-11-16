@@ -56,6 +56,8 @@ def smoke(web_url, api_url, source, verify=True, built_assets=True):
         assert response.status_code == 200 and len(response.json()['scenarios'])==5, 'Multiverse'
         assert client.get(web_url + '/api/history').status_code == 200, 'spending history'
         assert client.get(web_url + '/api/notifications/settings').status_code == 200, 'alerts'
+        response=client.get(web_url + '/api/notifications/history')
+        assert response.status_code==200 and isinstance(response.json(),list), 'notification history'
         assert client.get(web_url + '/api/v2/council/status').status_code == 200, 'council status'
         conversation=client.post(web_url+'/api/v2/conversations',json={'role':'council'})
         assert conversation.status_code==200,'signed Council session'
