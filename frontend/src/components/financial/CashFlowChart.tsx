@@ -30,10 +30,10 @@ export function CashFlowChart({ series, events, bufferCents, selectedId, height 
   }, [series]);
 
   // Event minimums can be below every daily close; keep those markers in view.
-  const all = series.flatMap((s) => [s.result.lowestBalanceCents / 100, ...s.result.dailyBalances.map((d) => d.endOfDayBalanceCents / 100)]);
+  const all = [0, ...(bufferCents === undefined ? [] : [bufferCents / 100]), ...series.flatMap((s) => [s.result.lowestBalanceCents / 100, ...s.result.dailyBalances.map((d) => d.endOfDayBalanceCents / 100)])];
   const min = Math.min(0, ...all);
   const max = Math.max(...all);
-  const pad = (max - min) * 0.12;
+  const pad = Math.max(1, (max - min) * 0.12);
   const yMin = Math.floor((min - pad) / 100) * 100;
   const yMax = Math.ceil((max + pad) / 100) * 100;
   const eventsByDate = new Map<string, AppliedEvent[]>();

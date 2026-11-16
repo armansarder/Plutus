@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+import { useDecision } from "@/components/app/DecisionContext";
 /** Adapted from Raiyan's Future Lab (97a08da); all financial values now come from Python. */
 import { useEffect, useRef, useState } from "react";
 import { CashFlowChart } from "@/components/financial/CashFlowChart";
@@ -13,6 +15,7 @@ import type { Multiverse as Result } from "@/types/multiverse";
 const names:Record<string,string>={buy_now:"Buy now",buy_later:"Buy later",skip:"Skip purchase",unexpected_expense:"Unexpected expense",delayed_income:"Income delayed three days"};
 const colors=["var(--scenario-now)","var(--scenario-later)","var(--brand)","var(--color-destructive)","var(--color-caution)"];
 export function Multiverse({snapshot}:{snapshot:SituationSnapshot}){
+ const {setCouncilDraft}=useDecision();
  const start=forecastStart(snapshot),end=addDays(start,29);
  const [form,setForm]=useState({amount:"400",reserve:"200",stress:"200",date:start,later:addDays(start,7)});
  const [result,setResult]=useState<Result|null>(null),[error,setError]=useState(""),[pending,setPending]=useState(false),[selected,setSelected]=useState("buy_now"),[day,setDay]=useState(0);
@@ -44,6 +47,7 @@ export function Multiverse({snapshot}:{snapshot:SituationSnapshot}){
    {current&&point&&<p className="my-3">{point.date} · Closing {formatMoney(centsValue(point.ending_balance))} · Difference from skip {formatMoney(centsValue(current.differences[day]!.balance_difference))}. Minimum event balance {formatMoney(centsValue(current.forecast.minimum_balance))}. {current.first_reserve_breach?`First reserve breach: ${current.first_reserve_breach}`:'Reserve preserved under this scenario.'} {!current.applicable&&'No eligible future income; delay test is not applicable.'}</p>}
    <details><summary>Accessible timeline and events</summary><div className="overflow-x-auto"><table className="w-full text-sm"><caption>{names[selected]} daily closing balances</caption><thead><tr><th>Date</th><th>Balance</th><th>Difference from skip</th></tr></thead><tbody>{current?.forecast.daily_balances.map((p,i)=><tr key={p.date}><td>{p.date}</td><td>{formatMoney(centsValue(p.ending_balance))}</td><td>{formatMoney(centsValue(current.differences[i]!.balance_difference))}</td></tr>)}</tbody></table></div>{current?.forecast.transaction_timeline.map(e=><p key={e.id} className="text-sm">{e.date}: {e.description} · Event balance {formatMoney(centsValue(e.balance))}</p>)}</details>
    <details className="mt-4"><summary>Assumptions and limits</summary>{result.assumptions.map(a=><p key={a} className="mt-2 text-sm text-muted-foreground">{a}</p>)}</details>
+   {["buy_now","buy_later"].includes(selected)&&<Button asChild className="mt-4"><Link to="/talk" onClick={()=>setCouncilDraft({amount:result.input.purchase_amount,date:selected==="buy_later"?result.input.later_date:result.input.purchase_date,reserve:result.input.reserve})}>Review selected purchase with Council</Link></Button>}
    <p className="mt-4 text-sm text-muted-foreground">Council reviews remain separate. Open Talk to Plutus and confirm the same purchase and reserve; its analysis takes a new snapshot. Custom Multiverse setbacks are not passed to Council.</p>
   </div>}
  </section>;

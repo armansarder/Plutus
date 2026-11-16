@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { engineDay, engineMoney, engineForecastSchema } from "./engine";
+import { decimalCents } from "@/services/backendFinancial";
+import { addDays } from "@/lib/dateOnly";
 export const multiverseRequestSchema = z.object({
   purchase_amount: engineMoney, purchase_date: engineDay, later_date: engineDay,
   reserve: engineMoney, horizon_days: z.number().int().min(1).max(90), stress_expense: engineMoney,
@@ -13,5 +15,14 @@ export const multiverseSchema = z.object({schema_version: z.literal("1.0"),
   const baseline=value.scenarios[0]?.forecast;
   if(new Set(value.scenarios.map(s=>s.name)).size!==5)ctx.addIssue({code:"custom",message:"Duplicate futures"});
   for(const s of value.scenarios)if(s.forecast.start_date!==baseline?.start_date || s.forecast.end_date!==baseline?.end_date || s.forecast.daily_balances.map(p=>p.date).join()!==baseline?.daily_balances.map(p=>p.date).join())ctx.addIssue({code:"custom",message:"Unaligned futures"});
+  // Validate returned evidence only; never generate a financial projection here.
+  const skip=value.scenarios.find(s=>s.name==='skip');
+  for(const s of value.scenarios){
+    if(s.forecast.customer_id!==baseline?.customer_id || s.forecast.currency!==baseline?.currency || s.forecast.daily_balances.length!==value.input.horizon_days || s.differences.length!==s.forecast.daily_balances.length || s.maintains_reserve!==(decimalCents.parse(s.forecast.minimum_balance)>=decimalCents.parse(value.reserve)) || (s.name!=='delayed_income'&&!s.applicable))ctx.addIssue({code:'custom',message:'Inconsistent future evidence'});
+    s.forecast.daily_balances.forEach((point,i)=>{
+      const difference=s.differences[i],base=skip?.forecast.daily_balances[i];
+      if(point.date!==addDays(s.forecast.start_date,i) || !difference || difference.date!==point.date || !base || decimalCents.parse(difference.balance_difference)!==decimalCents.parse(point.ending_balance)-decimalCents.parse(base.ending_balance))ctx.addIssue({code:'custom',message:'Inconsistent timeline difference'});
+    });
+  }
 });
 export type Multiverse = z.infer<typeof multiverseSchema>;

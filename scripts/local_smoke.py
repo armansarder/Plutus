@@ -11,6 +11,14 @@ import httpx
 from production_smoke import smoke
 
 root = Path(__file__).resolve().parents[1]
+def stop_child(child):
+    if child.poll() is not None:return
+    if os.name=='nt':
+        subprocess.run(['taskkill','/PID',str(child.pid),'/T','/F'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,creationflags=subprocess.CREATE_NO_WINDOW)
+    else:child.terminate()
+    try:child.wait(timeout=5)
+    except subprocess.TimeoutExpired:child.kill();child.wait()
+
 def free_port():
     with socket.socket() as sock:
         sock.bind(('127.0.0.1', 0)); return sock.getsockname()[1]
@@ -43,8 +51,6 @@ def run():
             print('PASS: built Node / fictional local-mode backend HTTP smoke')
         finally:
             for child in reversed(children):
-                child.terminate()
-                try: child.wait(timeout=5)
-                except subprocess.TimeoutExpired: child.kill(); child.wait()
+                stop_child(child)
 
 if __name__=='__main__': run()

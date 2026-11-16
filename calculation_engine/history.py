@@ -347,7 +347,7 @@ def build_history(source, *, currency='USD', month=None, months_back=6, today=No
     return HistoryResult(
         customer_id=raw['customer_id'], currency=currency, as_of_date=today,
         months=summaries, selected_month=month, transactions=transactions,
-        notes=['Historical transactions only; already reflected in the current balance.',
+        notes=([source.source_label] if getattr(source,'source_label',None) else []) + ['Historical transactions only; already reflected in the current balance.',
                'Transfers between own accounts are excluded from spending and income.',
                'Only completed/executed records count toward income or spending; pending records do not.',
                "Bills with status 'recurring' are future schedule, not history."],

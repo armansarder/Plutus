@@ -9,7 +9,7 @@ import sys
 import tempfile
 import time
 import httpx
-from local_smoke import free_port,root
+from local_smoke import free_port,root,stop_child
 from production_smoke import smoke
 
 def run():
@@ -21,7 +21,8 @@ def run():
     env.update(FINPILOT_MODE='production',FINPILOT_API_TOKEN=secrets.token_urlsafe(48),
         FINPILOT_CUSTOMER_ID='synthetic_demo',FINPILOT_ALLOWED_HOSTS='127.0.0.1,localhost',
         PLUTUS_DATA_MODE='demo',PLUTUS_COUNCIL_ENABLED='1',PLUTUS_PUBLIC_DEMO='1',
-        PLUTUS_SESSION_SECRET=secrets.token_urlsafe(48),PLUTUS_DELIVERY_MODE='preview',PLUTUS_ALERT_POLL_SECONDS='0')
+        PLUTUS_SESSION_SECRET=secrets.token_urlsafe(48),PLUTUS_DELIVERY_MODE='preview',PLUTUS_ALERT_POLL_SECONDS='0',
+        AGENT_DATA_SOURCE='demo',FINPILOT_DATA_SOURCE='mock',NVIDIA_API_KEY='')
     env.update(PLUTUS_PRIVATE_TOOLS='1',PLUTUS_OPERATOR_TOKEN=secrets.token_urlsafe(48),PLUTUS_RESEARCH_ENABLED='1')
     children=[]
     with tempfile.TemporaryDirectory() as temp:
@@ -65,8 +66,6 @@ def run():
             print('PASS: production Council, auth, API and built Node over certificate-verified backend TLS')
         finally:
             for child in reversed(children):
-                child.terminate()
-                try:child.wait(timeout=5)
-                except subprocess.TimeoutExpired:child.kill();child.wait()
+                stop_child(child)
 
 if __name__=='__main__':run()

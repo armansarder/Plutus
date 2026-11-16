@@ -5,6 +5,12 @@ services:
   - type: web
     name: plutus-api
     runtime: python
+    plan: starter
+    numInstances: 1
+    disk:
+      name: plutus-alerts
+      mountPath: /var/data
+      sizeGB: 1
     branch: feature/plutus-v2
     autoDeployTrigger: "off"
     buildCommand: pip install -r requirements-production.txt
@@ -20,17 +26,13 @@ services:
       - key: FINPILOT_API_TOKEN
         sync: false
       - key: FINPILOT_CUSTOMER_ID
-        sync: false
+        value: synthetic_demo
+      - key: PLUTUS_DATA_MODE
+        value: demo
       - key: FINPILOT_DATA_SOURCE
-        value: nessie
+        value: mock
       - key: AGENT_DATA_SOURCE
-        value: nessie
-      - key: NESSIE_BASE_URL
-        value: https://prod-api.nessieisreal.com
-      - key: NESSIE_API_KEY
-        sync: false
-      - key: NESSIE_ACCOUNT_ID
-        sync: false
+        value: demo
       - key: FINPILOT_CURRENCY
         value: USD
       - key: PLUTUS_COUNCIL_ENABLED
@@ -39,6 +41,8 @@ services:
         value: "1"
       - key: PLUTUS_SESSION_SECRET
         sync: false
+      - key: PLUTUS_RESEARCH_ENABLED
+        value: "0"
       - key: PLUTUS_PRIVATE_TOOLS
         value: "0"
       - key: PLUTUS_DEMO_MODE
@@ -50,10 +54,12 @@ services:
       - key: PHOTON_RECIPIENT_OPTED_IN
         value: "false"
       - key: PLUTUS_NOTIFICATIONS_DB
-        value: /tmp/plutus/notifications.sqlite3
+        value: /var/data/notifications.sqlite3
   - type: web
     name: plutus-web
     runtime: node
+    plan: starter
+    numInstances: 1
     branch: feature/plutus-v2
     rootDir: frontend
     autoDeployTrigger: "off"
@@ -71,6 +77,8 @@ services:
         value: remote
       - key: VITE_COUNCIL_ENABLED
         value: "true"
+      - key: PLUTUS_PUBLIC_ORIGIN
+        sync: false
       - key: FINPILOT_BACKEND_URL
         sync: false
       - key: PLUTUS_SESSION_SECRET

@@ -1,5 +1,6 @@
 import { isNotificationPath, proxyNotifications } from "./notificationsProxy.server";
 import { privateAccess, proxyPrivate } from "./privateGateway.server";
+import { canonicalRequest } from "./publicOrigin.server";
 import { isCouncilPath, proxyCouncil } from "./councilProxy.server";
 import { proxyFinancialData, FINANCIAL_PROXY_PATHS } from "./financialProxy.server";
 import "./lib/error-capture";
@@ -53,6 +54,9 @@ function isH3SwallowedErrorBody(body: string): boolean {
 // twice and renders garbled.
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const canonical = canonicalRequest(request);
+    if (canonical instanceof Response) return canonical;
+    request = canonical;
     const path = new URL(request.url).pathname;
     if (path.startsWith("/api/operator/") || path.startsWith("/api/research/")) return proxyPrivate(request);
     if (path === "/operator" || path.startsWith("/operator/") || path === "/research") {

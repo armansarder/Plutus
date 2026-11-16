@@ -41,6 +41,11 @@ Delays move the next eligible income three days; out-of-window income is clipped
 Equal purchase dates are allowed. Council remains a separately confirmed analysis
 with a new snapshot; custom Multiverse changes are not silently handed off.
 
+The Simulator's explicit Council button stages only ordinary purchase amount/date
+and reserve in React memory. Talk pre-fills those fields for user confirmation;
+it does not auto-submit, copy old numerical evidence or place financial fields in
+a URL/browser storage. Skip/custom setbacks cannot masquerade as a supported handoff.
+
 ## Production Council authorization
 
 Public recruiter mode requires `PLUTUS_PUBLIC_DEMO=1` and a source labeled

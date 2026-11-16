@@ -8,7 +8,7 @@ stores a delivery attempt ledger; jobs have queued, submitting, preview,
 provider_accepted, delivery_unconfirmed, failed or cancelled states. A provider
 receipt endpoint is not available; no state means confirmed delivered.
 
-Connection refusal before submission can retry at most three times, with 10/20/40
+Connection refusal before submission can make at most three attempts, with 10/20
 second backoff. Due jobs run on explicit checks, private Process due jobs, or the
 opt-in polling loop. Unknown outcomes/timeouts and interrupted submitting jobs
 never retry automatically. Disable preferences to cancel pending work on its next
@@ -186,8 +186,10 @@ npm run check
 Tests cover same-engine numerical agreement, transitions, account/customer isolation,
 forged identity, duplicate submissions, explicit source failures, enrollment,
 uncertain delivery, spending thresholds, missing history, honest frontend errors and
-existing Council/engine behavior. The copied Photon dependency tree currently has
-npm audit moderate advisories; no forced/breaking upgrades were applied.
+existing Council/engine behavior. V2 pins the existing Spectrum SDK at 12.15.0 and
+overrides OpenTelemetry core to 2.12.0 for its baggage-allocation advisory. The
+production npm audit now reports zero vulnerabilities; SDK imports and TypeScript
+pass. This is not live provider verification, and no major SDK downgrade was used.
 
 To return to the original presentation, stop these processes and switch back to
 `arman-shiv-combined-branch` after preserving final-branch changes. Credentials

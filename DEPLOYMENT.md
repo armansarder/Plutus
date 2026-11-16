@@ -1,193 +1,174 @@
-# Public demo deployment (Render)
+# Plutus V2 deployment preparation
 
-> **V2 audit: deployment blocked.** The configuration below currently enables
-> Council in production, which `nemotron_agent/council_api.py` deliberately rejects
-> until application authentication is integrated. The earlier local smoke used a
-> local-mode backend and did not verify this combination. See
-> [Milestone 0 audit](docs/MILESTONE_0_AUDIT.md). Do not deploy this checkpoint as-is;
-> complete the V2 milestones and obtain deployment approval first.
+No service has been deployed. All commits remain local on `feature/plutus-v2`.
+Publishing/pushing and deployment require explicit user approval. Never use the
+upstream team repository or either `main` branch for this release.
 
-Only deploy this independent repository, `raiyan11111/Plutus-v2`, branch
-`feature/plutus-v2`. Do not connect the HackUTD original repository or `main`.
-Local preparation does not authorize a push or deployment. Review the diff and
-approve publishing the feature branch before following the dashboard steps below.
+## Architecture and exact commands
 
-## What actually runs
+| Service | Root directory | Build | Start |
+| --- | --- | --- | --- |
+| Python FastAPI | empty (repository root) | `pip install -r requirements-production.txt` | `python -m uvicorn nemotron_agent.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*'` |
+| Node TanStack Start/Nitro | `frontend` | `npm ci --include=dev --no-audit --no-fund && npm run build` | `npm start` |
 
-| Question | Repository finding |
-| --- | --- |
-| Frontend framework | React 19, TanStack Start/Router, Vite 8, Tailwind, Nitro server. The package name does not mean this is a static SPA or Next.js app. |
-| Production frontend | In `frontend/`: `npm ci --include=dev --no-audit --no-fund`, `npm run build`, then `npm start` (`node .output/server/index.mjs`). Node 24.20.0. |
-| Backend | From repository root: `python -m uvicorn nemotron_agent.main:app`. This includes the calculation engine routes, agent, optional council, and notifications. Do not run a second calculation-engine server. |
-| Local launcher | Root `npm run dev` launches `frontend/scripts/dev.mjs` and `start_local.py`: it loads existing local backend env files, verifies Nessie, runs Uvicorn on 8000 and Vite dev on 8080. It requires local mode and Nessie credentials. It is not a production process manager. |
-| Browser communication | Same-origin `/api/...` requests to the Node server. Strict server-only financial, council, and notification proxies inject the backend bearer token. Council also uses signed HttpOnly session cookies. |
-| Localhost dependencies | Proxy defaults are `http://127.0.0.1:8000`; override with `FINPILOT_BACKEND_URL=https://YOUR-API.onrender.com`. The optional Photon sender is hardcoded to local port 8790; it is not needed in preview mode. `start_local.py` is deliberately localhost-only. |
-| Separate Render services | Yes: Node **Web Service** plus Python **Web Service**. A Static Site would lose SSR and the secret-bearing proxies. |
-| Visitor authentication | No login is required for this deliberately public fictional-customer demo. Backend authentication remains mandatory. All public visitors can see the same sandbox customer and share alert settings/watchlists. This is not private multi-user banking. Council conversations are separately session-bound. |
+The frontend is React 19/TanStack Start, Vite 8 and Nitro `node-server`, not a
+static SPA or Next.js site. `npm start` runs `node .output/server/index.mjs`.
+Do not deploy Vite dev/preview, `start_local.py`, a Static Site, or an extra
+calculation-engine server. Render supplies PORT; both services bind 0.0.0.0.
+Node uses HTTPS to the backend and injects credentials server-side. Browsers call
+same-origin `/api/*`; no browser bearer token or cross-origin CORS setup is needed.
 
-## Data and external services
+Use one backend instance and one Uvicorn worker. SQLite jobs require the configured
+persistent disk; Council histories are bounded in-memory and reset on restart.
+Do not add autoscaling/multiple workers until shared storage and coordination are
+implemented. Uvicorn's trust-all forwarded-proxy setting assumes Render's hosting
+boundary; do not use it on a directly internet-exposed standalone Uvicorn server.
 
-The recommended configuration preserves the current Nessie integration. Balances,
-account selection, transaction history, and explicit future bill dates come from
-the configured **Nessie sandbox**, never real banking. Account/customer IDs must
-belong to a dedicated fictional demo customer containing no personal information.
-No seed scripts or financial writes are needed to deploy.
+## Public fictional demo settings
 
-Forecasts, hypothetical purchases, reserve checks and stresses are deterministic
-calculations over that snapshot, not bank predictions. Unavailable monthly budgets
-remain unknown; the remote adapter does not invent an approved budget. Homepage
-illustrations are synthetic examples. NVIDIA is optional hosted orchestration,
-not the calculation engine; unavailable/disabled models are honestly labeled as
-deterministic fallback. No local GPU/model server is needed.
+The Blueprint defaults to `demo`, which needs no Nessie or NVIDIA credentials.
+All banking information/history is explicitly fictional. The Python engine
+calculates every projection. Alerts only preview; no sender service is deployed.
+Visitors need no personal login; signed anonymous guest sessions isolate Council
+conversations. Public alert preferences/watchlists intentionally share one fictional
+customer. Never enter private data or use this as real multi-user banking.
 
-An intentional synthetic deployment can instead set `AGENT_DATA_SOURCE=demo`,
-`FINPILOT_DATA_SOURCE=mock`, and `FINPILOT_CUSTOMER_ID=synthetic_demo`, omitting
-Nessie settings. Its fixture schedule rolls to the current UTC date. History is
-unavailable in that mode; use Nessie for the existing full history experience.
-Never change sources automatically after a Nessie error.
-
-Photon runs in `preview` mode: drafts and simulated alerts only. Do not deploy
-`photon_service`, enable `PLUTUS_DEMO_MODE`, configure operator secrets, or set
-delivery/recipient credentials for this public demo. Production blocks `/operator`
-and operator proxy routes and never installs backend operator handlers.
-
-## Render dashboard: exact manual setup
-
-These steps create live services and can incur charges. Perform them only after
-approving the push and deployment. The checked-in `render.yaml` is an equivalent
-Blueprint configuration, with manual environment prompts and auto-deploy disabled.
-Manual setup is easiest because Render may choose a unique hostname suffix.
-
-1. After approving and publishing the feature branch, sign in to Render. Choose
-   **New → Web Service → Git Provider**, connect GitHub, and select
-   **raiyan11111/Plutus-v2**. Select branch **feature/plutus-v2**.
-2. Name it `plutus-api` (or an available name). Choose **Python 3**, leave **Root
-   Directory empty**, and choose your region/instance plan. Use a paid always-on
-   instance for recruiter reliability; free instances have cold-start limitations.
-3. Enter backend **Build Command**:
-   `pip install -r requirements-production.txt`
-4. Enter backend **Start Command**:
-   `python -m uvicorn nemotron_agent.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*'`
-   Use one worker/instance: council state is in memory, and notification state is
-   local SQLite. Render terminates public TLS; Uvicorn trusts forwarded protocol
-   headers at that hosting boundary. Do not reuse this trust-all proxy setting on
-   a directly internet-exposed Uvicorn host outside Render.
-5. In **Advanced**, set **Health Check Path** `/health`, disable **Auto Deploy**,
-   and enter the backend environment variables below. Use the actual assigned
-   API hostname for `FINPILOT_ALLOWED_HOSTS` (no scheme/path/wildcard). If the final
-   hostname differs, update it before testing financial endpoints. Click
-   **Create Web Service** and wait for a successful deploy.
-6. Choose **New → Web Service**, same repository/branch/region. Name it
-   `plutus-web`; choose **Node**, **Root Directory** `frontend`.
-7. Frontend **Build Command**:
-   `npm ci --include=dev --no-audit --no-fund && npm run build`
-   Frontend **Start Command**: `npm start`.
-8. Set **Health Check Path** `/health`, disable **Auto Deploy**, and add the
-   frontend environment below. `FINPILOT_BACKEND_URL` must be the actual backend
-   **HTTPS origin**, with no API path. Both services need exactly the same private
-   `FINPILOT_API_TOKEN`. Click **Create Web Service**.
-9. Wait for both services to be healthy. Open `/dashboard`, `/simulator`,
-   `/cash-flow`, `/talk`, and `/alerts` at the frontend URL. Verify source labels,
-   chart values, visible fallback/model mode, and that `/operator` returns 404.
-10. Run the smoke command below against the actual URLs before sharing the
-    **frontend URL**. A green `/health` alone does not verify Nessie or NVIDIA.
-    Subsequent releases use **Manual Deploy → Deploy latest commit** only after
-    approval. A failed source request remains a visible error with retry controls.
-
-## Backend environment
-
-| Variable | Value / requirement |
+| Python variable | Value |
 | --- | --- |
 | `PYTHON_VERSION` | `3.12.10` |
 | `FINPILOT_MODE` | `production` |
-| `FINPILOT_API_TOKEN` | New private random token, at least 32 non-whitespace ASCII characters; same on Node. Generate with `python -c "import secrets; print(secrets.token_urlsafe(48))"` locally and enter privately. |
-| `FINPILOT_ALLOWED_HOSTS` | Actual API hostname, e.g. `plutus-api.onrender.com` |
-| `FINPILOT_CUSTOMER_ID` | Dedicated fictional Nessie customer ID |
-| `AGENT_DATA_SOURCE`, `FINPILOT_DATA_SOURCE` | Both `nessie` |
-| `NESSIE_API_KEY` | Private sandbox API key, backend only |
-| `NESSIE_ACCOUNT_ID` | Owned demo Checking/Savings account ID; explicit selection avoids ambiguity |
-| `NESSIE_BASE_URL` | `https://prod-api.nessieisreal.com` (sandbox provider despite hostname) |
+| `FINPILOT_ALLOWED_HOSTS` | Actual API hostname, without scheme/path/wildcard |
+| `FINPILOT_API_TOKEN` | Private random 48+ character token, same on Node |
+| `PLUTUS_SESSION_SECRET` | Separate private random 48+ character secret, same on Node; must differ from bearer |
+| `FINPILOT_CUSTOMER_ID` | `synthetic_demo` |
+| `PLUTUS_DATA_MODE` | `demo` |
+| `AGENT_DATA_SOURCE` | `demo` |
+| `FINPILOT_DATA_SOURCE` | `mock` |
 | `FINPILOT_CURRENCY` | `USD` |
-| `PLUTUS_COUNCIL_ENABLED` | `1` to preserve the existing local council experience |
-| `NVIDIA_API_KEY` | Optional private backend key; omit for deterministic fallback |
-| `NVIDIA_MODEL` | Optional; current default `nvidia/nemotron-3.5-bolt-e4b` |
-| `PLUTUS_DEMO_MODE` | `false`; production additionally refuses operator installation |
-| `PLUTUS_DELIVERY_MODE` | `preview` |
+| `PLUTUS_COUNCIL_ENABLED` | `1` |
+| `PLUTUS_PUBLIC_DEMO` | `1` |
+| `PLUTUS_PRIVATE_TOOLS`, `PLUTUS_RESEARCH_ENABLED` | Both `0` |
+| `PLUTUS_DELIVERY_MODE` | `preview` (enforced for public mode) |
 | `PLUTUS_ALERT_POLL_SECONDS` | `0` |
-| `PHOTON_RECIPIENT_OPTED_IN` | `false` |
-| `PLUTUS_NOTIFICATIONS_DB` | `/tmp/plutus/notifications.sqlite3`; temporary demo state |
+| `PHOTON_RECIPIENT_OPTED_IN`, `PLUTUS_DEMO_MODE` | Both `false` |
+| `PLUTUS_NOTIFICATIONS_DB` | `/var/data/notifications.sqlite3` |
 
-Leave `FINPILOT_CORS_ORIGINS` unset: browser calls stay same-origin at Node; Node
-calls FastAPI server-to-server. Do not set `FINPILOT_UPCOMING_FILE`, custom history
-files, Photon recipient/secret, or file-source variables. Never upload local `.env`
-files. Check environment values privately rather than logging keys or source bodies.
+Generate two independent values privately with
+`python -c "import secrets; print(secrets.token_urlsafe(48))"`. Do not paste them
+into chat or commit them. Render's default generated 256-bit base64 values can
+be shorter than the session-secret length requirement; enter a 48+ character
+value explicitly. Never use VITE_ prefixes for any secret.
 
-## Frontend environment
-
-| Variable | Value |
+| Node variable | Value |
 | --- | --- |
 | `NODE_VERSION` | `24.20.0` |
-| `NODE_ENV` | `production` |
-| `HOST` | `0.0.0.0` |
-| `VITE_DATA_MODE` | `remote` (even when using the backend's synthetic fixture) |
-| `VITE_COUNCIL_ENABLED` | `true` |
-| `FINPILOT_BACKEND_URL` | Actual API HTTPS origin |
-| `FINPILOT_API_TOKEN` | Same private backend service token, **without** a `VITE_` prefix |
+| `NODE_ENV`, `HOST` | `production`, `0.0.0.0` |
+| `VITE_DATA_MODE`, `VITE_COUNCIL_ENABLED` | `remote`, `true` (build-time public flags) |
+| `FINPILOT_BACKEND_URL` | Actual API HTTPS origin, no `/api` path |
+| `FINPILOT_API_TOKEN`, `PLUTUS_SESSION_SECRET` | Matching private Python values |
+| `PLUTUS_PUBLIC_ORIGIN` | Actual frontend HTTPS origin, no path |
+| `PLUTUS_PRIVATE_TOOLS` | `0` |
 
-Render provides `PORT`; do not hardcode it. `VITE_*` values are public build-time
-configuration: never put credentials there. NVIDIA and Nessie keys belong only on
-Python. Changing a `VITE_*` flag requires a rebuild. Server-only proxy variables
-are read at runtime.
+Node pins the external origin to keep same-origin checks and Secure cookies correct
+behind Render TLS termination. It rejects an unexpected host rather than trusting
+arbitrary forwarded-host headers. `/health` is public liveness, not proof of source
+or provider access. Account routes still require the backend bearer; Council also
+requires the separate signed guest credential. The former production Council
+startup conflict is resolved for this explicit fictional-demo policy and tested
+with a production-mode backend over verified local TLS. Personal-bank login remains
+out of scope, not silently bypassed.
 
-## Verification and operational limits
+## Optional Nessie sandbox mode
 
-From the root after installing Python dependencies:
+To use actual live HTTP responses from the simulated Nessie sandbox, change Python:
+
+- `PLUTUS_DATA_MODE=nessie`, `AGENT_DATA_SOURCE=nessie`, `FINPILOT_DATA_SOURCE=nessie`
+- `FINPILOT_CUSTOMER_ID=<dedicated fictional sandbox customer>`
+- `NESSIE_ACCOUNT_ID=<owned Checking/Savings account>`
+- `NESSIE_API_KEY=<private sandbox key>`
+- `NESSIE_BASE_URL=https://prod-api.nessieisreal.com`
+
+Leave Node `VITE_DATA_MODE=remote`. No keys move to Node/browser. Unset file/history/
+inferred-schedule overrides. A failure returns a visible error, never a demo
+substitute. Current balance is intraday UTC; projections start next day. Only
+explicitly dated future bills/deposits are used, as estimates. Historical records
+are not reapplied to balance. Records may be cached for up to 30 seconds.
+
+NVIDIA is optional: set `NVIDIA_API_KEY` on Python and optionally `NVIDIA_MODEL`
+(current code default `nvidia/nemotron-3.5-bolt-e4b`). Without provider access the
+UI reports deterministic-only/fallback, not live Nemotron success. No key/provider
+connectivity has been verified here. Do not deploy Photon sender/recipient secrets.
+Operator and research tools stay disabled publicly; private setup is documented
+in PHOTON_INTEGRATION.md and docs/RESEARCH_MODE.md.
+
+## Render dashboard steps (after approval only)
+
+Choose **one** setup method: the root Blueprint or the manual two-service setup.
+Do not create both sets of services. The manifest deliberately disables automatic
+deploys. Its paid Starter instances plus a 1 GB disk can incur charges once created;
+review Render's current plan terms before approving deployment.
+
+1. After approval, publish only `feature/plutus-v2` to your fork. Sign in to Render,
+   choose **New > Web Service > Git Provider**, select `raiyan11111/Plutus-v2`,
+   and select branch **feature/plutus-v2**.
+2. Name the Python service `plutus-api` (or an available name), choose Python 3,
+   leave Root Directory empty, choose your region and a paid disk-compatible plan.
+   Copy the Python build/start commands above exactly. Set Auto Deploy **Off**.
+3. In Advanced set Health Check Path `/health`. Add a persistent disk, mount
+   `/var/data`, size 1 GB. Enter all Python settings from the table. The actual
+   assigned API hostname must match FINPILOT_ALLOWED_HOSTS. Create the service.
+4. Create a second **Web Service**, same fork/branch/region, Node runtime, root
+   directory `frontend`. Use the Node commands above, Auto Deploy Off, health `/health`.
+5. Enter Node settings with the actual API HTTPS origin and actual frontend HTTPS
+   origin, and matching secrets. If Render appends a hostname suffix, update the
+   host/origin values accordingly. Create the service and wait for healthy deploys.
+6. If using a Blueprint instead, choose **New > Blueprint**, select this fork and
+   feature branch and root `render.yaml`. Review costs; enter prompted secrets/
+   hostnames/URLs. Do not also create manual services. Existing Blueprint updates
+   may need newly added secrets entered manually in each service environment.
+7. Run the deployed smoke check below. Open Dashboard, Simulator/Multiverse,
+   Cash Flow/history, Talk and Alerts. Confirm provenance/fallback labels and that
+   `/operator`, `/research` and private APIs are unavailable. Share only the
+   frontend URL after these external checks succeed.
+8. Subsequent approved releases use **Manual Deploy > Deploy latest commit**.
+   Custom DNS is a later separately approved step using Render-provided records.
+
+## Verification and smoke commands
 
 ```sh
-python -m pytest tests -q
-npm test --prefix frontend
-cd frontend
-npm run build
-# Runtime: npm start (not Vite dev/preview)
+python -m pip install -r nemotron_agent/requirements.txt
+npm ci --include=dev --prefix frontend
+npm ci --ignore-scripts --prefix photon_service
+python scripts/verify_v2.py "Final regression"
 ```
 
-After deployment, from the repository root:
+The runner performs Python/frontend tests, both type checks, production build,
+local built-server smoke, production-mode backend TLS/authentication/private-tools
+smoke, a full local HTTP Nessie-wire fixture integration, Render YAML/config
+invariants, whitespace and changed-file credential-pattern scans. Local TLS smoke
+requires OpenSSL (Git for Windows provides it here). It uses temporary test-only
+certificates, not insecure TLS bypasses. No external services or messages are used.
+
+After an approved deployment, from the root:
 
 ```sh
-python scripts/production_smoke.py --web-url https://YOUR-WEB.onrender.com --api-url https://YOUR-API.onrender.com --source nessie_sandbox
+python scripts/production_smoke.py --web-url https://YOUR-WEB.onrender.com --api-url https://YOUR-API.onrender.com --source synthetic_demo
+# Use --source nessie_sandbox only when explicitly configured and genuinely available.
 ```
 
-The smoke test makes no bank writes or external sends and disables model calls.
-It checks built pages/assets, both health endpoints, direct-backend authentication,
-source provenance, a forecast, all five agent scenarios, alert/council availability,
-and blocked operator paths. It suppresses account payloads and credentials.
-NVIDIA connectivity checks are separate opt-in synthetic tests; deployment work
-does not change the model protocol or require provider calls.
+These checks create temporary fictional Council chats, run model-disabled analyses,
+and make no bank writes or sends. Payloads/credentials are not printed. See
+`docs/PLUTUS_V2_TEST_RESULTS.md` for actual local outcomes and skips. Render Linux,
+external HTTPS, provider credentials/quotas and a public URL remain unverified
+until an approved deployment. Local YAML checks are not a remote Blueprint validation.
 
-Health is process liveness only, deliberately independent of rate limits, bearer
-credentials, and third-party services. Application API routes retain authentication,
-host validation, HTTPS enforcement, body/concurrency/rate limits and no-store headers.
-Public endpoints can still consume the shared demo's request budget and optional
-model quota. Leave NVIDIA unset if an unmetered public demo is preferred.
-
-All visitors share the fictional account's alert preferences and watchlist. Changes
-do not affect Nessie balances; messages never leave preview mode. Notification data
-is temporary and resets on instance replacement; council chats reset on restart.
-Do not enter private data, promise persistence, or scale to multiple workers.
-This deployment adds no database, queue, financial action, or new product feature.
+Persistent disk data survives service replacement; Council chats do not. Logs use
+safe status/attempt metadata, not recipient/message/account payloads. Review disk
+usage and failure rates, keep backups/retention under operator control, and keep
+one backend worker. Unknown delivery outcomes require manual reconciliation; they
+are not auto-retried. No real messages should be tested without separate approval.
 
 Render references: [Web Services](https://render.com/docs/web-services),
-[FastAPI](https://render.com/docs/deploy-fastapi),
-[health checks](https://render.com/docs/health-checks), and
-[Blueprint fields](https://render.com/docs/blueprint-spec).
-
-### Local verification completed
-
-On 2026-11-15: Python suite **92 passed, 1 skipped**; frontend suite **157
-passed, 2 skipped**; Node production build passed. The built Node server was
-started on a temporary loopback port and passed the HTTP smoke checks against an
-authenticated synthetic backend. That local backend used local HTTP mode; the
-backend production HTTPS/authentication boundaries were tested separately with
-FastAPI TestClient. No live Nessie/NVIDIA calls, Render deployment, git commit or
-push were performed. Run the deployed HTTPS smoke check after deploying; Linux
-hosting, Render proxy behavior, and live provider access remain unverified locally.
+[Blueprint fields](https://render.com/docs/blueprint-spec),
+[persistent disks](https://render.com/docs/disks),
+[health checks](https://render.com/docs/health-checks).

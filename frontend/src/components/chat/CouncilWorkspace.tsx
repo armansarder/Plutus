@@ -1,3 +1,4 @@
+import { useDecision } from "@/components/app/DecisionContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpRight, Calculator, CircleHelp, Layers3, LoaderCircle, RefreshCw, Send, ShieldCheck, Sparkles, Wallet } from "lucide-react";
@@ -47,6 +48,7 @@ export function CouncilWorkspace() {
   return <CustomerFinancialData>{snapshot => <Workspace key={snapshot.snapshotId + snapshot.startingBalanceCents} snapshot={snapshot} />}</CustomerFinancialData>;
 }
 function Workspace({snapshot}: {snapshot: SituationSnapshot}) {
+  const {councilDraft,setCouncilDraft}=useDecision();
   const {plan:cashPlan} = useCashPlan(snapshot);
   const queryClient = useQueryClient();
   const key = useMemo(() => ["council-conversations", snapshot.snapshotId, snapshot.startingBalanceCents], [snapshot.snapshotId, snapshot.startingBalanceCents]);
@@ -61,6 +63,7 @@ function Workspace({snapshot}: {snapshot: SituationSnapshot}) {
   const [reserve, setReserve] = useState(cashPlan?.protected_amount ?? "200");
   const [days, setDays] = useState("30");
   const [allowModel, setAllowModel] = useState(true);
+  useEffect(()=>{if(councilDraft){setAmount(councilDraft.amount);setDate(councilDraft.date);setReserve(councilDraft.reserve);setPurchase(true);setQuestion("Review my selected Multiverse purchase using a fresh snapshot and standard stress tests.");setCouncilDraft(null);}},[councilDraft,setCouncilDraft]);
   const [opening, setOpening] = useState(false);
   const [pending, setPending] = useState<CouncilRole | null>(null);
   const [error, setError] = useState("");

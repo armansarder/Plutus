@@ -1,5 +1,6 @@
 """Repeatable local milestone gates. No providers, sends or credentials required."""
 import re
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -16,15 +17,19 @@ def run(label):
         ['npm.cmd' if sys.platform == 'win32' else 'npm', 'run', 'build', '--prefix', 'frontend'],
         [sys.executable, 'scripts/local_smoke.py'],
         [sys.executable, 'scripts/production_tls_smoke.py'],
+        [sys.executable, 'scripts/nessie_wire_smoke.py'],
+        ['node', 'scripts/check_render.mjs'],
         ['git', 'diff', '--check'],
     ]
     record = [f'\n## {label}\n']
     for command in commands:
         print('Checking:', ' '.join(command[1:]), flush=True)
-        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        environment=dict(os.environ)
+        if 'build' in command:environment.update(NODE_ENV='production',VITE_DATA_MODE='remote',VITE_SITUATION_DATA_MODE='remote',VITE_COUNCIL_ENABLED='true')
+        result = subprocess.run(command, cwd=ROOT, env=environment, capture_output=True, text=True, encoding='utf-8', errors='replace')
         output = re.sub(r'\x1b\[[0-9;]*[A-Za-z]', '', result.stdout + result.stderr)
         summaries = [line.strip() for line in output.splitlines() if re.search(r'\d+ passed|Tests\s+|Test Files\s+', line)]
-        record.append(f'- `{ " ".join(command[1:]) }`: ' + ('PASS' if result.returncode == 0 else 'FAIL') + ' ' + '; '.join(summaries))
+        record.append((f'- `{ " ".join(command[1:]) }`: ' + ('PASS' if result.returncode == 0 else 'FAIL') + ' ' + '; '.join(summaries)).rstrip())
         if result.returncode:
             print(output[-12000:]); raise SystemExit(result.returncode)
     paths = set(subprocess.check_output(['git', 'diff', '--name-only'], cwd=ROOT).decode().splitlines())

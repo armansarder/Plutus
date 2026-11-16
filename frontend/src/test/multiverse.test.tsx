@@ -4,6 +4,8 @@ import { Multiverse } from "@/components/simulator/Multiverse";
 import { BackendSituationAdapter } from "@/services/situation";
 import { financialPayload } from "./fixtures/engineResponses";
 import fixture from "./fixtures/multiverse.json";
+import type { ReactNode } from "react";
+vi.mock("@tanstack/react-router",async original=>({...await original<typeof import("@tanstack/react-router")>(),Link:({children,to,onClick}:{children:ReactNode;to:string;onClick?:()=>void})=><a href={to} onClick={e=>{e.preventDefault();onClick?.();}}>{children}</a>}));
 vi.mock("@/components/financial/CashFlowChart",()=>({CashFlowChart:()=> <div>Shared-axis chart</div>}));
 afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 it("validates inputs and shows explicit calculation failure without fixture substitution",async()=>{

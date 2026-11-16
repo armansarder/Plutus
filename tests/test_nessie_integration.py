@@ -265,3 +265,11 @@ def test_council_uses_authorized_nessie_adapter_and_same_chart_snapshot(nessie, 
         assert result['analysis']['scenarios'][1]['forecast']['ending_balance'] == '1025.25'
         assert not result['analysis']['scenarios'][2]['applicable']
     assert len(nessie['calls']) == 7
+
+
+def test_alerts_require_explicit_account_selection(nessie):
+    app=app_for_customer()
+    with TestClient(app) as client:
+        response=client.get('/api/notifications/settings',headers={'Authorization':'Bearer '+TOKEN})
+        assert response.status_code==503
+        assert 'explicit owned Nessie account' in response.json()['error']['message']

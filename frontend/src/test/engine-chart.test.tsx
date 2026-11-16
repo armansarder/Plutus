@@ -9,6 +9,11 @@ vi.mock("recharts", () => {
 });
 import { CashFlowChart } from "@/components/financial/CashFlowChart";
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
+it("keeps a large reserve and a non-degenerate zero-balance scale visible",()=>{
+ render(<CashFlowChart events={[]} bufferCents={500000} series={[{shortName:'Equal outcomes',color:'blue',result:{id:'same',lowestBalanceCents:0,lowestBalanceDate:'2026-11-08',dailyBalances:[{date:'2026-11-08',endOfDayBalanceCents:0}]}}]}/>);
+ const {domain}=axis.mock.calls[0]![0] as {domain:[number,number]};
+ expect(domain[0]).toBeLessThan(0);expect(domain[1]).toBeGreaterThan(5000);
+});
 it("keeps a negative event minimum visible even when all daily closes are positive", () => {
   render(<CashFlowChart events={[]} series={[{ shortName: "Backend forecast", color: "red", result: { id: "forecast", lowestBalanceCents: -10000, lowestBalanceDate: "2026-11-08", dailyBalances: [{ date: "2026-11-07", endOfDayBalanceCents: 80000 }, { date: "2026-11-08", endOfDayBalanceCents: 90000 }] } }]} />);
   const { domain } = axis.mock.calls[0]![0] as { domain: [number, number] };

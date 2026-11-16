@@ -23,6 +23,9 @@ def install_notifications(app,snapshot_dependency,source):
     router=APIRouter(prefix='/api/notifications',tags=['Photon alerts'])
     def owner(request:Request):
         if not settings.api_token or not customer:raise HTTPException(503,'Alerts require a configured customer and service token')
+        from calculation_engine.nessie_adapter import NessieAdapter
+        if isinstance(app.state.financial_source,NessieAdapter) and not app.state.financial_source.account_id:
+            raise HTTPException(503,'Alerts require an explicit owned Nessie account selection')
         if request.query_params:raise HTTPException(400,'Client-selected customer or account is not supported')
         return scope
 

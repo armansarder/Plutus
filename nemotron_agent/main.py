@@ -45,9 +45,14 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
     if os.getenv('PLUTUS_PUBLIC_DEMO') == '1':
         if mode not in ('demo','nessie') or os.getenv('PLUTUS_DELIVERY_MODE','preview') != 'preview':
             raise ValueError('Public fictional demo requires demo/Nessie sandbox source and preview delivery')
+        if mode == 'nessie' and not getattr(app.state.financial_source,'account_id',None):
+            raise ValueError('Public Nessie demo requires an explicit owned account selection')
     from calculation_engine.nessie_adapter import NessieAdapter
     if isinstance(app.state.financial_source, NessieAdapter):
         label = 'nessie_sandbox'
+    if label == 'synthetic_demo' and app.state.history_source is None:
+        from calculation_engine.demo_history import DemoHistory
+        app.state.history_source = DemoHistory()
     app.title = 'Plutus Agent and Simulation API'
     # Reuse the exact ownership-checked data dependency from the engine route.
     route = next(r for r in app.routes if getattr(r, 'path', None) == '/api/financial-data')
