@@ -49,6 +49,8 @@ export async function proxyCouncil(request: Request): Promise<Response> {
   const validMethod = status ? request.method === "GET" : create || message || cancel ? request.method === "POST" : ["GET", "DELETE"].includes(request.method);
   if (!validMethod) return fail(405);
   const token = process.env["FINPILOT_API_TOKEN"]; if (!token || token.length < 32) return fail(503);
+  const signingSecret = process.env["PLUTUS_SESSION_SECRET"] || (process.env["NODE_ENV"] === "production" ? undefined : token);
+  if (!signingSecret || (process.env["NODE_ENV"] === "production" && (signingSecret.length < 48 || signingSecret === token))) return fail(503);
   let body: string | undefined = cancel ? "{}" : undefined;
   if (create || message) {
     if (request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() !== "application/json" || ![null, "identity"].includes(request.headers.get("content-encoding"))) return fail(415);
@@ -59,7 +61,7 @@ export async function proxyCouncil(request: Request): Promise<Response> {
     const upstream = new URL(process.env["FINPILOT_BACKEND_URL"] || "http://127.0.0.1:8000");
     if (upstream.username || upstream.password || upstream.search || upstream.hash || upstream.pathname !== "/" || !["http:", "https:"].includes(upstream.protocol) ||
       (upstream.protocol === "http:" && !["localhost", "127.0.0.1", "[::1]"].includes(upstream.hostname))) return fail(503);
-    const signed = await session(request, token);
+    const signed = await session(request, signingSecret);
     const response = await fetch(new URL(url.pathname, upstream), {method: request.method,
       ...(body === undefined ? {} : {body}), headers: {Authorization: `Bearer ${token}`, "X-Plutus-Session": signed,
         Accept: "application/json", ...(body === undefined ? {} : {"Content-Type": "application/json"})},

@@ -22,7 +22,7 @@ def run():
     env.update(FINPILOT_MODE='local', FINPILOT_API_TOKEN=secrets.token_urlsafe(48),
         FINPILOT_CUSTOMER_ID='synthetic_demo', FINPILOT_DATA_SOURCE='mock', AGENT_DATA_SOURCE='demo',
         FINPILOT_ALLOWED_HOSTS='127.0.0.1,localhost', PLUTUS_COUNCIL_ENABLED='1',
-        PLUTUS_DELIVERY_MODE='preview', PLUTUS_ALERT_POLL_SECONDS='0', NVIDIA_API_KEY='')
+        PLUTUS_DELIVERY_MODE='preview', PLUTUS_ALERT_POLL_SECONDS='0', NVIDIA_API_KEY='', PLUTUS_SESSION_SECRET=secrets.token_urlsafe(48))
     children = []
     with tempfile.TemporaryDirectory() as temp:
         env['PLUTUS_NOTIFICATIONS_DB'] = str(Path(temp)/'notifications.sqlite3')

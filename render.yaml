@@ -1,7 +1,6 @@
 # Two web services: TanStack Start requires a server for its private API proxies.
 # Dashboard setup and environment values: DEPLOYMENT.md. No deploy is automatic.
-# V2 audit: production Council auth gate blocks startup with the current flags.
-# Preservation checkpoint only; see docs/MILESTONE_0_AUDIT.md before deployment.
+# V2 public-fictional-demo policy uses separate signed guest sessions.
 services:
   - type: web
     name: plutus-api
@@ -36,6 +35,12 @@ services:
         value: USD
       - key: PLUTUS_COUNCIL_ENABLED
         value: "1"
+      - key: PLUTUS_PUBLIC_DEMO
+        value: "1"
+      - key: PLUTUS_SESSION_SECRET
+        sync: false
+      - key: PLUTUS_PRIVATE_TOOLS
+        value: "0"
       - key: PLUTUS_DEMO_MODE
         value: "false"
       - key: PLUTUS_DELIVERY_MODE
@@ -68,5 +73,9 @@ services:
         value: "true"
       - key: FINPILOT_BACKEND_URL
         sync: false
+      - key: PLUTUS_SESSION_SECRET
+        sync: false
+      - key: PLUTUS_PRIVATE_TOOLS
+        value: "0"
       - key: FINPILOT_API_TOKEN
         sync: false

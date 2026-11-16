@@ -38,6 +38,8 @@ def process(id,deliver,clock=time.time):
         claimed=db.execute("UPDATE alert_jobs SET status='submitting', attempts=attempts+1 WHERE id=? AND status='queued' AND due<=? AND attempts<3",(id,clock()))
         if not claimed.rowcount:return None
         row=db.execute('SELECT * FROM alert_jobs WHERE id=?',(id,)).fetchone()
+        db.execute('INSERT INTO alert_attempts(job_id,attempt,outcome,created_at) VALUES (?,?,?,?)',
+                   (id,row['attempts'],'submitting',now()))
     try:outcome=deliver(row['text'])
     except Exception:outcome='delivery_unconfirmed'
     if outcome=='preview_only':status='preview'
@@ -49,8 +51,8 @@ def process(id,deliver,clock=time.time):
         initialize(db)
         db.execute('UPDATE alert_jobs SET status=?,outcome=?,due=? WHERE id=?',
                    (status,outcome,clock()+min(300,5*2**row['attempts']),id))
-        db.execute('INSERT INTO alert_attempts(job_id,attempt,outcome,created_at) VALUES (?,?,?,?)',
-                   (id,row['attempts'],outcome,now()))
+        db.execute('UPDATE alert_attempts SET outcome=? WHERE job_id=? AND attempt=?',
+                   (outcome,id,row['attempts']))
         db.execute('UPDATE notification_events SET status=? WHERE event_key=?',(outcome,row['event_key']))
     log.info('alert_attempt status=%s attempt=%d',status,row['attempts'])
     return outcome
@@ -59,6 +61,7 @@ def recover():
     with database() as db:
         initialize(db)
         db.execute("UPDATE alert_jobs SET status='delivery_unconfirmed',outcome='worker_restart_unconfirmed' WHERE status='submitting'")
+        db.execute("UPDATE alert_attempts SET outcome='worker_restart_unconfirmed' WHERE outcome='submitting'")
 
 def drain(deliver,scope,limit=3):
     with database() as db:

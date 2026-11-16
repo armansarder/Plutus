@@ -42,6 +42,9 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
         source = FunctionAdapter(demo_snapshot)
     app = create_engine_app(source=source, settings=settings,
                            data_source_mode='nessie' if mode == 'nessie' else 'mock' if explicit == 'demo' else None)
+    if os.getenv('PLUTUS_PUBLIC_DEMO') == '1':
+        if mode not in ('demo','nessie') or os.getenv('PLUTUS_DELIVERY_MODE','preview') != 'preview':
+            raise ValueError('Public fictional demo requires demo/Nessie sandbox source and preview delivery')
     from calculation_engine.nessie_adapter import NessieAdapter
     if isinstance(app.state.financial_source, NessieAdapter):
         label = 'nessie_sandbox'

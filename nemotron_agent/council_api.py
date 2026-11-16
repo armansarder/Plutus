@@ -14,8 +14,13 @@ def install_council(app, snapshot_dependency, source, provider=None):
     enabled = os.getenv('PLUTUS_COUNCIL_ENABLED') == '1'
     if enabled and not settings.api_token:
         raise ValueError('Council requires FINPILOT_API_TOKEN and the signed-session frontend proxy')
+    session_secret = os.getenv('PLUTUS_SESSION_SECRET') or settings.api_token
     if enabled and settings.mode == 'production':
-        raise ValueError('Council sessions require local mode; integrate real application authentication before production')
+        session_secret = os.getenv('PLUTUS_SESSION_SECRET', '')
+        if (os.getenv('PLUTUS_PUBLIC_DEMO') != '1' or source not in ('synthetic_demo','nessie_sandbox') or
+                len(session_secret)<48 or not session_secret.isascii() or
+                any(c.isspace() for c in session_secret) or session_secret==settings.api_token):
+            raise ValueError('Production Council requires an explicit fictional public demo and separate 48-character session secret')
     store = CouncilStore(limit=32, ttl=1800)
     app.state.council_store = store
     router = APIRouter(prefix='/api/v2')
@@ -23,7 +28,7 @@ def install_council(app, snapshot_dependency, source, provider=None):
     def owner(request: Request):
         if not enabled:
             raise HTTPException(404, 'Council feature is disabled')
-        session = verify_session(request.headers.get('x-plutus-session'), settings.api_token)
+        session = verify_session(request.headers.get('x-plutus-session'), session_secret)
         return (settings.customer_id or 'configured_source', session)
 
     def view(item):
@@ -35,7 +40,7 @@ def install_council(app, snapshot_dependency, source, provider=None):
         configured = bool(key and 'PASTE_' not in key and not any(c.isspace() for c in key))
         return CouncilStatus(enabled=enabled, roles=['council', 'budget', 'risk', 'simulator'],
             model_configured=configured,
-            scope='Temporary signed-browser sessions for one configured customer; local use only. No user login or durable storage.')
+            scope='Temporary signed-browser sessions for one fictional customer. No personal banking login or durable chat storage.')
 
     @router.post('/conversations', response_model=ConversationView)
     async def create(body: ConversationCreate, identity=Depends(owner)):

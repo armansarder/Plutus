@@ -9,8 +9,8 @@ from urllib.parse import urlsplit
 import httpx
 
 
-def smoke(web_url, api_url, source):
-    with httpx.Client(timeout=90, follow_redirects=False, trust_env=False) as client:
+def smoke(web_url, api_url, source, verify=True):
+    with httpx.Client(timeout=90, follow_redirects=False, trust_env=False, verify=verify) as client:
         for base in (web_url, api_url):
             response = client.get(base + '/health')
             assert response.status_code == 200 and response.json()['status'] == 'ok', 'health'
@@ -55,6 +55,12 @@ def smoke(web_url, api_url, source):
             assert client.get(web_url + '/api/history').status_code == 200, 'sandbox history'
         assert client.get(web_url + '/api/notifications/settings').status_code == 200, 'alerts'
         assert client.get(web_url + '/api/v2/council/status').status_code == 200, 'council status'
+        conversation=client.post(web_url+'/api/v2/conversations',json={'role':'council'})
+        assert conversation.status_code==200,'signed Council session'
+        result=client.post(web_url+'/api/v2/conversations/'+conversation.json()['id']+'/messages',json={
+            'request_key':'smoke_request_123','message':'Review this fictional purchase',
+            'analysis':{'purchase_amount':'10.00','horizon_days':7},'allow_model':False})
+        assert result.status_code==200 and result.json()['mode']=='deterministic_only','grounded Council fallback'
 
 
 if __name__ == '__main__':

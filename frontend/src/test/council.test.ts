@@ -56,3 +56,15 @@ it("sends an explicit empty JSON object for cancellation through the backend mid
   const response = await proxyCouncil(new Request("http://localhost/api/v2/conversations/" + ID + "/messages/request_123/cancel", {method: "POST"}));
   expect(response.status).toBe(200);
 });
+
+it("requires a separate production signing secret instead of accepting a browser bearer",async()=>{
+ vi.stubEnv('NODE_ENV','production');vi.stubEnv('PLUTUS_SESSION_SECRET','');
+ expect((await proxyCouncil(new Request('https://demo.example/api/v2/council/status'))).status).toBe(503);
+ vi.stubEnv('PLUTUS_SESSION_SECRET','s'.repeat(64));
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json({id:ID,role:'budget',messages:[],busy:false,temporary:true})));
+ const result=await proxyCouncil(new Request('https://demo.example/api/v2/conversations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:'budget'})}));
+ expect(result.status).toBe(200);expect(result.headers.get('Set-Cookie')).toContain('Secure');
+ const signed=new Headers(vi.mocked(fetch).mock.calls[0]?.[1]?.headers).get('X-Plutus-Session')!;
+ const [identity,signature]=signed.split('.');
+ expect(signature).toBe(createHmac('sha256','s'.repeat(64)).update('plutus-council:'+identity).digest('hex'));
+});

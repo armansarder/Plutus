@@ -15,6 +15,7 @@ def run(label):
         ['npm.cmd' if sys.platform == 'win32' else 'npm', 'run', 'check', '--prefix', 'photon_service'],
         ['npm.cmd' if sys.platform == 'win32' else 'npm', 'run', 'build', '--prefix', 'frontend'],
         [sys.executable, 'scripts/local_smoke.py'],
+        [sys.executable, 'scripts/production_tls_smoke.py'],
         ['git', 'diff', '--check'],
     ]
     record = [f'\n## {label}\n']

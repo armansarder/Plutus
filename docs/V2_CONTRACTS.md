@@ -40,3 +40,19 @@ hypotheticals applying to all futures; stress expense applies only to its scenar
 Delays move the next eligible income three days; out-of-window income is clipped.
 Equal purchase dates are allowed. Council remains a separately confirmed analysis
 with a new snapshot; custom Multiverse changes are not silently handed off.
+
+## Production Council authorization
+
+Public recruiter mode requires `PLUTUS_PUBLIC_DEMO=1` and a source labeled
+synthetic demo or Nessie sandbox. Preview delivery is enforced at startup. Node and
+Python share a separate, private 48+ character `PLUTUS_SESSION_SECRET`; do not reuse
+the backend bearer. Node signs a random guest identifier, places it in a Secure,
+HttpOnly, SameSite=Strict cookie on HTTPS, and forwards it server-to-server with
+the service bearer. FastAPI verifies both secrets independently and binds every
+conversation read/write/cancel/handoff to customer plus guest identity. IDs alone
+confer no access. Histories are bounded, temporary and single-worker only.
+
+This is anonymous fictional-demo authorization, not a personal-bank login. An
+actual multi-user financial product needs an identity provider and durable,
+user-owned storage before any real records are admitted. Operator and research
+credentials are separate from guest Council sessions.

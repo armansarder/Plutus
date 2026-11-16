@@ -643,3 +643,14 @@ No model can send messages. Generic notifications omit balances, IDs and merchan
 records. Log submission honestly; never equate it with confirmed delivery. Persistent
 claims suppress duplicate and uncertain retries. Polling is opt-in, one worker,
 minimum 60 seconds. See PHOTON_INTEGRATION.md for configuration and limitations.
+
+## Authorized independent V2 public-demo policy
+
+V2 production Council may run only with explicit `PLUTUS_PUBLIC_DEMO=1`, a
+synthetic-demo/Nessie-sandbox source, preview-only delivery, and a separate server-only
+`PLUTUS_SESSION_SECRET` of at least 48 characters. The Node gateway issues signed
+HttpOnly guest sessions; FastAPI verifies those in addition to the service bearer
+and reauthorizes conversation ownership. This supersedes the blanket production
+Council block for the fictional recruiter demo only. It is not personal banking
+login or permission to expose file-backed/private customer data. Operator/research
+tools require separate opt-in credentials and remain absent from the public demo.
