@@ -5,6 +5,31 @@ import httpx
 import pytest
 
 
+def test_demo_is_explicit_offline_and_uses_ephemeral_server_only_secrets(tmp_path):
+    inherited = {'PATH': 'preserved', 'NESSIE_API_KEY': 'do-not-use',
+                 'NVIDIA_API_KEY': 'do-not-use', 'PLUTUS_DELIVERY_MODE': 'live',
+                 'FINPILOT_HISTORY_DIR': 'do-not-read', 'VITE_DATA_MODE': 'synthetic_demo'}
+    backend, frontend = start_local.demo_environments(inherited, tmp_path / 'demo.sqlite3')
+    assert backend['PYTHON_DOTENV_DISABLED'] == '1'
+    assert backend['PLUTUS_DATA_MODE'] == 'demo'
+    assert backend['FINPILOT_DATA_SOURCE'] == 'mock'
+    assert backend['AGENT_DATA_SOURCE'] == 'demo'
+    assert backend['NVIDIA_API_KEY'] == ''
+    assert 'NESSIE_API_KEY' not in backend and 'FINPILOT_HISTORY_DIR' not in backend
+    assert backend['PLUTUS_DELIVERY_MODE'] == 'preview'
+    assert backend['PLUTUS_PRIVATE_TOOLS'] == backend['PLUTUS_RESEARCH_ENABLED'] == '0'
+    assert len(backend['FINPILOT_API_TOKEN']) >= 48
+    assert backend['FINPILOT_API_TOKEN'] != backend['PLUTUS_SESSION_SECRET']
+    assert frontend['FINPILOT_API_TOKEN'] == backend['FINPILOT_API_TOKEN']
+    assert frontend['PLUTUS_SESSION_SECRET'] == backend['PLUTUS_SESSION_SECRET']
+    assert frontend['VITE_DATA_MODE'] == frontend['VITE_SITUATION_DATA_MODE'] == 'remote'
+    assert not any(value in (backend['FINPILOT_API_TOKEN'], backend['PLUTUS_SESSION_SECRET'])
+                   for key, value in frontend.items() if key.startswith('VITE_'))
+    again, _ = start_local.demo_environments(inherited, tmp_path / 'other.sqlite3')
+    assert again['FINPILOT_API_TOKEN'] != backend['FINPILOT_API_TOKEN']
+    assert not list(tmp_path.iterdir())  # Configuration builder writes no files.
+
+
 def test_file_token_overrides_stale_shell_and_stays_server_side():
     values = dict(FINPILOT_MODE='local', FINPILOT_DATA_SOURCE='nessie',
                   FINPILOT_API_TOKEN='new-test-token', NESSIE_API_KEY='private-test-key',

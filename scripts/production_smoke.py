@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 import httpx
 
 
-def smoke(web_url, api_url, source, verify=True):
+def smoke(web_url, api_url, source, verify=True, built_assets=True):
     with httpx.Client(timeout=90, follow_redirects=False, trust_env=False, verify=verify) as client:
         for base in (web_url, api_url):
             response = client.get(base + '/health')
@@ -20,7 +20,7 @@ def smoke(web_url, api_url, source, verify=True):
             assert 'Public fictional-customer demo' in response.text, 'demo label'
             assert 'Private Demo Operator Interface' not in response.text, 'operator UI'
             # Check a real built asset, rather than trusting only the SSR response.
-            if path == '/':
+            if path == '/' and built_assets:
                 import re
                 asset = re.search(r'(?:src|href)="(/assets/[^" ]+\.(?:js|css))"', response.text)
                 assert asset and client.get(web_url + asset[1]).status_code == 200, 'built asset'

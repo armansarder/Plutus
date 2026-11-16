@@ -1,4 +1,4 @@
-"""Local startup with one existing server-side token; never writes configuration."""
+"""Shared local launcher: configured Nessie or explicit credential-free fictional demo."""
 import os
 import hashlib
 from pathlib import Path
@@ -7,6 +7,8 @@ import socket
 import subprocess
 import sys
 import time
+import secrets
+import tempfile
 
 import httpx
 from dotenv import dotenv_values
@@ -43,7 +45,7 @@ def environments(inherited, values):
     backend.update({k: v for k, v in values.items() if v is not None})
     required = ('FINPILOT_API_TOKEN', 'NESSIE_API_KEY', 'FINPILOT_CUSTOMER_ID', 'NESSIE_ACCOUNT_ID')
     if any(not backend.get(k) for k in required):
-        raise ValueError('Required credentials or account configuration are missing')
+        raise ValueError('Required credentials or account configuration are missing. For the credential-free fictional demo, run npm run dev:demo')
     if backend.get('FINPILOT_MODE') != 'local' or backend.get('FINPILOT_DATA_SOURCE') != 'nessie':
         raise ValueError('Local launcher requires local mode and Nessie source')
     backend['AGENT_DATA_SOURCE'] = 'nessie'
@@ -73,6 +75,27 @@ def load_environments():
     return backend, frontend
 
 
+def demo_environments(inherited, database_path):
+    """Explicit offline profile; ignore saved/live settings and never write secrets."""
+    clean = {k: v for k, v in inherited.items() if not k.startswith(
+        ('FINPILOT_', 'NESSIE_', 'NVIDIA_', 'PHOTON_', 'PLUTUS_', 'AGENT_', 'VITE_'))}
+    backend = dict(clean, PYTHON_DOTENV_DISABLED='1', FINPILOT_MODE='local',
+        FINPILOT_API_TOKEN=secrets.token_urlsafe(48),
+        PLUTUS_SESSION_SECRET=secrets.token_urlsafe(48),
+        FINPILOT_CUSTOMER_ID='synthetic_demo', FINPILOT_ALLOWED_HOSTS='127.0.0.1,localhost',
+        FINPILOT_DATA_SOURCE='mock', AGENT_DATA_SOURCE='demo', PLUTUS_DATA_MODE='demo',
+        PLUTUS_COUNCIL_ENABLED='1', PLUTUS_PRIVATE_TOOLS='0', PLUTUS_RESEARCH_ENABLED='0',
+        PLUTUS_DELIVERY_MODE='preview', PLUTUS_ALERT_POLL_SECONDS='0',
+        PHOTON_RECIPIENT_OPTED_IN='false', NVIDIA_API_KEY='',
+        PLUTUS_NOTIFICATIONS_DB=str(database_path))
+    frontend = dict(clean, NODE_ENV='development',
+        FINPILOT_API_TOKEN=backend['FINPILOT_API_TOKEN'],
+        PLUTUS_SESSION_SECRET=backend['PLUTUS_SESSION_SECRET'], PLUTUS_PRIVATE_TOOLS='0',
+        FINPILOT_BACKEND_URL='http://127.0.0.1:8000', VITE_API_BASE_URL='',
+        VITE_DATA_MODE='remote', VITE_SITUATION_DATA_MODE='remote', VITE_COUNCIL_ENABLED='true')
+    return backend, frontend
+
+
 def reuse_running_app(backend, occupied):
     if not occupied:
         return False
@@ -96,11 +119,12 @@ def reuse_running_app(backend, occupied):
     return True
 
 
-def run_once():
+def run_once(demo_database=None):
     children = []
     try:
-        version = configuration_version()
-        backend, frontend = load_environments()
+        version = configuration_version() if demo_database is None else None
+        backend, frontend = (demo_environments(os.environ, demo_database)
+                             if demo_database is not None else load_environments())
         occupied = set()
         for port in (8000, 8080):
             with socket.socket() as sock:
@@ -128,9 +152,10 @@ def run_once():
                         print('Financial source is temporarily unavailable. Starting the website with a retryable error; no substitute data is used.', flush=True)
                         break
                     if response.status_code != 200:
-                        raise ValueError(f'Authenticated Nessie check failed: HTTP {response.status_code}')
-                    if response.json().get('source') != 'nessie_sandbox':
-                        raise ValueError('Backend did not return Nessie source')
+                        raise ValueError(f'Authenticated financial source check failed: HTTP {response.status_code}')
+                    expected_source = 'synthetic_demo' if demo_database is not None else 'nessie_sandbox'
+                    if response.json().get('source') != expected_source:
+                        raise ValueError('Backend did not return the selected source')
                     break
                 except httpx.ConnectError:
                     time.sleep(0.25)
@@ -140,14 +165,14 @@ def run_once():
             else:
                 raise ValueError('Backend startup timed out')
         if source_status == 200:
-            print('Authenticated Nessie check: HTTP 200.', flush=True)
+            print('Authenticated ' + ('fictional demo' if demo_database is not None else 'Nessie') + ' check: HTTP 200.', flush=True)
         print('Starting http://127.0.0.1:8080/dashboard', flush=True)
         children.append(subprocess.Popen([node, str(vite), 'dev', '--host', '127.0.0.1',
                                           '--port', '8080', '--strictPort'], cwd=ROOT / 'frontend', env=frontend))
         while all(child.poll() is None for child in children):
             time.sleep(0.5)
-            saved_version = configuration_version()
-            if saved_version != version:
+            saved_version = configuration_version() if demo_database is None else None
+            if demo_database is None and saved_version != version:
                 try:
                     load_environments()
                 except Exception:
@@ -171,6 +196,13 @@ def run_once():
 
 
 def main():
+    if sys.argv[1:] == ['--demo']:
+        with tempfile.TemporaryDirectory(prefix='plutus-local-demo-') as temp:
+            print('LOCAL FICTIONAL DEMO: no live providers; temporary settings/chats reset on exit.', flush=True)
+            return run_once(Path(temp) / 'notifications.sqlite3')
+    if sys.argv[1:]:
+        print('Usage: python start_local.py [--demo]', file=sys.stderr)
+        return 1
     while True:
         result = run_once()
         if result != 2:

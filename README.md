@@ -23,6 +23,18 @@ and [deployment steps](DEPLOYMENT.md).
 
 ### Recruiter demo locally (no provider credentials)
 
+From the repository root, run **`npm run dev:demo`**, then open
+**http://127.0.0.1:8080/dashboard**. This starts Vite/Node on 8080 and FastAPI on
+8000 using the existing fictional customer and Python engine. No production build
+or `.env` is required. Local-only bearer/session secrets are generated in memory;
+saved live settings are ignored. Alerts preview only; operator/research tools are
+off. Ctrl+C stops both services; temporary settings/chats reset. Ports must be free.
+The existing `npm run dev` remains the explicitly configured Nessie launcher and
+requires its sandbox account/key; it does not silently switch data sources.
+Install backend dependencies into `.venv` and frontend dependencies as below first.
+
+For the alternative **built production preview** (port 18080):
+
 ```sh
 python -m pip install -r nemotron_agent/requirements.txt
 npm ci --include=dev --prefix frontend

@@ -1,5 +1,20 @@
 # V2 local verification
 
+## Credential-free development launcher
+
+- Root command: `npm run dev:demo`; URL `http://127.0.0.1:8080/dashboard`.
+- Reuses `start_local.py` and the existing fictional snapshot/engine; skips saved
+  dotenv/provider settings, generates two server-only secrets and temporary SQLite.
+- Actual npm launcher HTTP smoke: PASS (Node/Vite + FastAPI, dashboard, simulator,
+  forecast, Multiverse, history, Council fallback, bearer rejection/private boundaries).
+  Harness stops its owned process tree afterward; no external API or message used.
+- Full Python suite: 110 passed, 1 skipped (one dependency deprecation warning).
+- Launcher-focused Python tests: 7 passed.
+- Full frontend suite: 166 passed, 2 skipped; TypeScript `--noEmit`: PASS.
+- `git diff --check`: PASS. Both Render manifests unchanged; no `.env` written.
+- This is HTTP verification of the development runtime, not a browser interaction
+  or live provider verification claim. Existing production preview remains available.
+
 External services are not verified by these tests. All test financial records and
 provider responses are fictional fixtures. Live Nessie/NVIDIA/Photon checks remain
 unverified because credentials/authorization are absent. No messages are sent.

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "dev:demo": "node scripts/dev.mjs --demo",
     "dev:frontend": "vite dev",
     "build": "vite build",
     "build:demo": "node scripts/build-demo.mjs",

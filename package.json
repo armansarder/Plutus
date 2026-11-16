@@ -2,6 +2,7 @@
   "name": "plutus-local",
   "private": true,
   "scripts": {
-    "dev": "node frontend/scripts/dev.mjs"
+    "dev": "node frontend/scripts/dev.mjs",
+    "dev:demo": "node frontend/scripts/dev.mjs --demo"
   }
 }

@@ -1,4 +1,4 @@
-// Start both services with the same existing configuration. Never handle secrets here.
+// Start both services via the shared Python launcher; secrets stay server-side.
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +13,8 @@ if (!python) {
   process.exit(1);
 }
 const options = process.argv.slice(2);
+const demo = options[0] === '--demo';
+if (demo) options.shift();
 let supported = true;
 for (let i = 0; i < options.length; i += 2) {
   if (!((options[i] === "--port" && options[i + 1] === "8080") ||
@@ -23,7 +25,7 @@ if (!supported) {
   process.exit(1);
 }
 const [command, ...args] = python;
-const child = spawn(command, [...args, join(root, "start_local.py")], { cwd: root, stdio: "inherit", windowsHide: true });
+const child = spawn(command, [...args, join(root, "start_local.py"), ...(demo ? ['--demo'] : [])], { cwd: root, stdio: "inherit", windowsHide: true });
 let stopping = false;
 function stop() {
   if (stopping) return;
