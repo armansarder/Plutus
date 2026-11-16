@@ -14,7 +14,7 @@ real customer data access, participant recruitment or response collection occurr
 | 3: Alerts/operator | Persistent jobs/attempts and authorized private controls; live delivery unverified | `92f5837` |
 | 4: Council/reliability | Explicit fictional-demo authorization, separate signing key, production-mode TLS/auth smoke passed | `bdcbf81` |
 | 5: Research pilot | Private seeded previews, fixed truth across conditions, test-only export; no human study | `b3aa7f8` |
-| 6: Readiness | Local configuration/build/auth/integration prepared; hosted verification and deployment approval still required | See local `chore: prepare Plutus V2 production readiness` checkpoint |
+| 6: Readiness | Local configuration/build/auth/integration prepared; hosted verification and deployment approval still required | `d1ffd82` |
 
 ## Major changes and preserved behavior
 
