@@ -1,5 +1,21 @@
 # Plutus V2 implementation report
 
+## Free recruiter deployment follow-up
+
+`render.free.yaml` adds two Free Web Services with no disk or hosted database;
+the original paid `render.yaml` remains unchanged. Temporary SQLite lives under
+`/tmp/plutus-demo` and is recreated after filesystem loss. Photon is preview-only
+with no sender, credentials, opt-in or polling. Operator/research tools remain off.
+The frontend and deterministic financial runtime are unchanged. See
+`FREE_RENDER_DEPLOYMENT.md` for exact dashboard steps and the shared Free-hour,
+cold-start and ephemeral-state limitations. `free_demo_smoke.py` tests production
+TLS/authentication, history and startup twice with the database directory discarded
+between runs; the normal HTTP suites cover the built website and calculations.
+No standalone Spending Fingerprint route/component was found; existing spending
+history views are preserved, not represented as a newly verified named feature.
+Results appear under "Free recruiter deployment profile" in the test report.
+No push, deployment, purchase or DNS changes were performed.
+
 Branch: `feature/plutus-v2`. Original baseline: `1f7d8c510cab0cc2fab5800ca5ed51623d3b127f`.
 All work is local. No push, merge, deployment, DNS change, real Photon message,
 real customer data access, participant recruitment or response collection occurred.

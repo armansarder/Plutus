@@ -1,0 +1,88 @@
+# FREE RECRUITER DEMO ONLY. See docs/FREE_RENDER_DEPLOYMENT.md. No disk or database service.
+# Two web services: TanStack Start requires a server for its private API proxies.
+# Dashboard setup and environment values: DEPLOYMENT.md. No deploy is automatic.
+# V2 public-fictional-demo policy uses separate signed guest sessions.
+services:
+  - type: web
+    name: plutus-demo-api
+    runtime: python
+    plan: free
+    numInstances: 1
+    branch: feature/plutus-v2
+    autoDeployTrigger: "off"
+    buildCommand: pip install -r requirements-production.txt
+    startCommand: python -m uvicorn nemotron_agent.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*'
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: FINPILOT_MODE
+        value: production
+      - key: FINPILOT_ALLOWED_HOSTS
+        sync: false
+      - key: FINPILOT_API_TOKEN
+        sync: false
+      - key: FINPILOT_CUSTOMER_ID
+        value: synthetic_demo
+      - key: PLUTUS_DATA_MODE
+        value: demo
+      - key: FINPILOT_DATA_SOURCE
+        value: mock
+      - key: AGENT_DATA_SOURCE
+        value: demo
+      - key: FINPILOT_CURRENCY
+        value: USD
+      - key: PLUTUS_COUNCIL_ENABLED
+        value: "1"
+      - key: PLUTUS_PUBLIC_DEMO
+        value: "1"
+      - key: PLUTUS_SESSION_SECRET
+        sync: false
+      - key: PLUTUS_RESEARCH_ENABLED
+        value: "0"
+      - key: PLUTUS_PRIVATE_TOOLS
+        value: "0"
+      - key: PLUTUS_DEMO_MODE
+        value: "false"
+      - key: NVIDIA_API_KEY
+        value: ""
+      - key: PLUTUS_DELIVERY_MODE
+        value: preview
+      - key: PLUTUS_ALERT_POLL_SECONDS
+        value: "0"
+      - key: PHOTON_RECIPIENT_OPTED_IN
+        value: "false"
+      - key: PLUTUS_NOTIFICATIONS_DB
+        value: /tmp/plutus-demo/notifications.sqlite3
+  - type: web
+    name: plutus-demo-web
+    runtime: node
+    plan: free
+    numInstances: 1
+    branch: feature/plutus-v2
+    rootDir: frontend
+    autoDeployTrigger: "off"
+    buildCommand: npm ci --include=dev --no-audit --no-fund && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.20.0
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: VITE_DATA_MODE
+        value: remote
+      - key: VITE_COUNCIL_ENABLED
+        value: "true"
+      - key: PLUTUS_PUBLIC_ORIGIN
+        sync: false
+      - key: FINPILOT_BACKEND_URL
+        sync: false
+      - key: PLUTUS_SESSION_SECRET
+        sync: false
+      - key: PLUTUS_PRIVATE_TOOLS
+        value: "0"
+      - key: FINPILOT_API_TOKEN
+        sync: false

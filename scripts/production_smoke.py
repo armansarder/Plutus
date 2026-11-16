@@ -36,6 +36,9 @@ def smoke(web_url, api_url, source, verify=True):
         start = date.fromisoformat(snapshot['data']['as_of_date'])
         if snapshot['data']['snapshot_basis'] == 'intraday':
             start += timedelta(days=1)
+        response = client.post(web_url + '/api/simulate', json={
+            'purchase_amount': '10.00', 'purchase_date': str(start)})
+        assert response.status_code == 200, 'existing purchase simulator'
         response = client.post(web_url + '/api/forecast', json={
             'start_date': str(start), 'end_date': str(start + timedelta(days=6))})
         assert response.status_code == 200, 'forecast'
@@ -51,8 +54,7 @@ def smoke(web_url, api_url, source, verify=True):
             'purchase_amount':'10.00','purchase_date':str(start),'later_date':str(start+timedelta(days=3)),
             'reserve':'0.00','stress_expense':'200.00','horizon_days':7})
         assert response.status_code == 200 and len(response.json()['scenarios'])==5, 'Multiverse'
-        if source == 'nessie_sandbox':
-            assert client.get(web_url + '/api/history').status_code == 200, 'sandbox history'
+        assert client.get(web_url + '/api/history').status_code == 200, 'spending history'
         assert client.get(web_url + '/api/notifications/settings').status_code == 200, 'alerts'
         assert client.get(web_url + '/api/v2/council/status').status_code == 200, 'council status'
         conversation=client.post(web_url+'/api/v2/conversations',json={'role':'council'})

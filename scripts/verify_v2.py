@@ -19,6 +19,8 @@ def run(label):
         [sys.executable, 'scripts/production_tls_smoke.py'],
         [sys.executable, 'scripts/nessie_wire_smoke.py'],
         ['node', 'scripts/check_render.mjs'],
+        ['node', 'scripts/check_render_free.mjs'],
+        [sys.executable, 'scripts/free_demo_smoke.py'],
         ['git', 'diff', '--check'],
     ]
     record = [f'\n## {label}\n']

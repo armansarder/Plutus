@@ -1,5 +1,9 @@
 # Plutus V2 deployment preparation
 
+**Strict $0 recruiter demo:** follow [Free Render deployment](docs/FREE_RENDER_DEPLOYMENT.md)
+and `render.free.yaml`. The setup below uses paid persistence and is **not** the
+free-demo path. Both configurations are retained independently.
+
 No service has been deployed. All commits remain local on `feature/plutus-v2`.
 Publishing/pushing and deployment require explicit user approval. Never use the
 upstream team repository or either `main` branch for this release.

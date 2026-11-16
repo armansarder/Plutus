@@ -104,3 +104,12 @@ commit keys. No payment or external message is executed.
 See [nemotron_agent/COUNCIL.md](nemotron_agent/COUNCIL.md) for the opt-in v2 council,
 four specialist chats, signed demo sessions, chart evidence, startup and rollback.
 Existing purchase analysis and financial routes remain compatible.
+
+# Free recruiter demo deployment
+
+For a $0 Node + FastAPI Render demo, use
+[the Free deployment guide](docs/FREE_RENDER_DEPLOYMENT.md) and `render.free.yaml`.
+No paid disk/database or external API is required. Fictional financial records,
+Python-engine Simulator/Multiverse, spending/history views and deterministic Council
+remain available. Free services sleep; all temporary settings/chat history can reset.
+The original `render.yaml` retains the separate paid production configuration.
