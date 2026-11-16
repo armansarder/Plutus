@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "enum": [
+        "synthetic_demo",
+        "nessie_sandbox",
+        "configured_backend"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "label": {
+      "title": "Label",
+      "type": "string"
+    },
+    "snapshot_date": {
+      "format": "date",
+      "title": "Snapshot Date",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "title": "Observed At",
+      "type": "string"
+    },
+    "cache_max_seconds": {
+      "title": "Cache Max Seconds",
+      "type": "integer"
+    },
+    "schedule_complete": {
+      "const": false,
+      "default": false,
+      "title": "Schedule Complete",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "source",
+    "label",
+    "snapshot_date",
+    "snapshot_id",
+    "observed_at",
+    "cache_max_seconds"
+  ],
+  "title": "SourceInfo",
+  "type": "object"
+}

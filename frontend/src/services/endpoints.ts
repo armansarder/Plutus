@@ -5,6 +5,7 @@
  * Stage 1 contracts.
  */
 export const ENDPOINTS = {
+  source: "/api/source",
   notifications: "/api/notifications",
   councilStatus: "/api/v2/council/status",
   councilConversations: "/api/v2/conversations",

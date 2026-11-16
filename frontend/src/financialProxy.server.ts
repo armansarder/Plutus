@@ -5,7 +5,7 @@ import { nemotronRequestSchema, nemotronResponseSchema } from "./types/nemotron"
 import { ENDPOINTS } from "./services/endpoints";
 import { cashPlanRequestSchema, cashPlanResultSchema } from "./types/cashPlan";
 
-export const FINANCIAL_PROXY_PATHS = ["/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", "/api/cash-plan/preview", ENDPOINTS.agentRun] as const;
+export const FINANCIAL_PROXY_PATHS = [ENDPOINTS.source, "/api/financial-data", "/api/simulate", "/api/compare", "/api/forecast", "/api/history", "/api/cash-plan/preview", ENDPOINTS.agentRun] as const;
 
 export async function readBody(request: Request) {
   const reader = request.body?.getReader();
@@ -74,6 +74,10 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
       cache: "no-store", redirect: "error", signal: AbortSignal.any([request.signal, AbortSignal.timeout(agent ? 60000 : 12000)]),
     });
     if (!response.ok) return error([401, 403, 422, 429, 503].includes(response.status) ? response.status : 502, "Financial service request failed");
+    if (url.pathname === ENDPOINTS.source) {
+      const source = z.object({source: z.enum(["synthetic_demo", "nessie_sandbox", "configured_backend"]), label: z.string(), snapshot_date: z.string(), snapshot_id: z.string(), observed_at: z.string(), cache_max_seconds: z.number(), schedule_complete: z.literal(false)}).safeParse(await response.json());
+      return source.success ? Response.json(source.data, {headers}) : error(502, "Invalid provenance");
+    }
     if (plan) {
       const result = cashPlanResultSchema.safeParse(await response.json());
       return result.success ? Response.json(result.data,{headers}) : error(502,"Invalid cash plan response");

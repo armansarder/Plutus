@@ -24,6 +24,15 @@ def demo_snapshot():
 
 def create_app(source=None, settings=None, provider=None, council_provider=None):
     mode = os.getenv('AGENT_DATA_SOURCE') or ('nessie' if os.getenv('FINPILOT_DATA_SOURCE') == 'nessie' else 'demo')
+    explicit = os.getenv('PLUTUS_DATA_MODE')
+    if explicit:
+        if explicit not in ('demo', 'nessie'):
+            raise ValueError('PLUTUS_DATA_MODE must be demo or nessie; research is isolated')
+        expected = 'nessie' if explicit == 'nessie' else 'mock'
+        if (os.getenv('AGENT_DATA_SOURCE') not in (None, explicit) or
+                os.getenv('FINPILOT_DATA_SOURCE') not in (None, expected)):
+            raise ValueError('Conflicting financial data modes')
+        mode = explicit
     if mode not in ('demo', 'engine', 'nessie'):
         raise ValueError('AGENT_DATA_SOURCE must be demo, engine, or nessie')
     if mode == 'demo' and os.getenv('FINPILOT_DATA_SOURCE') == 'nessie':
@@ -32,7 +41,7 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
     if source is None and mode == 'demo':
         source = FunctionAdapter(demo_snapshot)
     app = create_engine_app(source=source, settings=settings,
-                           data_source_mode='nessie' if mode == 'nessie' else None)
+                           data_source_mode='nessie' if mode == 'nessie' else 'mock' if explicit == 'demo' else None)
     from calculation_engine.nessie_adapter import NessieAdapter
     if isinstance(app.state.financial_source, NessieAdapter):
         label = 'nessie_sandbox'
