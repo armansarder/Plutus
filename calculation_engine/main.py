@@ -145,6 +145,11 @@ def create_app(source=None, settings: SecuritySettings | None = None, history_so
 
     from .planning import CashPlanRequest, CashPlanResult, preview_cash_plan
     from .provenance import SourceInfo, source_info
+    from .multiverse import MultiverseRequest, MultiverseResponse, compare_futures
+
+    @app.post('/api/multiverse', response_model=MultiverseResponse)
+    def multiverse(body: MultiverseRequest, data=Depends(get_data)):
+        return compare_futures(data, body, app.state.financial_source)
 
     @app.get('/api/source', response_model=SourceInfo)
     def financial_source(data=Depends(get_data)):

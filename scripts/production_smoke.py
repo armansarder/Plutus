@@ -47,6 +47,10 @@ def smoke(web_url, api_url, source):
         assert data['mode'] == 'deterministic_fallback', 'truthful fallback'
         assert not data['trust_shield']['payment_execution'], 'no payment'
         assert not data['trust_shield']['external_message_sent'], 'no delivery'
+        response = client.post(web_url + '/api/multiverse', json={
+            'purchase_amount':'10.00','purchase_date':str(start),'later_date':str(start+timedelta(days=3)),
+            'reserve':'0.00','stress_expense':'200.00','horizon_days':7})
+        assert response.status_code == 200 and len(response.json()['scenarios'])==5, 'Multiverse'
         if source == 'nessie_sandbox':
             assert client.get(web_url + '/api/history').status_code == 200, 'sandbox history'
         assert client.get(web_url + '/api/notifications/settings').status_code == 200, 'alerts'

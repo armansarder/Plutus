@@ -1,0 +1,30 @@
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, expect, it, vi } from "vitest";
+import { Multiverse } from "@/components/simulator/Multiverse";
+import { BackendSituationAdapter } from "@/services/situation";
+import { financialPayload } from "./fixtures/engineResponses";
+import fixture from "./fixtures/multiverse.json";
+vi.mock("@/components/financial/CashFlowChart",()=>({CashFlowChart:()=> <div>Shared-axis chart</div>}));
+afterEach(()=>{cleanup();vi.unstubAllGlobals();});
+it("validates inputs and shows explicit calculation failure without fixture substitution",async()=>{
+ vi.stubGlobal("fetch",vi.fn(async(url:string)=>url==="/api/financial-data"?Response.json(financialPayload):new Response("",{status:503})));
+ const snapshot=await new BackendSituationAdapter().getSnapshot();
+ render(<Multiverse snapshot={snapshot}/>);
+ fireEvent.change(screen.getByLabelText("Multiverse purchase amount"),{target:{value:"-1"}});
+ fireEvent.click(screen.getByRole("button",{name:"Explore futures"}));
+ expect(screen.getByRole("alert")).toHaveTextContent("Check amounts");expect(fetch).toHaveBeenCalledTimes(1);
+ fireEvent.change(screen.getByLabelText("Multiverse purchase amount"),{target:{value:"400"}});
+ fireEvent.click(screen.getByRole("button",{name:"Explore futures"}));
+ expect(await screen.findByRole("alert")).toHaveTextContent("No sample or stale results");
+});
+it("renders engine futures, exact accessible points, and clears outcomes immediately on edits",async()=>{
+ vi.stubGlobal("fetch",vi.fn(async(url:string)=>Response.json(url==="/api/financial-data"?fixture.snapshot:fixture.result)));
+ const snapshot=await new BackendSituationAdapter().getSnapshot();render(<Multiverse snapshot={snapshot}/>);
+ fireEvent.click(screen.getByRole("button",{name:"Explore futures"}));
+ expect(await screen.findByText("Shared-axis chart")).toBeInTheDocument();
+ expect(screen.getByRole("button",{name:"Skip purchase"})).toBeInTheDocument();
+ expect(screen.getByText(/Fictional Demo/)).toBeInTheDocument();
+ expect(screen.getByRole("table")).toHaveTextContent(fixture.result.scenarios[0]!.forecast.start_date);
+ fireEvent.change(screen.getByLabelText("Multiverse purchase amount"),{target:{value:"600"}});
+ expect(screen.queryByText("Shared-axis chart")).not.toBeInTheDocument();
+});

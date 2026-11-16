@@ -22,3 +22,21 @@ the cached wire-fetch timestamp for Nessie and generation time for a demo fixtur
 
 The frontend's `remote` means connected to the selected backend source. It does
 not certify Nessie access. No source failure changes the selected mode.
+
+## Multiverse
+
+`POST /api/multiverse`: strict schemas `multiverse-request.schema.json` and
+`multiverse-response.schema.json`; Python models in `calculation_engine/multiverse.py`,
+matching TypeScript validators in `types/multiverse.ts`. Example input:
+
+```json
+{"purchase_amount":"400.00","purchase_date":"2026-11-16","later_date":"2026-11-23","reserve":"200.00","stress_expense":"200.00","horizon_days":30,"extra_expenses":[]}
+```
+
+All five futures freeze one source snapshot; Python returns daily series,
+event-level minima, first reserve breach, applicability and daily differences from
+skip. No account balance/schedule is overwritten. Extra expenses are explicit
+hypotheticals applying to all futures; stress expense applies only to its scenario.
+Delays move the next eligible income three days; out-of-window income is clipped.
+Equal purchase dates are allowed. Council remains a separately confirmed analysis
+with a new snapshot; custom Multiverse changes are not silently handed off.

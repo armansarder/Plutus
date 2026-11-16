@@ -19,3 +19,14 @@ Milestone gates below are recorded by `scripts/verify_v2.py` after actual execut
 - `scripts/local_smoke.py`: PASS 
 - `diff --check`: PASS 
 - Changed-file credential-pattern scan: PASS (bounded pattern scan, not proof about all history).
+
+## Milestone 2 - Financial Multiverse
+
+- `-m pytest tests -q`: PASS 97 passed, 1 skipped, 2 warnings in 7.35s
+- `test --prefix frontend`: PASS Test Files  26 passed | 2 skipped (28); Tests  159 passed | 2 skipped (161)
+- `frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json`: PASS 
+- `run check --prefix photon_service`: PASS 
+- `run build --prefix frontend`: PASS 
+- `scripts/local_smoke.py`: PASS 
+- `diff --check`: PASS 
+- Changed-file credential-pattern scan: PASS (bounded pattern scan, not proof about all history).

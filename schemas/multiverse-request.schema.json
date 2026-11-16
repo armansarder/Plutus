@@ -1,0 +1,109 @@
+{
+  "$defs": {
+    "HypotheticalExpense": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "gt": 0,
+          "le": 100000,
+          "title": "Amount"
+        }
+      },
+      "required": [
+        "date",
+        "amount"
+      ],
+      "title": "HypotheticalExpense",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "purchase_amount": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "gt": 0,
+      "le": 100000,
+      "title": "Purchase Amount"
+    },
+    "purchase_date": {
+      "format": "date",
+      "title": "Purchase Date",
+      "type": "string"
+    },
+    "later_date": {
+      "format": "date",
+      "title": "Later Date",
+      "type": "string"
+    },
+    "reserve": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "default": "200.00",
+      "ge": 0,
+      "le": 100000,
+      "title": "Reserve"
+    },
+    "horizon_days": {
+      "default": 30,
+      "maximum": 90,
+      "minimum": 1,
+      "title": "Horizon Days",
+      "type": "integer"
+    },
+    "stress_expense": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "default": "200.00",
+      "ge": 0,
+      "le": 100000,
+      "title": "Stress Expense"
+    },
+    "extra_expenses": {
+      "items": {
+        "$ref": "#/$defs/HypotheticalExpense"
+      },
+      "maxItems": 20,
+      "title": "Extra Expenses",
+      "type": "array"
+    }
+  },
+  "required": [
+    "purchase_amount",
+    "purchase_date",
+    "later_date"
+  ],
+  "title": "MultiverseRequest",
+  "type": "object"
+}
