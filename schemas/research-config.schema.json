@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "ScenarioConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "comfortable",
+            "tight_timing",
+            "shortfall"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Balance",
+          "type": "string"
+        },
+        "purchase": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Purchase",
+          "type": "string"
+        },
+        "rent": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Rent",
+          "type": "string"
+        },
+        "income": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Income",
+          "type": "string"
+        },
+        "reserve": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Reserve",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "balance",
+        "purchase",
+        "rent",
+        "income",
+        "reserve"
+      ],
+      "title": "ScenarioConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "experiment_version": {
+      "const": "pilot-1",
+      "title": "Experiment Version",
+      "type": "string"
+    },
+    "decision_rule": {
+      "const": "reserve_and_applicable_stresses_v1",
+      "title": "Decision Rule",
+      "type": "string"
+    },
+    "conditions": {
+      "items": {
+        "enum": [
+          "direct",
+          "evidence",
+          "multi_agent",
+          "uncertainty"
+        ],
+        "type": "string"
+      },
+      "title": "Conditions",
+      "type": "array"
+    },
+    "outcomes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Outcomes",
+      "type": "array"
+    },
+    "scenarios": {
+      "items": {
+        "$ref": "#/$defs/ScenarioConfig"
+      },
+      "title": "Scenarios",
+      "type": "array"
+    }
+  },
+  "required": [
+    "experiment_version",
+    "decision_rule",
+    "conditions",
+    "outcomes",
+    "scenarios"
+  ],
+  "title": "ExperimentConfig",
+  "type": "object"
+}

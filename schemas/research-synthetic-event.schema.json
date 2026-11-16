@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "pilot-1",
+      "default": "pilot-1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "synthetic": {
+      "const": true,
+      "default": true,
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "sample_slot": {
+      "exclusiveMaximum": 10000,
+      "minimum": 0,
+      "title": "Sample Slot",
+      "type": "integer"
+    },
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "condition": {
+      "enum": [
+        "direct",
+        "evidence",
+        "multi_agent",
+        "uncertainty"
+      ],
+      "title": "Condition",
+      "type": "string"
+    },
+    "event": {
+      "enum": [
+        "condition_shown",
+        "synthetic_choice",
+        "explanation_acknowledged"
+      ],
+      "title": "Event",
+      "type": "string"
+    },
+    "decision_time_ms": {
+      "maximum": 3600000,
+      "minimum": 0,
+      "title": "Decision Time Ms",
+      "type": "integer"
+    },
+    "consent_basis": {
+      "const": "test_data_only",
+      "default": "test_data_only",
+      "title": "Consent Basis",
+      "type": "string"
+    }
+  },
+  "required": [
+    "sample_slot",
+    "scenario_id",
+    "condition",
+    "event",
+    "decision_time_ms"
+  ],
+  "title": "SyntheticEvent",
+  "type": "object"
+}

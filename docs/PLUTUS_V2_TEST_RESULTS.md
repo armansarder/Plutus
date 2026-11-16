@@ -53,3 +53,15 @@ Milestone gates below are recorded by `scripts/verify_v2.py` after actual execut
 - `scripts/production_tls_smoke.py`: PASS 
 - `diff --check`: PASS 
 - Changed-file credential-pattern scan: PASS (bounded pattern scan, not proof about all history).
+
+## Milestone 5 - isolated reproducible research pilot
+
+- `-m pytest tests -q`: PASS 107 passed, 1 skipped, 2 warnings in 14.18s
+- `test --prefix frontend`: PASS Test Files  28 passed | 2 skipped (30); Tests  162 passed | 2 skipped (164)
+- `frontend/node_modules/typescript/bin/tsc --noEmit -p frontend/tsconfig.json`: PASS 
+- `run check --prefix photon_service`: PASS 
+- `run build --prefix frontend`: PASS 
+- `scripts/local_smoke.py`: PASS 
+- `scripts/production_tls_smoke.py`: PASS 
+- `diff --check`: PASS 
+- Changed-file credential-pattern scan: PASS (bounded pattern scan, not proof about all history).

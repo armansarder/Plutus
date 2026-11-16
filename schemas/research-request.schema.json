@@ -1,0 +1,41 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "experiment_version": {
+      "const": "pilot-1",
+      "default": "pilot-1",
+      "title": "Experiment Version",
+      "type": "string"
+    },
+    "scenario_id": {
+      "default": "comfortable",
+      "enum": [
+        "comfortable",
+        "tight_timing",
+        "shortfall"
+      ],
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "seed": {
+      "default": 42,
+      "maximum": 2147483647,
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "condition": {
+      "default": "direct",
+      "enum": [
+        "direct",
+        "evidence",
+        "multi_agent",
+        "uncertainty"
+      ],
+      "title": "Condition",
+      "type": "string"
+    }
+  },
+  "title": "PreviewRequest",
+  "type": "object"
+}

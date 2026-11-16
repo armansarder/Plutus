@@ -1,0 +1,750 @@
+{
+  "$defs": {
+    "Assumptions": {
+      "additionalProperties": false,
+      "properties": {
+        "snapshot": {
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "same_day_order": {
+          "title": "Same Day Order",
+          "type": "string"
+        },
+        "coverage": {
+          "title": "Coverage",
+          "type": "string"
+        },
+        "estimated_transaction_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Estimated Transaction Ids",
+          "type": "array"
+        },
+        "missing_information": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Information",
+          "type": "array"
+        },
+        "currency_precision": {
+          "title": "Currency Precision",
+          "type": "string"
+        },
+        "source_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Notes",
+          "type": "array"
+        },
+        "scenario_changes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Scenario"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "snapshot",
+        "same_day_order",
+        "coverage",
+        "estimated_transaction_ids",
+        "missing_information",
+        "currency_precision",
+        "source_notes"
+      ],
+      "title": "Assumptions",
+      "type": "object"
+    },
+    "DailyBalance": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "ending_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Ending Balance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "ending_balance"
+      ],
+      "title": "DailyBalance",
+      "type": "object"
+    },
+    "Difference": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "balance_difference": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Balance Difference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "balance_difference"
+      ],
+      "title": "Difference",
+      "type": "object"
+    },
+    "ForecastResult": {
+      "additionalProperties": false,
+      "properties": {
+        "customer_id": {
+          "title": "Customer Id",
+          "type": "string"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date",
+          "title": "Start Date",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date",
+          "title": "End Date",
+          "type": "string"
+        },
+        "starting_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Starting Balance",
+          "type": "string"
+        },
+        "ending_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Ending Balance",
+          "type": "string"
+        },
+        "minimum_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Minimum Balance",
+          "type": "string"
+        },
+        "minimum_balance_date": {
+          "format": "date",
+          "title": "Minimum Balance Date",
+          "type": "string"
+        },
+        "shortfall_occurs": {
+          "title": "Shortfall Occurs",
+          "type": "boolean"
+        },
+        "transaction_timeline": {
+          "items": {
+            "$ref": "#/$defs/TimelineEvent"
+          },
+          "title": "Transaction Timeline",
+          "type": "array"
+        },
+        "daily_balances": {
+          "items": {
+            "$ref": "#/$defs/DailyBalance"
+          },
+          "title": "Daily Balances",
+          "type": "array"
+        },
+        "negative_balance_days": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Negative Balance Days",
+          "type": "array"
+        },
+        "minimum_daily_ending_balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Minimum Daily Ending Balance",
+          "type": "string"
+        },
+        "minimum_daily_ending_balance_date": {
+          "format": "date",
+          "title": "Minimum Daily Ending Balance Date",
+          "type": "string"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/Assumptions"
+        }
+      },
+      "required": [
+        "customer_id",
+        "currency",
+        "start_date",
+        "end_date",
+        "starting_balance",
+        "ending_balance",
+        "minimum_balance",
+        "minimum_balance_date",
+        "shortfall_occurs",
+        "transaction_timeline",
+        "daily_balances",
+        "negative_balance_days",
+        "minimum_daily_ending_balance",
+        "minimum_daily_ending_balance_date",
+        "assumptions"
+      ],
+      "title": "ForecastResult",
+      "type": "object"
+    },
+    "Future": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "buy_now",
+            "buy_later",
+            "skip",
+            "unexpected_expense",
+            "delayed_income"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "applicable": {
+          "title": "Applicable",
+          "type": "boolean"
+        },
+        "maintains_reserve": {
+          "title": "Maintains Reserve",
+          "type": "boolean"
+        },
+        "first_reserve_breach": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "First Reserve Breach"
+        },
+        "forecast": {
+          "$ref": "#/$defs/ForecastResult"
+        },
+        "differences": {
+          "items": {
+            "$ref": "#/$defs/Difference"
+          },
+          "title": "Differences",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "applicable",
+        "maintains_reserve",
+        "first_reserve_breach",
+        "forecast",
+        "differences"
+      ],
+      "title": "Future",
+      "type": "object"
+    },
+    "HypotheticalExpense": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "gt": 0,
+          "le": 100000,
+          "title": "Amount"
+        }
+      },
+      "required": [
+        "date",
+        "amount"
+      ],
+      "title": "HypotheticalExpense",
+      "type": "object"
+    },
+    "IncomeDelay": {
+      "additionalProperties": false,
+      "properties": {
+        "transaction_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Transaction Id",
+          "type": "string"
+        },
+        "new_date": {
+          "format": "date",
+          "title": "New Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "transaction_id",
+        "new_date"
+      ],
+      "title": "IncomeDelay",
+      "type": "object"
+    },
+    "MultiverseRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "purchase_amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "gt": 0,
+          "le": 100000,
+          "title": "Purchase Amount"
+        },
+        "purchase_date": {
+          "format": "date",
+          "title": "Purchase Date",
+          "type": "string"
+        },
+        "later_date": {
+          "format": "date",
+          "title": "Later Date",
+          "type": "string"
+        },
+        "reserve": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "default": "200.00",
+          "ge": 0,
+          "le": 100000,
+          "title": "Reserve"
+        },
+        "horizon_days": {
+          "default": 30,
+          "maximum": 90,
+          "minimum": 1,
+          "title": "Horizon Days",
+          "type": "integer"
+        },
+        "stress_expense": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "default": "200.00",
+          "ge": 0,
+          "le": 100000,
+          "title": "Stress Expense"
+        },
+        "extra_expenses": {
+          "items": {
+            "$ref": "#/$defs/HypotheticalExpense"
+          },
+          "maxItems": 20,
+          "title": "Extra Expenses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "purchase_amount",
+        "purchase_date",
+        "later_date"
+      ],
+      "title": "MultiverseRequest",
+      "type": "object"
+    },
+    "MultiverseResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceInfo"
+        },
+        "reserve": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Reserve",
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/MultiverseRequest"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/Future"
+          },
+          "title": "Scenarios",
+          "type": "array"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source",
+        "reserve",
+        "input",
+        "scenarios",
+        "assumptions"
+      ],
+      "title": "MultiverseResponse",
+      "type": "object"
+    },
+    "Scenario": {
+      "additionalProperties": false,
+      "properties": {
+        "purchase_amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "ge": 0,
+          "title": "Purchase Amount"
+        },
+        "purchase_date": {
+          "format": "date",
+          "title": "Purchase Date",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "delayed_income": {
+          "items": {
+            "$ref": "#/$defs/IncomeDelay"
+          },
+          "maxItems": 100,
+          "title": "Delayed Income",
+          "type": "array"
+        },
+        "unexpected_expenses": {
+          "items": {
+            "$ref": "#/$defs/Transaction"
+          },
+          "maxItems": 100,
+          "title": "Unexpected Expenses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "purchase_amount",
+        "purchase_date",
+        "name"
+      ],
+      "title": "Scenario",
+      "type": "object"
+    },
+    "SourceInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "enum": [
+            "synthetic_demo",
+            "nessie_sandbox",
+            "configured_backend",
+            "research_scenario"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "snapshot_date": {
+          "format": "date",
+          "title": "Snapshot Date",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "cache_max_seconds": {
+          "title": "Cache Max Seconds",
+          "type": "integer"
+        },
+        "schedule_complete": {
+          "const": false,
+          "default": false,
+          "title": "Schedule Complete",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source",
+        "label",
+        "snapshot_date",
+        "snapshot_id",
+        "observed_at",
+        "cache_max_seconds"
+      ],
+      "title": "SourceInfo",
+      "type": "object"
+    },
+    "TimelineEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "amount": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "income",
+            "expense"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "source_status": {
+          "enum": [
+            "confirmed",
+            "estimated"
+          ],
+          "title": "Source Status",
+          "type": "string"
+        },
+        "balance": {
+          "pattern": "^-?\\d+\\.\\d{2}$",
+          "title": "Balance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "description",
+        "amount",
+        "type",
+        "source_status",
+        "balance"
+      ],
+      "title": "TimelineEvent",
+      "type": "object"
+    },
+    "Transaction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "description": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "type": {
+          "enum": [
+            "income",
+            "expense"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "source_status": {
+          "enum": [
+            "confirmed",
+            "estimated"
+          ],
+          "title": "Source Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "description",
+        "amount",
+        "type",
+        "source_status"
+      ],
+      "title": "Transaction",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "experiment_version": {
+      "const": "pilot-1",
+      "default": "pilot-1",
+      "title": "Experiment Version",
+      "type": "string"
+    },
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "instance_id": {
+      "title": "Instance Id",
+      "type": "string"
+    },
+    "seed": {
+      "title": "Seed",
+      "type": "integer"
+    },
+    "condition": {
+      "enum": [
+        "direct",
+        "evidence",
+        "multi_agent",
+        "uncertainty"
+      ],
+      "title": "Condition",
+      "type": "string"
+    },
+    "source": {
+      "const": "research_scenario",
+      "default": "research_scenario",
+      "title": "Source",
+      "type": "string"
+    },
+    "assigned_recommendation": {
+      "enum": [
+        "consider_purchase",
+        "consider_waiting",
+        "reserve_at_risk"
+      ],
+      "title": "Assigned Recommendation",
+      "type": "string"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    },
+    "simulated_presentation": {
+      "const": true,
+      "default": true,
+      "title": "Simulated Presentation",
+      "type": "boolean"
+    },
+    "collection_enabled": {
+      "const": false,
+      "default": false,
+      "title": "Collection Enabled",
+      "type": "boolean"
+    },
+    "financial_truth": {
+      "$ref": "#/$defs/MultiverseResponse"
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/Transaction"
+      },
+      "title": "History",
+      "type": "array"
+    },
+    "outcomes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Outcomes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "scenario_id",
+    "instance_id",
+    "seed",
+    "condition",
+    "assigned_recommendation",
+    "explanation",
+    "financial_truth",
+    "history",
+    "outcomes"
+  ],
+  "title": "PreviewResult",
+  "type": "object"
+}

@@ -15,6 +15,7 @@ import { Route as CashFlowRouteImport } from './routes/cash-flow'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MonthlyPlanRouteImport } from './routes/monthly-plan'
 import { Route as OperatorRouteImport } from './routes/operator'
+import { Route as ResearchRouteImport } from './routes/research'
 import { Route as SimulatorRouteImport } from './routes/simulator'
 import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as TalkRouteImport } from './routes/talk'
@@ -49,6 +50,11 @@ const OperatorRoute = OperatorRouteImport.update({
   path: '/operator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResearchRoute = ResearchRouteImport.update({
+  id: '/research',
+  path: '/research',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimulatorRoute = SimulatorRouteImport.update({
   id: '/simulator',
   path: '/simulator',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/monthly-plan': typeof MonthlyPlanRoute
   '/operator': typeof OperatorRoute
+  '/research': typeof ResearchRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
   '/talk': typeof TalkRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/monthly-plan': typeof MonthlyPlanRoute
   '/operator': typeof OperatorRoute
+  '/research': typeof ResearchRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
   '/talk': typeof TalkRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/monthly-plan': typeof MonthlyPlanRoute
   '/operator': typeof OperatorRoute
+  '/research': typeof ResearchRoute
   '/simulator': typeof SimulatorRoute
   '/suggestions': typeof SuggestionsRoute
   '/talk': typeof TalkRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/monthly-plan'
     | '/operator'
+    | '/research'
     | '/simulator'
     | '/suggestions'
     | '/talk'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/monthly-plan'
     | '/operator'
+    | '/research'
     | '/simulator'
     | '/suggestions'
     | '/talk'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/monthly-plan'
     | '/operator'
+    | '/research'
     | '/simulator'
     | '/suggestions'
     | '/talk'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   MonthlyPlanRoute: typeof MonthlyPlanRoute
   OperatorRoute: typeof OperatorRoute
+  ResearchRoute: typeof ResearchRoute
   SimulatorRoute: typeof SimulatorRoute
   SuggestionsRoute: typeof SuggestionsRoute
   TalkRoute: typeof TalkRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OperatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/research': {
+      id: '/research'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simulator': {
       id: '/simulator'
       path: '/simulator'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   MonthlyPlanRoute: MonthlyPlanRoute,
   OperatorRoute: OperatorRoute,
+  ResearchRoute: ResearchRoute,
   SimulatorRoute: SimulatorRoute,
   SuggestionsRoute: SuggestionsRoute,
   TalkRoute: TalkRoute,

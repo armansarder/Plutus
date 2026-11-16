@@ -5,7 +5,7 @@ from typing import Literal
 from .models import Contract, Day
 
 class SourceInfo(Contract):
-    source: Literal['synthetic_demo', 'nessie_sandbox', 'configured_backend']
+    source: Literal['synthetic_demo', 'nessie_sandbox', 'configured_backend', 'research_scenario']
     label: str
     snapshot_date: Day
     snapshot_id: str

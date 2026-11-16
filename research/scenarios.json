@@ -1,0 +1,11 @@
+{
+  "experiment_version": "pilot-1",
+  "decision_rule": "reserve_and_applicable_stresses_v1",
+  "conditions": ["direct", "evidence", "multi_agent", "uncertainty"],
+  "outcomes": ["decision_correct", "decision_time_ms", "trust_1_to_7", "usefulness_1_to_7", "confidence_1_to_7", "explanation_acknowledged"],
+  "scenarios": [
+    {"id": "comfortable", "balance": "3000.00", "purchase": "400.00", "rent": "900.00", "income": "1300.00", "reserve": "200.00"},
+    {"id": "tight_timing", "balance": "1400.00", "purchase": "500.00", "rent": "700.00", "income": "1300.00", "reserve": "200.00"},
+    {"id": "shortfall", "balance": "300.00", "purchase": "500.00", "rent": "700.00", "income": "1300.00", "reserve": "200.00"}
+  ]
+}

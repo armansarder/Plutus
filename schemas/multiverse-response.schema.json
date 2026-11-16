@@ -450,7 +450,8 @@
           "enum": [
             "synthetic_demo",
             "nessie_sandbox",
-            "configured_backend"
+            "configured_backend",
+            "research_scenario"
           ],
           "title": "Source",
           "type": "string"

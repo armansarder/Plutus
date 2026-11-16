@@ -61,6 +61,8 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
     install_notifications(app, snapshot_dependency, label)
     from notifications.operator import install_operator
     install_operator(app, snapshot_dependency, label)
+    from research.preview import install_research
+    install_research(app)
     # Legacy shadow/mutation controls are retained in Git history, never installed.
 
     from .council_api import install_council

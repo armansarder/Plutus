@@ -81,7 +81,7 @@ export async function proxyFinancialData(request: Request): Promise<Response> {
       return result.success ? Response.json(result.data, {headers}) : error(502, "Invalid Multiverse evidence");
     }
     if (url.pathname === ENDPOINTS.source) {
-      const source = z.object({source: z.enum(["synthetic_demo", "nessie_sandbox", "configured_backend"]), label: z.string(), snapshot_date: z.string(), snapshot_id: z.string(), observed_at: z.string(), cache_max_seconds: z.number(), schedule_complete: z.literal(false)}).safeParse(await response.json());
+      const source = z.object({source: z.enum(["synthetic_demo", "nessie_sandbox", "configured_backend", "research_scenario"]), label: z.string(), snapshot_date: z.string(), snapshot_id: z.string(), observed_at: z.string(), cache_max_seconds: z.number(), schedule_complete: z.literal(false)}).safeParse(await response.json());
       return source.success ? Response.json(source.data, {headers}) : error(502, "Invalid provenance");
     }
     if (plan) {

@@ -56,3 +56,12 @@ This is anonymous fictional-demo authorization, not a personal-bank login. An
 actual multi-user financial product needs an identity provider and durable,
 user-owned storage before any real records are admitted. Operator and research
 credentials are separate from guest Council sessions.
+
+## Isolated research preview
+
+`POST /api/research/preview` uses `research-request.schema.json` and
+`research-response.schema.json`. Example: `{"scenario_id":"comfortable","seed":42,"condition":"evidence"}`.
+Both service bearer and separate operator token are required; feature defaults off.
+The four presentation conditions share identical engine truth and recommendation.
+`research-config.schema.json` versions scenario packs; `research-synthetic-event.schema.json`
+rejects real participant data. There is no participant ingestion/export API.

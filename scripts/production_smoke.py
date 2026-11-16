@@ -24,7 +24,7 @@ def smoke(web_url, api_url, source, verify=True):
                 import re
                 asset = re.search(r'(?:src|href)="(/assets/[^" ]+\.(?:js|css))"', response.text)
                 assert asset and client.get(web_url + asset[1]).status_code == 200, 'built asset'
-        for path in ('/operator', '/api/notifications/operator/state'):
+        for path in ('/operator', '/api/notifications/operator/state', '/research', '/api/operator/jobs'):
             assert client.get(web_url + path).status_code == 404, 'operator boundary'
         assert client.get(api_url + '/api/financial-data').status_code == 401, 'backend auth'
         response = client.get(web_url + '/api/financial-data')
