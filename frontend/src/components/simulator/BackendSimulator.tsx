@@ -52,7 +52,7 @@ function PurchaseCalculator({ snapshot }: { snapshot: SituationSnapshot }) {
   }
   const comparison = !mutation.isError && !mutation.isPending ? mutation.data?.comparison : undefined;
   const result = comparison?.scenarios.find(s => s.name === selected);
-  return <div><PageHeading eyebrow={`Your account Â· Try a decision`} title="What if you bought it?" description="Compare buying now, buying later or skipping a purchase using your backend records." />
+  return <div><PageHeading eyebrow={`Your account · Try a decision`} title="What if you bought it?" description="Compare buying now, buying later or skipping a purchase using your backend records." />
     <details className="mb-6 text-sm text-muted-foreground"><summary className="cursor-pointer">What this simulation includes</summary><p className="mt-2">This simulation uses your balance, scheduled income and expenses, and the purchase details you enter. It does not apply your saved cash plan or category budgets. Expenses missing from your schedule are not included.</p></details>
     <div className="grid items-start gap-8 lg:grid-cols-[320px_1fr]"><form className="panel space-y-4 p-5" noValidate onSubmit={e => { e.preventDefault(); submit(); }}>
       <h2 className="font-display text-lg font-semibold">What are you thinking of buying?</h2><p className="text-xs text-muted-foreground">Simulation only. No money moves.</p>
@@ -60,9 +60,9 @@ function PurchaseCalculator({ snapshot }: { snapshot: SituationSnapshot }) {
       <div><Label htmlFor="backend-date">Purchase date</Label><Input id="backend-date" type="date" min={start} max={end} value={date} onChange={e => setDate(e.target.value)} /></div>
       <div><Label htmlFor="backend-later">Or buy later on</Label><Input id="backend-later" type="date" min={start} max={end} value={later} onChange={e => setLater(e.target.value)} /></div>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? "Comparingâ€¦" : "Compare choices"}</Button>
+      <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? "Comparing…" : "Compare choices"}</Button>
     </form><div aria-live="polite" aria-busy={mutation.isPending}>
-      {mutation.isPending && <p role="status">Calculating your purchase and alternativesâ€¦</p>}
+      {mutation.isPending && <p role="status">Calculating your purchase and alternatives…</p>}
       {mutation.isError && <div role="alert"><p>We couldn't calculate these choices. Check the dates or refresh Current Situation if your records changed. No sample results were substituted.</p><Button className="mt-3" onClick={submit}>Try again</Button></div>}
       {!mutation.data && !mutation.isPending && !mutation.isError && <p className="panel p-6 text-muted-foreground">Enter a purchase to see its effect on your cash.</p>}
       {comparison && result && <><p className="mb-4 text-sm text-muted-foreground">Last completed comparison: {formatMoney(centsValue(mutation.data!.input.purchase.purchase_amount))} purchase on {formatDateOnly(mutation.data!.input.purchase.purchase_date)}, or later on {formatDateOnly(mutation.data!.input.later)}. Edit the form and compare again to update these results.</p><div className="mb-4 flex flex-wrap gap-2">{comparison.scenarios.map(s => <Button key={s.name} variant={s.name === selected ? "default" : "outline"} onClick={() => setSelected(s.name)}>{s.name}</Button>)}</div><h2 className="mb-3 font-display text-2xl">{selected}</h2><EngineSummary result={result} /><EngineComparisonChart comparison={comparison} selected={selected} /><EngineTimeline result={result} /><Button asChild className="mt-6"><Link to="/cash-flow">See cash flow</Link></Button></>}

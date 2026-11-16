@@ -56,10 +56,9 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
 
     from notifications.router import install_notifications
     install_notifications(app, snapshot_dependency, label)
-    if (app.state.security_settings.mode != 'production' and
-            os.getenv('PLUTUS_DEMO_MODE', 'false').lower() == 'true'):
-        from notifications.operator_demo import install_operator_demo
-        install_operator_demo(app)
+    from notifications.operator import install_operator
+    install_operator(app, snapshot_dependency, label)
+    # Legacy shadow/mutation controls are retained in Git history, never installed.
 
     from .council_api import install_council
     install_council(app, snapshot_dependency, label, provider=council_provider)

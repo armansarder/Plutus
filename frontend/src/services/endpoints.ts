@@ -1,6 +1,6 @@
 /**
  * Single source of truth for backend endpoint paths.
- * The /api/* routes are PROPOSED internal endpoints (Stage 2/3 brief) â€” teammates may not
+ * The /api/* routes are PROPOSED internal endpoints (Stage 2/3 brief) — teammates may not
  * have implemented them yet. Adjust paths here only. Existing /api/v1/* paths are the
  * Stage 1 contracts.
  */

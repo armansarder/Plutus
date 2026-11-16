@@ -1,5 +1,36 @@
 # Plutus v1 final: original design + Photon alerts
 
+## V2 reliability update
+
+The public demo remains preview-only. `notifications/jobs.py` now commits stable
+trigger claims, public events and durable jobs together before transport. SQLite
+stores a delivery attempt ledger; jobs have queued, submitting, preview,
+provider_accepted, delivery_unconfirmed, failed or cancelled states. A provider
+receipt endpoint is not available; no state means confirmed delivered.
+
+Connection refusal before submission can retry at most three times, with 10/20/40
+second backoff. Due jobs run on explicit checks, private Process due jobs, or the
+opt-in polling loop. Unknown outcomes/timeouts and interrupted submitting jobs
+never retry automatically. Disable preferences to cancel pending work on its next
+processing check. Durable storage must be configured on a single instance.
+
+Private `/operator` now uses the existing design with real job summaries and
+engine-backed evaluation. The old shadow/bank-mutation console is no longer
+installed. To enable private tools on a trusted local/private deployment, configure
+`PLUTUS_PRIVATE_TOOLS=1` on Node and Python, `PLUTUS_OPERATOR_TOKEN` (same separate
+32+ character server-only secret on both), and `PLUTUS_OPERATOR_PASSWORD` (32+
+characters, Node only). HTTP Basic username is `operator`; public hosts require
+HTTPS. Missing credentials/flag deny access, and the ordinary public demo leaves
+all private-tool flags off. Do not put any of these secrets in `VITE_*` variables.
+Every backend operator call requires both the service bearer and operator token;
+the Node gateway also checks same-origin mutations. Summaries omit message bodies,
+account records and recipients. Retry/cancel rejects unsafe states and foreign jobs.
+
+The Spectrum sender is an iMessage integration, not verified SMS. Live provider
+acceptance/delivery remain unverified. No sender was started and no messages were
+sent during V2 implementation. Provider credentials, enrollment and an authorized
+test send are still required for external verification.
+
 Branch `Plutus-v1-final` starts at `arman-shiv-combined-branch` commit `cab91b5`.
 No full branch merge was used. The Photon sender/package lock were copied from
 `photon-alerts`; its alert workflow was adapted to the real configured account.

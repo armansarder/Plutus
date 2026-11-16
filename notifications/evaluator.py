@@ -39,7 +39,11 @@ def deliver_message(text):
     try:
         with urlopen(req,timeout=12) as response:
             return 'submitted_not_delivery_confirmed' if response.status in (200,202) else 'sender_rejected'
-    except Exception:return 'delivery_unconfirmed'
+    except Exception as exc:
+        from urllib.error import URLError
+        if isinstance(exc, URLError) and isinstance(exc.reason, ConnectionRefusedError):
+            return 'sender_unavailable'
+        return 'delivery_unconfirmed'
 
 def purchase_evidence(snapshot,item,source):
     start=snapshot.as_of_date+timedelta(days=snapshot.snapshot_basis=='intraday')
@@ -76,8 +80,10 @@ def record_alert(db,scope,key,kind,text):
     cursor=db.execute('INSERT INTO notification_events(scope,event_key,kind,text,status,created_at) VALUES (?,?,?,?,?,?)',
         (scope,scope+':'+key,kind,text,'claimed_not_submitted',now()))
     event_id=cursor.lastrowid
-    db.commit() # Claim before sending. Never retry an uncertain submission automatically.
-    status=deliver_message(text)
+    from .jobs import enqueue, process
+    job_id=enqueue(db,scope,scope+':'+key,kind,text)
+    db.commit() # Claim, public event and durable job commit together before sending.
+    status=process(job_id,deliver_message) or 'delivery_unconfirmed'
     db.execute('UPDATE notification_events SET status=? WHERE id=?',(status,event_id))
     # Retain only the latest 100 events for this account.
     db.execute('DELETE FROM notification_events WHERE scope=? AND id NOT IN (SELECT id FROM notification_events WHERE scope=? ORDER BY id DESC LIMIT 100)',(scope,scope))

@@ -9,7 +9,7 @@ import { useCustomerFinancialData } from "./CustomerFinancialData";
 
 function BackendDataBadge() {
   const query = useCustomerFinancialData();
-  const label = query.isError ? "Backend data unavailable" : query.isPending ? "Loading backend dataâ€¦" : query.data.backend?.source === "nessie_sandbox" ? "Nessie sandbox data" : query.data.backend?.source === "synthetic_demo" ? "Fictional demo data" : "Backend-connected data";
+  const label = query.isError ? "Backend data unavailable" : query.isPending ? "Loading backend data…" : query.data.backend?.source === "nessie_sandbox" ? "Nessie sandbox data" : query.data.backend?.source === "synthetic_demo" ? "Fictional demo data" : "Backend-connected data";
   return <span className="text-xs text-muted-foreground" title={query.data ? `Snapshot ${query.data.startDate}; schedule completeness unverified` : undefined}>{label}</span>;
 }
 

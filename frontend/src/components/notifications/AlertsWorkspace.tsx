@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { formatMoney,parseDollarsToCents } from "@/lib/formatMoney";
 import { notificationAdapter } from "@/services/notifications";
 import type { AlertPreferences } from "@/types/notifications";
-const STATUS:Record<string,string>={preview_only:"Preview — no text sent",submitted_not_delivery_confirmed:"Submitted to Photon — delivery unconfirmed",blocked_not_enrolled:"Blocked — recipient not enrolled",blocked_missing_sender_secret:"Blocked — sender not configured",sender_rejected:"Sender rejected the request",delivery_unconfirmed:"Delivery unconfirmed — no automatic retry",claimed_not_submitted:"Submission interrupted — no automatic retry"};
+const STATUS:Record<string,string>={sender_unavailable:"Queued - sender connection refused; bounded retry pending",preview_only:"Preview — no text sent",submitted_not_delivery_confirmed:"Submitted to Photon — delivery unconfirmed",blocked_not_enrolled:"Blocked — recipient not enrolled",blocked_missing_sender_secret:"Blocked — sender not configured",sender_rejected:"Sender rejected the request",delivery_unconfirmed:"Delivery unconfirmed — no automatic retry",claimed_not_submitted:"Submission interrupted — no automatic retry"};
 export function AlertsWorkspace(){
  const client=useQueryClient();const [feedback,setFeedback]=useState("");
  const settings=useQuery({queryKey:["alert-settings"],queryFn:({signal})=>notificationAdapter.settings(signal),retry:false});

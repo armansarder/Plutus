@@ -1,4 +1,5 @@
 import { isNotificationPath, proxyNotifications } from "./notificationsProxy.server";
+import { privateAccess, proxyPrivate } from "./privateGateway.server";
 import { isCouncilPath, proxyCouncil } from "./councilProxy.server";
 import { proxyFinancialData, FINANCIAL_PROXY_PATHS } from "./financialProxy.server";
 import "./lib/error-capture";
@@ -53,10 +54,14 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const path = new URL(request.url).pathname;
+    if (path.startsWith("/api/operator/") || path.startsWith("/api/research/")) return proxyPrivate(request);
+    if (path === "/operator" || path.startsWith("/operator/") || path === "/research") {
+      const denied = privateAccess(request); if (denied) return denied;
+    }
     if (path === "/health" && ["GET", "HEAD"].includes(request.method)) {
       return Response.json({ status: "ok" }, { headers: { "Cache-Control": "no-store" } });
     }
-    if (process.env["NODE_ENV"] === "production" && (path === "/operator" || path.startsWith("/operator/") || path.startsWith("/api/notifications/operator/"))) {
+    if (process.env["NODE_ENV"] === "production" && path.startsWith("/api/notifications/operator/")) {
       return new Response("Not found", { status: 404 });
     }
     if (isNotificationPath(new URL(request.url).pathname)) return proxyNotifications(request);
