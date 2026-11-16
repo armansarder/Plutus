@@ -70,7 +70,7 @@ it("keeps customer identity and one shared snapshot while navigating all financi
     fireEvent.click(link!);
     expect(await screen.findByText(message)).toBeInTheDocument();
     expect(screen.getByText(/Your account/)).toBeInTheDocument();
-    expect(screen.getByText("Backend-connected data")).toBeInTheDocument();
+    expect(screen.getByText("Fictional demo data")).toBeInTheDocument();
     expect(screen.queryByText("Synthetic sample data · Alex")).not.toBeInTheDocument();
   }
   expect(fetch).toHaveBeenCalledTimes(2);

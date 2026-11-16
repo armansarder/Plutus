@@ -52,6 +52,13 @@ function isH3SwallowedErrorBody(body: string): boolean {
 // twice and renders garbled.
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const path = new URL(request.url).pathname;
+    if (path === "/health" && ["GET", "HEAD"].includes(request.method)) {
+      return Response.json({ status: "ok" }, { headers: { "Cache-Control": "no-store" } });
+    }
+    if (process.env["NODE_ENV"] === "production" && (path === "/operator" || path.startsWith("/operator/") || path.startsWith("/api/notifications/operator/"))) {
+      return new Response("Not found", { status: 404 });
+    }
     if (isNotificationPath(new URL(request.url).pathname)) return proxyNotifications(request);
     if (isCouncilPath(new URL(request.url).pathname)) return proxyCouncil(request);
     if ((FINANCIAL_PROXY_PATHS as readonly string[]).includes(new URL(request.url).pathname)) return proxyFinancialData(request);

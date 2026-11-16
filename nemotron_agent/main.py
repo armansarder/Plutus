@@ -47,7 +47,8 @@ def create_app(source=None, settings=None, provider=None, council_provider=None)
 
     from notifications.router import install_notifications
     install_notifications(app, snapshot_dependency, label)
-    if os.getenv('PLUTUS_DEMO_MODE', 'false').lower() == 'true':
+    if (app.state.security_settings.mode != 'production' and
+            os.getenv('PLUTUS_DEMO_MODE', 'false').lower() == 'true'):
         from notifications.operator_demo import install_operator_demo
         install_operator_demo(app)
 

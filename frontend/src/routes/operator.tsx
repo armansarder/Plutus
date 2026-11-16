@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, DollarSign, Eye, MessageSquare, Radio, RotateCcw, ShieldAlert, ShoppingBag, Zap } from "lucide-react";
@@ -11,6 +11,7 @@ import { operatorDemoAdapter, type OperatorDemoEvent } from "@/services/notifica
 import { formatMoney } from "@/lib/formatMoney";
 
 export const Route = createFileRoute("/operator")({
+  beforeLoad: () => { if (import.meta.env.PROD) throw notFound(); },
   head: () => ({ meta: [{ title: "Demo Operator Console — Plutus" }, { name: "description", content: "Private local Photon demonstration controls." }] }),
   component: OperatorPage,
 });

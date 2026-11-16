@@ -1,5 +1,11 @@
 # Plutus
 
+For the independent public fictional-customer demo, see [Render deployment](DEPLOYMENT.md)
+for exact production commands, private environment configuration, dashboard steps,
+and smoke checks. Deployment uses a Node web service plus one combined Python API;
+the Photon operator interface is blocked in production. Do not use the local
+launcher as a production start command.
+
 Financial council and four specialist chats are available locally; see
 [Council integration](nemotron_agent/COUNCIL.md) for contracts and limitations.
 

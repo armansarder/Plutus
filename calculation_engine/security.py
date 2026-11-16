@@ -112,13 +112,18 @@ class SecurityMiddleware:
 
         # Ignore forwarded headers here. Only an explicitly trusted deployment proxy
         # may change the ASGI scheme/client before this middleware.
-        if settings.mode == 'production' and scope.get('scheme') != 'https':
+        health_probe = scope.get('path') == '/health' and scope['method'] in ('GET', 'HEAD')
+        if settings.mode == 'production' and scope.get('scheme') != 'https' and not health_probe:
             return await reject(400, 'https_required', 'HTTPS is required')
         client = scope.get('client')
         if settings.mode == 'local' and not settings.api_token and (
             not client or client[0] not in ('127.0.0.1', '::1', 'testclient')
         ):
             return await reject(403, 'local_only', 'Unauthenticated mode is loopback-only')
+
+        if health_probe:
+            # No account/provider information; Render probes may use internal HTTP.
+            return await JSONResponse({'status': 'ok'})(scope, receive, secure_send)
 
         with self.lock:
             now = time.monotonic()

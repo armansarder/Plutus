@@ -12,6 +12,7 @@ export async function proxyNotifications(request:Request):Promise<Response>{
  if(!isNotificationPath(url.pathname)||url.search)return fail(404);
  if(request.headers.get("sec-fetch-site")==="cross-site"||(request.headers.get("origin")&&request.headers.get("origin")!==url.origin))return fail(403);
  const suffix=url.pathname.slice("/api/notifications/".length),remove=suffix.startsWith("watchlist/"),operator=suffix.startsWith("operator/");
+ if(operator && process.env["NODE_ENV"] === "production")return fail(404);
  const methods=operator?(suffix.endsWith("/state")||suffix.endsWith("/watchlist")||suffix.endsWith("/history")?["GET"]:["POST"]):remove?["DELETE"]:suffix==="settings"?["GET","PUT"]:suffix==="watchlist"?["GET","POST"]:suffix==="history"?["GET"]:["POST"];
  if(!methods.includes(request.method))return fail(405);
  let body:string|undefined;
